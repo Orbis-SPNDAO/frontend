@@ -1,25 +1,26 @@
-import { useRouter } from "next/router"
-import { FC, useState } from "react"
+import { useRouter } from "next/router";
+import { FC } from "react";
 
-import useIsMounted from "../hooks/useIsMounted"
+import useIsMounted from "../hooks/useIsMounted";
 
-import { useMMContext } from "../context/MMProvider"
+import { useMMContext } from "../context/MMProvider";
+import { abbrevAccount } from "../utils";
 
 type HeaderProps = {
-  type?: string
-}
+  type?: string;
+};
 
 const Header: FC<HeaderProps> = ({}) => {
-  const mm = useMMContext().mmContext
-  const router = useRouter()
-  const isMounted = useIsMounted()
+  const mm = useMMContext().mmContext;
+  const router = useRouter();
+  const isMounted = useIsMounted();
 
   return (
-    <div className="min-h-full shadow-sm">
+    <div className="min-h-full">
       <div className="container mx-auto px-6 flex items-center h-20 text-gray-600">
         <div className="flex items-center justify-between w-full">
           <button
-            className="text-extrabold text-4xl text-violet-600 w-32 flex items-center justify-center"
+            className="font-medium text-4xl flex text-custom-purple items-center justify-center"
             onClick={() => router.push("/")}
           >
             <h2>Pattern DAO</h2>
@@ -28,16 +29,16 @@ const Header: FC<HeaderProps> = ({}) => {
           <div className="flex items-center space-x-6 z-50">
             {!isMounted ? null : mm.status == "connected" ? (
               <button
-                className="text-bold text-md rounded-xl text-violet-600 border-2 border-gray-100 py-2 px-6 max-w-xs truncate"
+                className="font-medium text-md rounded-xl border-solid border-slate-300 border text-black py-2 px-6 max-w-xs"
                 onClick={() => {
-                  router.push("/dashboard")
+                  router.push("/dashboard");
                 }}
               >
-                {mm.account}
+                {abbrevAccount(mm.account!)}
               </button>
             ) : (
               <button
-                className="text-bold text-md rounded-xl text-violet-600 border-2 border-gray-100 py-2 px-6"
+                className="text-bold text-md rounded-xl text-custom-purple border-2 border-gray-100 py-2 px-6"
                 onClick={mm.connect}
               >
                 Sign in with wallet
@@ -46,14 +47,8 @@ const Header: FC<HeaderProps> = ({}) => {
           </div>
         </div>
       </div>
-      {/* <ConnectModal
-        onClose={() => setOpenConnectModal(false)}
-        open={openConnectModal}
-        modalTitle="Connect Wallet"
-      />
-      </div>     */}
     </div>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

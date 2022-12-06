@@ -1,137 +1,125 @@
-import { ethers } from "ethers"
-import { useRouter } from "next/router"
-import { useRef, useState } from "react"
-import { AiFillDatabase, AiFillStar } from "react-icons/ai"
-import { BiUpload } from "react-icons/bi"
-import { IoIosCheckmark } from "react-icons/io"
-import useIsMounted from "../hooks/useIsMounted"
-import PageLayout from "../components/layouts/PageLayout"
-import Spinner from "../components/Spinner"
-import { useEthersContext } from "../context/EthersProvider"
-import { useMMContext } from "../context/MMProvider"
-import { SBT_ABI } from "../abis/currentABI"
+import { ethers } from "ethers";
+import { useRouter } from "next/router";
+import { useRef, useState } from "react";
+import { AiFillDatabase, AiFillStar } from "react-icons/ai";
+import { BiUpload } from "react-icons/bi";
+import { IoIosCheckmark } from "react-icons/io";
+import useIsMounted from "../hooks/useIsMounted";
+import PageLayout from "../components/layouts/PageLayout";
+import Spinner from "../components/Spinner";
+import { useEthersContext } from "../context/EthersProvider";
+import { useMMContext } from "../context/MMProvider";
+import { SBT_ABI } from "../abis/currentABI";
+import Subtitle from "../components/Subtitle";
 var crypto = require("crypto");
 
 enum JoinState {
   Start = "start",
   UploadingCsv = "uploading-csv",
-  UploadSuccess = "upload-success",
   UploadFailure = "upload-failure",
   MintToken = "mint-token",
   MintSuccess = "mint-success",
   MintFailure = "mint-failure",
 }
 
-let cid = ""
+let cid = "";
 
 export default function Join() {
-  const mm = useMMContext().mmContext
+  const mm = useMMContext().mmContext;
   const provider = useEthersContext()
-    .ethersContext as ethers.providers.Web3Provider
-  const router = useRouter()
-  const isMounted = useIsMounted()
+    .ethersContext as ethers.providers.Web3Provider;
+  const router = useRouter();
+  const isMounted = useIsMounted();
 
-  const [joinState, setJoinState] = useState<JoinState>(JoinState.Start)
+  const [joinState, setJoinState] = useState<JoinState>(JoinState.Start);
 
-  const fileRef = useRef<HTMLInputElement | null>()
+  const fileRef = useRef<HTMLInputElement | null>();
 
   // loads file client side so server can see it
   const uploadToClient = async (event: any) => {
-    const file = event.target.files[0]
+    const file = event.target.files[0];
 
-    uploadToServer(file)
-  }
+    uploadToServer(file);
+  };
 
   function clickFileInput() {
-    fileRef?.current?.click()
+    fileRef?.current?.click();
   }
 
   const uploadToServer = async (file: File) => {
-    setJoinState(JoinState.UploadingCsv)
+    setJoinState(JoinState.UploadingCsv);
 
     try {
-      const file_id = crypto.randomBytes(20).toString('hex');
+      const file_id = crypto.randomBytes(20).toString("hex");
 
       const path = JSON.stringify({ path: `./public/uploads/${file_id}.csv` });
 
-      const body = new FormData()
-      body.append("file", file)
-      body.append('id', file_id);
+      const body = new FormData();
+      body.append("file", file);
+      body.append("id", file_id);
 
-
-      fetch("/api/saveFile", { method: "POST", body })
-      .then(() => {
+      fetch("/api/saveFile", { method: "POST", body }).then(() => {
         fetch("/api/ipfs", { method: "POST", body: path })
-        .then((res) => res.json())
-        .then( (new_cid) => { cid = new_cid;})        
-        // .then( () => {
-        //   console.log(cid);
-        // })
-        .then( () => {
-          fetch("/api/cleanup", { method: "POST", body: path })        
-        });
-      })
-    
-      setJoinState(JoinState.UploadSuccess)
+          .then((res) => res.json())
+          .then((new_cid) => {
+            cid = new_cid;
+          })
+          // .then( () => {
+          //   console.log(cid);
+          // })
+          .then(() => {
+            fetch("/api/cleanup", { method: "POST", body: path });
+          });
+      });
+
+      setJoinState(JoinState.MintToken);
     } catch (e: any) {
-      console.error(`An error occured during uploading the file: ${e.message}`)
-      setJoinState(JoinState.UploadFailure)
+      console.error(`An error occured during uploading the file: ${e.message}`);
+      setJoinState(JoinState.UploadFailure);
     }
-  }
+  };
 
   async function onMintToken() {
     // FOR TESTING
     if (provider == undefined) {
-      console.log("no provider")
-      return
+      console.log("no provider");
+      return;
     } else if (cid == undefined || cid == "") {
-      console.log("invalid cid")
-      return
+      console.log("invalid cid");
+      return;
     }
 
     try {
-      await provider.send("eth_requestAccounts", [])
-      const signer = provider.getSigner()
+      await provider.send("eth_requestAccounts", []);
+      const signer = provider.getSigner();
 
       const PatternDAO = new ethers.Contract(
         process.env.NEXT_PUBLIC_SBT_ADDR!,
         SBT_ABI as ethers.ContractInterface,
         signer
-      )
+      );
 
-      await PatternDAO.safeMint(mm.account!, cid)
-      // await tx.wait(); // wait for the transaction to be mined
-      setJoinState(JoinState.MintSuccess)
+      await PatternDAO.safeMint(mm.account!, cid);
+      setJoinState(JoinState.MintSuccess);
     } catch (e) {
-      console.log(e)
-      setJoinState(JoinState.MintFailure)
+      console.log(e);
+      setJoinState(JoinState.MintFailure);
     }
-
-    // await PatternDAO.balanceOf(account!)
-    // .then(parseInt)
-    // .then(console.log)
-
-    // await provider.getBalance(account!)
-    //   .then(ethers.utils.formatEther)
-    //   .then(console.log)
   }
 
   function onViewDashboard() {
-    router.push("/dashboard")
+    router.push("/dashboard");
   }
 
   function showTitle() {
-    let title = null
+    let title = null;
     switch (joinState) {
       case JoinState.Start:
-        title = "Upload a CSV file"
-        break
+        title = "Upload a CSV file";
+        break;
       case JoinState.UploadingCsv:
-        title = "Uploading your files..."
-        break
-      case JoinState.UploadSuccess:
-        title = "Upload successful!"
-        break
+        title = "Uploading to IPFS...";
+        break;
       case JoinState.UploadFailure:
       case JoinState.MintFailure:
         title = (
@@ -139,114 +127,90 @@ export default function Join() {
             <p>We&apos;re really sorry.</p>
             <p>An error occurred, please refresh the page and try again.</p>
           </>
-        )
-        break
+        );
+        break;
       case JoinState.MintToken:
-        title = "Data encrypted. You can mint your token now"
-        break
+        title = "Upload successful! Mint your token now";
+        break;
       case JoinState.MintSuccess:
-        title = "Token mint successful"
-        break
+        title = "Token mint successful";
+        break;
       default:
-        break
+        break;
     }
 
-    return title
+    return title;
   }
 
   function showContent() {
-    let content = null
+    let content = null;
 
     switch (joinState) {
       case JoinState.Start:
         content = (
-          // <div className="mx-auto w-1/2 mt-24 py-24 px-8 py-2 border-2 border-dashed border-gray-500 rounded-xl bg-white">
-          // <button
-          //   className="mx-auto flex flex-col items-center rounded-xl"
-          //   onClick={() => clickFileInput()}
-          // >
-          //   <div className="text-violet-600 text-bold text-5xl ">
-          //     <BiUpload />
-          //   </div>
+          <>
+            <Subtitle>
+              Please remove all sensitive personal identifiable information. See
+              the list{" "}
+              <a
+                href="https://www.investopedia.com/terms/p/personally-identifiable-information-pii.asp#:~:text=Key%20Takeaways%201%20Personally%20identifiable%20information%20%28PII%29%20uses,license%2C%20financial%20information%2C%20and%20medical%20records.%20More%20items"
+                target="blank"
+                className="underline text-blue-500"
+              >
+                here
+              </a>
+              .
+            </Subtitle>
 
-          <div className="mx-auto w-1/2 mt-24 py-24 px-8 py-2 border-2 border-dashed border-gray-500 rounded-xl bg-white">
-            {/* <form onSubmit={uploadToServer}>
-              <input id="images" type="file" onChange={uploadToClient} />
-              <br></br>
-              <button type="submit">Upload</button>
-            </form> */}
+            <div className="mx-auto w-1/2 mt-24 py-24 px-8 py-2 border-2 border-dashed border-gray-500 rounded-xl bg-white">
+              <button
+                className="mx-auto flex flex-col items-center rounded-xl"
+                onClick={() => {
+                  clickFileInput();
+                }}
+              >
+                <div className="text-violet-600 text-bold text-5xl ">
+                  <BiUpload />
+                </div>
 
-            {/* TEST BUTTON */}
+                <p>
+                  <span className="text-violet-600 text-bold">Browse</span> your
+                  files
+                </p>
+              </button>
 
-            {/* <button onClick={onMintToken}>Mint Token</button> */}
-
-            <button
-              className="mx-auto flex flex-col items-center rounded-xl"
-              onClick={() => {
-                clickFileInput()
-              }}
-            >
-              <div className="text-violet-600 text-bold text-5xl ">
-                <BiUpload />
-              </div>
-
-              <p>
-                <span className="text-violet-600 text-bold">Browse</span> your
-                files
-              </p>
-            </button>
-
-            <input
-              ref={(ref) => (fileRef.current = ref)}
-              type="file"
-              accept=".csv"
-              // accept=".csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-              className="hidden"
-              // className="flex justify-center mt-10 w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-600 hover:file:bg-violet-100"
-              onChange={uploadToClient}
-            />
-          </div>
-        )
-        break
+              <input
+                ref={(ref) => (fileRef.current = ref)}
+                type="file"
+                accept=".csv"
+                className="hidden"
+                onChange={uploadToClient}
+              />
+            </div>
+          </>
+        );
+        break;
       case JoinState.UploadingCsv:
         content = (
-          <div className="mx-auto w-1/2 mt-24 py-24 px-8 py-2 border-2 border-dashed border-gray-500 rounded-xl bg-white">
-            <div className="mx-auto flex flex-col items-center rounded-xl">
-              <Spinner />
+          <>
+            <Subtitle>
+              Your file will be encrypted immediately, and will be uploaded to
+              and stored on decentralized storage provided by IPFS.
+            </Subtitle>
+            <div className="mx-auto w-1/2 mt-24 py-24 px-8 py-2 border-2 border-dashed border-gray-500 rounded-xl bg-white">
+              <div className="mx-auto flex flex-col items-center rounded-xl">
+                <Spinner />
 
-              <p className="mt-4">This may take a while...</p>
-              <p>Please do not close your browser</p>
+                <p className="mt-4">This may take a while...</p>
+                <p>Please do not close your browser</p>
+              </div>
             </div>
-          </div>
-        )
-        break
-      case JoinState.UploadSuccess:
-        // content = (
-        //   <div className="mx-auto w-1/2">
-        //     <div className="mt-24 py-24 px-8 py-2 border-2 border-dashed border-gray-500 rounded-xl bg-white">
-        //       <div className="mx-auto flex flex-col items-center rounded-xl">
-        //         <div className="rounded-full py-4 px-4 text-bold text-5xl border-2 border-violet-600 text-violet-600">
-        //           <IoIosCheckmark />
-        //         </div>
-
-        //         <p className="mt-4">Your IPFS link has been generated!.</p>
-        //         <p># CID #</p>
-        //       </div>
-        //     </div>
-        //     <button
-        //       className="bg-violet-600 text-white text-bold text-xl rounded-xl mt-24 px-16 py-2"
-        //       onClick={() => onEncryptUrl()}
-        //     >
-        //       Encrypt URL
-        //     </button>
-        //   </div>
-        // )
-        setJoinState(JoinState.MintToken)
-
-        break
+          </>
+        );
+        break;
       case JoinState.UploadFailure:
       case JoinState.MintFailure:
-        break
+        break;
       case JoinState.MintToken:
         content = (
           <div className="flex flex-col items-center mx-auto mt-24 py-24 px-8">
@@ -261,8 +225,8 @@ export default function Join() {
               Mint token
             </button>
           </div>
-        )
-        break
+        );
+        break;
       case JoinState.MintSuccess:
         content = (
           <div className="flex flex-col items-center mx-auto mt-18 py-24 px-8">
@@ -292,35 +256,28 @@ export default function Join() {
               View in dashboard
             </button>
           </div>
-        )
-        break
+        );
+        break;
 
       default:
-        break
+        break;
     }
 
-    return content
+    return content;
   }
 
   return (
-    <PageLayout containerClassName="bg-gray-50">
-      <div className="w-full min-h-screen bg-cover ">
-        <div className="text-center mt-32">
-          {!isMounted ? null : mm.status != "connected" ? (
-            <h1 className="font-bold text-4xl leading-tight">Please sign in</h1>
-          ) : (
-            <>
-              <h1 className="font-bold text-4xl leading-tight">
-                {showTitle()}
-              </h1>
-
-              <div className="mt-10">Explanatory text, lorem ipsum...</div>
-
-              {showContent()}
-            </>
-          )}
-        </div>
+    <PageLayout containerClassName="bg-custom-blue bg-cover min-h-screen">
+      <div className="text-center mt-32 w-full">
+        {!isMounted ? null : mm.status != "connected" ? (
+          <h1 className="font-bold text-4xl leading-tight">Please sign in</h1>
+        ) : (
+          <>
+            <h1 className="font-bold text-4xl leading-tight">{showTitle()}</h1>
+            {showContent()}
+          </>
+        )}
       </div>
     </PageLayout>
-  )
+  );
 }

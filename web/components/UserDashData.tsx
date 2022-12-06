@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ethers } from "ethers";
+import { Contract, providers, Signer } from "ethers";
 
 import { useMMContext } from "../context/MMProvider";
 import { useEthersContext } from "../context/EthersProvider";
@@ -9,6 +9,7 @@ import Spinner from "./Spinner";
 type Nft = {
   status: number;
   totalItems: number;
+  tokenId: number;
   items: [
     {
       id: string;
@@ -27,11 +28,12 @@ type Nft = {
 
 export default function UserDashData() {
   const mm = useMMContext().mmContext;
-  const provider = useEthersContext()
-    .ethersContext as ethers.providers.Web3Provider;
-  const [list, setList] = useState<any[]>([]);
+  const provider = useEthersContext().ethersContext as providers.Web3Provider;
+  const [list, setList] = useState<Nft[]>([]);
   const [loaded, setLoaded] = useState<boolean>(false);
   const [isBurning, setIsBurning] = useState(false);
+  const [signer, setSigner] = useState<Signer | null>(null);
+  const [contract, setContract] = useState<Contract | null>(null);
 
   // updates dashboard if mm or provider changes
   useEffect(() => {
@@ -40,19 +42,23 @@ export default function UserDashData() {
       setList([]);
 
       const signer = provider.getSigner();
-      const contract = new ethers.Contract(
+      const contract = new Contract(
         process.env.NEXT_PUBLIC_SBT_ADDR!,
         SBT_ABI,
         signer
       );
-      const bal = await contract.balanceOf(mm.account!);
+      setSigner(signer);
+      setContract(contract);
+      const bal = parseInt(await contract.balanceOf(mm.account), 10);
 
+      const newList: any[] = [];
       // first token is just to initialize the array
       for (let i = 1; i < bal; i++) {
         await contract
           .ownerToTokenIds(mm.account!, i)
           .then(parseInt)
           .then((id: any) => {
+            console.log({ id });
             contract.cidList(id).then((cid: string) => {
               fetch("/api/getData", {
                 method: "POST",
@@ -63,7 +69,8 @@ export default function UserDashData() {
               })
                 .then((res) => res.json())
                 .then((data) => {
-                  setList((list) => [...list, JSON.stringify(data)]);
+                  newList.push({ ...data, tokenId: i });
+                  if (i === bal - 1) setList(newList);
                 });
             });
           });
@@ -77,14 +84,14 @@ export default function UserDashData() {
     }
   }, [provider, mm]);
 
-  function burnToken(tokenId: string) {
+  async function burnToken(tokenId: number) {
     setIsBurning(true);
-
-    setTimeout(() => {
-      console.log(`Burn token with id ${tokenId}`);
-      console.log("Not Implemented yet");
-      setIsBurning(false);
-    }, 2000);
+    console.log(`Burn token with id ${tokenId}`);
+    if (contract && signer) {
+      console.log(mm.account, tokenId)
+      await contract.userBurn(mm.account, tokenId);
+    }
+    setIsBurning(false);
   }
 
   if (!loaded) {
@@ -102,8 +109,8 @@ export default function UserDashData() {
   } else {
     return (
       <div className="flex flex-col items-center mx-auto px-8">
-        {list.map((item, index) => {
-          const nft = JSON.parse(item) as Nft;
+        {list.map((nft, index) => {
+          console.log({ nft });
           return (
             <div
               key={index}
@@ -112,7 +119,7 @@ export default function UserDashData() {
               <div className="flex flex-col items-start">
                 <p className="text-bold text-gray-500">Token Name</p>
                 <p className="truncate max-w-xs text-bold text-gray-500">
-                  {nft?.items[0].name.substring(0, 8)}
+                  {nft.items[0].name.substring(0, 8)}
                 </p>
               </div>
               <div className="ml-8 flex flex-col items-start">
@@ -129,7 +136,7 @@ export default function UserDashData() {
               <button
                 className="ml-8 bg-violet-600 text-white text-bold text-md rounded-md px-6 py-2"
                 disabled={!!isBurning}
-                onClick={() => burnToken(nft?.items[0].id)}
+                onClick={() => burnToken(nft.tokenId)}
               >
                 {!!isBurning ? <Spinner /> : "Burn"}
               </button>
