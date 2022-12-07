@@ -1,43 +1,34 @@
-import Image from "next/image";
 import { useRouter } from "next/router";
 import PageLayout from "../components/layouts/PageLayout";
 
-import { ethers } from "ethers";
-import { useEthersContext } from "../context/EthersProvider";
-import { useMMContext } from "../context/MMProvider";
-import { ADMIN_ABI } from "../abis/currentABI";
 import { useEffect } from "react";
+import { ADMIN_ABI } from "../abis/currentABI";
 
+import { useAccount, useContract, useProvider } from "wagmi";
 import AdminDashData from "../components/AdminDashData";
 
 export default function Home() {
-  const mm = useMMContext().mmContext;
-  const provider = useEthersContext()
-    .ethersContext as ethers.providers.Web3Provider;
+  const provider = useProvider();
+  const contract = useContract({
+    address: process.env.NEXT_PUBLIC_ADMIN_ADDR,
+    abi: ADMIN_ABI,
+    signerOrProvider: provider,
+  });
+  const { address } = useAccount();
   const router = useRouter();
 
   useEffect(() => {
     // check for admin NFT
     async function checkForAdminNFT() {
-      if (provider == undefined) {
+      if (!provider) {
         console.log("no provider");
         return;
-      } else if (mm.status != "connected") {
-        console.log("mm not connected");
+      } else if (!contract) {
+        console.log("No Contract");
         return;
       }
-
       try {
-        await provider.send("eth_requestAccounts", []);
-        const signer = provider.getSigner();
-
-        const PatternDAOAdmin = new ethers.Contract(
-          process.env.NEXT_PUBLIC_ADMIN_ADDR!,
-          ADMIN_ABI as ethers.ContractInterface,
-          signer
-        );
-        const bal = await PatternDAOAdmin.balanceOf(mm.account!);
-        // console.log(`bal: ${bal}`)
+        const bal = await contract.balanceOf(address);
 
         if (bal > 0) {
           console.log("admin NFT found");
@@ -46,19 +37,19 @@ export default function Home() {
           // router.push("/")
         }
       } catch (e) {
-        console.log(mm.account);
+        console.log(address);
         router.push("/");
       }
     }
 
     checkForAdminNFT();
-  }, [mm, provider]);
+  }, [address, contract, router]);
 
   return (
-    <PageLayout containerClassName="bg-stone-900 min-h-screen">
+    <PageLayout containerClassName="bg-custom-blue min-h-screen">
       <div className="w-full bg-cover">
         <div className="text-center mt-32">
-          <h1 className="font-bold text-6xl leading-tight">Decrypted Data</h1>
+          <h1 className="font-bold text-6xl leading-tight text-custom-purple">Decrypted Data</h1>
 
           <div className="mt-8 flex flex-col items-center mx-auto">
             <AdminDashData />

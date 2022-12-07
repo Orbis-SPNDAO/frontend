@@ -1,16 +1,14 @@
-import { ethers } from "ethers";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { AiFillDatabase, AiFillStar } from "react-icons/ai";
 import { BiUpload } from "react-icons/bi";
 import { IoIosCheckmark } from "react-icons/io";
-import useIsMounted from "../hooks/useIsMounted";
+import { useAccount, useContract, useSigner } from "wagmi";
+import { SBT_ABI } from "../abis/currentABI";
 import PageLayout from "../components/layouts/PageLayout";
 import Spinner from "../components/Spinner";
-import { useEthersContext } from "../context/EthersProvider";
-import { useMMContext } from "../context/MMProvider";
-import { SBT_ABI } from "../abis/currentABI";
 import Subtitle from "../components/Subtitle";
+import useIsMounted from "../hooks/useIsMounted";
 var crypto = require("crypto");
 
 enum JoinState {
@@ -25,9 +23,13 @@ enum JoinState {
 let cid = "";
 
 export default function Join() {
-  const mm = useMMContext().mmContext;
-  const provider = useEthersContext()
-    .ethersContext as ethers.providers.Web3Provider;
+  const { data: signer } = useSigner();
+  const contract = useContract({
+    address: process.env.NEXT_PUBLIC_SBT_ADDR,
+    abi: SBT_ABI,
+    signerOrProvider: signer,
+  });
+  const { address } = useAccount();
   const router = useRouter();
   const isMounted = useIsMounted();
 
@@ -64,9 +66,6 @@ export default function Join() {
           .then((new_cid) => {
             cid = new_cid;
           })
-          // .then( () => {
-          //   console.log(cid);
-          // })
           .then(() => {
             fetch("/api/cleanup", { method: "POST", body: path });
           });
@@ -74,15 +73,17 @@ export default function Join() {
 
       setJoinState(JoinState.MintToken);
     } catch (e: any) {
-      console.error(`An error occured during uploading the file: ${e.message}`);
+      console.error(
+        `An error occurred during uploading the file: ${e.message}`
+      );
       setJoinState(JoinState.UploadFailure);
     }
   };
 
   async function onMintToken() {
     // FOR TESTING
-    if (provider == undefined) {
-      console.log("no provider");
+    if (!contract || !address || !signer) {
+      console.log("no contract, address, or signer");
       return;
     } else if (cid == undefined || cid == "") {
       console.log("invalid cid");
@@ -90,16 +91,7 @@ export default function Join() {
     }
 
     try {
-      await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
-
-      const PatternDAO = new ethers.Contract(
-        process.env.NEXT_PUBLIC_SBT_ADDR!,
-        SBT_ABI as ethers.ContractInterface,
-        signer
-      );
-
-      await PatternDAO.safeMint(mm.account!, cid);
+      await contract.safeMint(address, cid);
       setJoinState(JoinState.MintSuccess);
     } catch (e) {
       console.log(e);
@@ -169,13 +161,13 @@ export default function Join() {
                   clickFileInput();
                 }}
               >
-                <div className="text-violet-600 text-bold text-5xl ">
+                <div className="text-custom-purple text-bold text-5xl ">
                   <BiUpload />
                 </div>
 
                 <p>
-                  <span className="text-violet-600 text-bold">Browse</span> your
-                  files
+                  <span className="text-custom-purple text-bold">Browse</span>{" "}
+                  your files
                 </p>
               </button>
 
@@ -219,7 +211,7 @@ export default function Join() {
             </div>
 
             <button
-              className="bg-violet-600 text-white text-bold text-xl rounded-xl mt-24 px-16 py-2"
+              className="bg-custom-purple text-white text-bold text-xl rounded-xl mt-24 px-16 py-2"
               onClick={() => onMintToken()}
             >
               Mint token
@@ -250,7 +242,7 @@ export default function Join() {
             </div>
 
             <button
-              className="bg-violet-600 text-white text-bold text-xl rounded-xl mt-24 px-16 py-2"
+              className="bg-custom-purple text-white text-bold text-xl rounded-xl mt-24 px-16 py-2"
               onClick={() => onViewDashboard()}
             >
               View in dashboard
@@ -269,7 +261,7 @@ export default function Join() {
   return (
     <PageLayout containerClassName="bg-custom-blue bg-cover min-h-screen">
       <div className="text-center mt-32 w-full">
-        {!isMounted ? null : mm.status != "connected" ? (
+        {!isMounted ? null : !address ? (
           <h1 className="font-bold text-4xl leading-tight">Please sign in</h1>
         ) : (
           <>

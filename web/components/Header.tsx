@@ -3,15 +3,13 @@ import { FC } from "react";
 
 import useIsMounted from "../hooks/useIsMounted";
 
-import { useMMContext } from "../context/MMProvider";
-import { abbrevAccount } from "../utils";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 type HeaderProps = {
   type?: string;
 };
 
 const Header: FC<HeaderProps> = ({}) => {
-  const mm = useMMContext().mmContext;
   const router = useRouter();
   const isMounted = useIsMounted();
 
@@ -27,23 +25,7 @@ const Header: FC<HeaderProps> = ({}) => {
           </button>
 
           <div className="flex items-center space-x-6 z-50">
-            {!isMounted ? null : mm.status == "connected" ? (
-              <button
-                className="font-medium text-md rounded-xl border-solid border-slate-300 border text-black py-2 px-6 max-w-xs"
-                onClick={() => {
-                  router.push("/dashboard");
-                }}
-              >
-                {abbrevAccount(mm.account!)}
-              </button>
-            ) : (
-              <button
-                className="text-bold text-md rounded-xl text-custom-purple border-2 border-gray-100 py-2 px-6"
-                onClick={mm.connect}
-              >
-                Sign in with wallet
-              </button>
-            )}
+            <ConnectButton />
           </div>
         </div>
       </div>

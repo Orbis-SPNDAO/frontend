@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import { Contract, providers, Signer } from "ethers";
 
-import { useMMContext } from "../context/MMProvider";
-import { useEthersContext } from "../context/EthersProvider";
+import { useAccount, useContract, useSigner } from "wagmi";
 import { SBT_ABI } from "../abis/currentABI";
 import Spinner from "./Spinner";
 
@@ -27,69 +25,62 @@ type Nft = {
 };
 
 export default function UserDashData() {
-  const mm = useMMContext().mmContext;
-  const provider = useEthersContext().ethersContext as providers.Web3Provider;
   const [list, setList] = useState<Nft[]>([]);
   const [loaded, setLoaded] = useState<boolean>(false);
   const [isBurning, setIsBurning] = useState(false);
-  const [signer, setSigner] = useState<Signer | null>(null);
-  const [contract, setContract] = useState<Contract | null>(null);
+  const { data: signer } = useSigner();
+  const contract = useContract({
+    address: process.env.NEXT_PUBLIC_SBT_ADDR,
+    abi: SBT_ABI,
+    signerOrProvider: signer,
+  });
+  const { address } = useAccount();
 
   // updates dashboard if mm or provider changes
   useEffect(() => {
     const getNFTs = async () => {
-      setLoaded(false);
-      setList([]);
+      if (signer && contract && address) {
+        setLoaded(false);
+        setList([]);
 
-      const signer = provider.getSigner();
-      const contract = new Contract(
-        process.env.NEXT_PUBLIC_SBT_ADDR!,
-        SBT_ABI,
-        signer
-      );
-      setSigner(signer);
-      setContract(contract);
-      const bal = parseInt(await contract.balanceOf(mm.account), 10);
+        const bal = parseInt(await contract.balanceOf(address), 10);
 
-      const newList: any[] = [];
-      // first token is just to initialize the array
-      for (let i = 1; i < bal; i++) {
-        await contract
-          .ownerToTokenIds(mm.account!, i)
-          .then(parseInt)
-          .then((id: any) => {
-            console.log({ id });
-            contract.cidList(id).then((cid: string) => {
-              fetch("/api/getData", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ cid: cid }),
-              })
-                .then((res) => res.json())
-                .then((data) => {
-                  newList.push({ ...data, tokenId: i });
-                  if (i === bal - 1) setList(newList);
-                });
+        const newList: any[] = [];
+        // first token is just to initialize the array
+        for (let i = 1; i < bal; i++) {
+          await contract
+            .ownerToTokenIds(address, i)
+            .then(parseInt)
+            .then((id: any) => {
+              contract.cidList(id).then((cid: string) => {
+                fetch("/api/getData", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ cid: cid }),
+                })
+                  .then((res) => res.json())
+                  .then((data) => {
+                    newList.push({ ...data, tokenId: i });
+                    if (i === bal - 1) setList(newList);
+                  });
+              });
             });
-          });
+        }
+        setLoaded(true);
       }
-      setLoaded(true);
     };
 
     // only run when mm and provider are defined
-    if (provider != undefined && mm != undefined && mm.status == "connected") {
-      getNFTs();
-    }
-  }, [provider, mm]);
+    getNFTs();
+  }, [signer, contract, address]);
 
   async function burnToken(tokenId: number) {
     setIsBurning(true);
     console.log(`Burn token with id ${tokenId}`);
     if (contract && signer) {
-      console.log(mm.account, tokenId)
-      await contract.userBurn(mm.account, tokenId);
+      await contract.userBurn(address, tokenId);
     }
     setIsBurning(false);
   }
@@ -134,7 +125,7 @@ export default function UserDashData() {
               </div>
 
               <button
-                className="ml-8 bg-violet-600 text-white text-bold text-md rounded-md px-6 py-2"
+                className="ml-8 bg-custom-purple text-white text-bold text-md rounded-md px-6 py-2"
                 disabled={!!isBurning}
                 onClick={() => burnToken(nft.tokenId)}
               >
