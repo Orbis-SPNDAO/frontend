@@ -1,5 +1,5 @@
-import { useRouter } from "next/router"
-import { useState } from "react"
+import { useRouter } from "next/router";
+import { useState } from "react";
 
 enum UserChoice {
   EndUser = "endUser",
@@ -7,33 +7,30 @@ enum UserChoice {
 }
 
 export default function Home() {
-  const router = useRouter()
+  const router = useRouter();
 
-  const [activeChoice, setActiveChoice] = useState(UserChoice.EndUser)
+  const [activeChoice, setActiveChoice] = useState(UserChoice.EndUser);
 
   return (
     <div className="w-full min-h-screen bg-cover bg-[url('/assets/landing_bg.png')]">
       <div className="text-center pt-32">
-        <h1 className="font-bold text-violet-600 text-6xl leading-tight">
+        <h1 className="font-bold text-custom-purple text-6xl leading-tight">
           Pattern DAO
         </h1>
         <button
-          className="block mx-auto bg-violet-600 text-white text-bold text-xl rounded-xl mt-48 px-16 py-2"
-          onClick={()=>router.push("/dashboard")}
-        >          
-            User
+          className="block mx-auto bg-custom-purple text-white text-bold text-xl rounded-xl mt-48 px-16 py-2"
+          onClick={() => router.push("/dashboard")}
+        >
+          User
         </button>
-        <h1 className="font-bold text-violet-600 text-6xl leading-tight">
-          
-        </h1>
+        <h1 className="font-bold text-custom-purple text-6xl leading-tight"></h1>
         <button
-          className="block mx-auto bg-violet-600 text-white text-bold text-xl rounded-xl mt-5 px-16 py-2"
-          onClick={()=>router.push("/admin-dashboard")}
-        >          
-            Admin           
+          className="block mx-auto bg-custom-purple text-white text-bold text-xl rounded-xl mt-5 px-16 py-2"
+          onClick={() => router.push("/admin-dashboard")}
+        >
+          Admin
         </button>
-
       </div>
     </div>
-  )
+  );
 }
