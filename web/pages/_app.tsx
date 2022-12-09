@@ -1,14 +1,23 @@
-import { ChakraProvider } from "@chakra-ui/react";
 import type { AppProps } from "next/app";
+import merge from 'lodash.merge';
 
 import MainLayout from "../components/layouts/MainLayout";
 import "../styles/globals.css";
 
-import "@rainbow-me/rainbowkit/styles.css";
+  import "@rainbow-me/rainbowkit/styles.css";
 
-import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { darkTheme, getDefaultWallets, lightTheme, RainbowKitProvider, Theme } from "@rainbow-me/rainbowkit";
 import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
+
+const myTheme = merge(lightTheme(), {
+  colors: {
+    accentColor: '#5D5FEF',
+  },
+  fonts: {
+    body: 'Rubik',
+  }
+} as Theme);
 
 const App = ({ Component, pageProps }: AppProps) => {
   const { chains, provider } = configureChains(
@@ -29,12 +38,10 @@ const App = ({ Component, pageProps }: AppProps) => {
 
   return (
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains}>
-        <ChakraProvider>
+      <RainbowKitProvider chains={chains} theme={myTheme}>
           <MainLayout>
             <Component {...pageProps} />
           </MainLayout>
-        </ChakraProvider>
       </RainbowKitProvider>
     </WagmiConfig>
   );
