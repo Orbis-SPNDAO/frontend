@@ -5,14 +5,18 @@ import { BiUpload } from "react-icons/bi";
 import { IoIosCheckmark } from "react-icons/io";
 import { useAccount, useContract, useSigner } from "wagmi";
 import { SBT_ABI } from "../abis/currentABI";
+import Button from "../components/Button";
 import PageLayout from "../components/layouts/PageLayout";
+import { SocialsFooter } from "../components/SocialsFooter";
 import Spinner from "../components/Spinner";
+import { SplashStep } from "../components/SplashStep";
 import Subtitle from "../components/Subtitle";
 import useIsMounted from "../hooks/useIsMounted";
 var crypto = require("crypto");
 
 enum JoinState {
   Start = "start",
+  PromptUpload = "prompt-upload",
   UploadingCsv = "uploading-csv",
   UploadFailure = "upload-failure",
   MintToken = "mint-token",
@@ -260,9 +264,55 @@ export default function Join() {
 
   return (
     <PageLayout containerClassName="bg-custom-blue bg-cover min-h-screen">
-      <div className="text-center mt-32 w-full">
-        {!isMounted ? null : !address ? (
-          <h1 className="font-bold text-4xl leading-tight">Please sign in</h1>
+      <div className="text-center mt-20 w-full">
+        {joinState == JoinState.Start ? (
+          <>
+            <h4 className="text-slate-600 font-normal">
+              Not a SPN DAO member yet?
+            </h4>
+            <div className="w-stretch my-10 mx-28 h-fit p-10 hero">
+              <h1 className="text-3xl">
+                <span className="text-4xl">Join the party 🥳</span> <br></br>for
+                true ownership and monetization of your data
+              </h1>
+              <div className="mt-6 m-auto w-fit flex flex-col items-start">
+                <SplashStep
+                  title="1. Upload & Encrypt"
+                  subtitle="credit card transactions"
+                />
+                <SplashStep
+                  title="2. Mint"
+                  subtitle="a non-transferrable DAO membership token"
+                />
+                <SplashStep
+                  title="3. Get rewards"
+                  subtitle="for decrypted data"
+                />
+              </div>
+              <div className="my-4 flex flex-row items-center w-fit m-auto">
+                <input
+                  type="checkbox"
+                  id="consent"
+                  name="consent"
+                  value="consent"
+                />
+                <label
+                  htmlFor="consent"
+                  className="ml-2 font-normal text-neutral-900"
+                >
+                  Lorem ipsum dolet
+                </label>
+              </div>
+              <Button btnSize="w-96 m-auto">Join SPN DAO</Button>
+              <h3 className="mt-6 font-normal text-zinc-500 max-w-3xl m-auto">
+                Your data will be temporarily stored on a cloud server and then
+                encrypted and uploaded to IPFS. The resulting IPFS link will be
+                encrypted and immutable, and the data on the cloud server will
+                be deleted.
+              </h3>
+            </div>
+            <SocialsFooter />
+          </>
         ) : (
           <>
             <h1 className="font-bold text-4xl leading-tight">{showTitle()}</h1>

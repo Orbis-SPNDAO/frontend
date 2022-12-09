@@ -6,7 +6,7 @@ export enum ButtonTypes {
   React = "reset",
 }
 type ButtonProps = {
-  type: ButtonTypes | undefined
+  type?: ButtonTypes
   btnSize?: string
 } & React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLButtonElement>,
