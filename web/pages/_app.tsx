@@ -1,10 +1,13 @@
 import type { AppProps } from "next/app";
 import merge from 'lodash.merge';
 
+import { Provider as SelfProvider } from '@self.id/framework'
+
+
 import MainLayout from "../components/layouts/MainLayout";
 import "../styles/globals.css";
 
-  import "@rainbow-me/rainbowkit/styles.css";
+import "@rainbow-me/rainbowkit/styles.css";
 
 import { darkTheme, getDefaultWallets, lightTheme, RainbowKitProvider, Theme } from "@rainbow-me/rainbowkit";
 import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
@@ -39,9 +42,11 @@ const App = ({ Component, pageProps }: AppProps) => {
   return (
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider chains={chains} theme={myTheme}>
+        <SelfProvider client={{ ceramic: 'testnet-clay' }}>
           <MainLayout>
             <Component {...pageProps} />
           </MainLayout>
+        </SelfProvider>
       </RainbowKitProvider>
     </WagmiConfig>
   );
