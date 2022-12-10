@@ -1,36 +1,15 @@
 // PAGE FOR TESTING, REMOVE LATER
-import { useViewerRecord } from '@self.id/framework'
+import { Integration } from 'lit-ceramic-sdk'
 
-function ShowViewerName() {
-    const record = useViewerRecord('basicProfile')
+let litCeramicIntegration = new Integration('https://ceramic-clay.3boxlabs.com', 'polygon')
 
-    const text = record.isLoading
-        ? 'Loading...'
-        : record.content
-            ? `Hello ${record.content.name || 'stranger'}`
-            : 'No profile to load'
-    return <p>{text}</p>
-}
+let streamID = 'kjzl6cwe1jw1479rnblkk5u43ivxkuo29i4efdx1e7hk94qrhjl0d4u0dyys1au' // test data
 
-function SetViewerName() {
-    const record = useViewerRecord('basicProfile')
-
-    return (
-        <button
-            disabled={!record.isMutable || record.isMutating}
-            onClick={async () => {
-                await record.merge?.({ name: 'Alice' })
-            }}>
-            Set name
-        </button>
-    )
-}
 
 export default function Test() {
     return (
         <div>
-            <ShowViewerName />
-            <SetViewerName />
+           <h1> Testing page </h1>
         </div>
     )
 }
