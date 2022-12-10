@@ -2,21 +2,19 @@ import classNames from "classnames";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
+import { BiUpload } from "react-icons/bi";
+import { BsCheckLg } from "react-icons/bs";
 import { FaDatabase } from "react-icons/fa";
-import { BiErrorAlt, BiUpload } from "react-icons/bi";
-import { IoIosCheckmark } from "react-icons/io";
-import { useAccount, useContract, useContractWrite, useSigner } from "wagmi";
+import { useAccount, useContractWrite } from "wagmi";
 import { SBT_ABI } from "../abis/currentABI";
 import Button from "../components/Button";
+import { JoinSubText } from "../components/JoinSubText";
 import PageLayout from "../components/layouts/PageLayout";
 import { ProgressStepsDot } from "../components/ProgressStepsDot";
 import { SocialsFooter } from "../components/SocialsFooter";
 import Spinner from "../components/Spinner";
 import { SplashStep } from "../components/SplashStep";
-import Subtitle from "../components/Subtitle";
 import { UploadBox } from "../components/UploadBox";
-import useIsMounted from "../hooks/useIsMounted";
-import { AiFillStar } from "react-icons/ai";
 var crypto = require("crypto");
 
 enum JoinState {
@@ -50,10 +48,9 @@ export default function Join() {
   });
   const { address } = useAccount();
   const router = useRouter();
-  const [submitAttempted, setSubmitAttempted] = useState(false);
   const [consentChecked, setConsentChecked] = useState(false);
 
-  const [joinState, setJoinState] = useState<JoinState>(JoinState.MintSuccess);
+  const [joinState, setJoinState] = useState<JoinState>(JoinState.Start);
 
   const fileRef = useRef<HTMLInputElement | null>();
 
@@ -161,7 +158,7 @@ export default function Join() {
       case JoinState.PromptUpload:
         content = (
           <>
-            <div className="border border-amber-600 bg-red-50 w-fit m-auto rounded-xl p-2 text-amber-600 mt-4">
+            <JoinSubText amber>
               Please remove all sensitive personal identifiable information. See
               the list{" "}
               <a
@@ -172,7 +169,7 @@ export default function Join() {
                 here
               </a>
               .
-            </div>
+            </JoinSubText>
 
             <UploadBox>
               <button
@@ -205,10 +202,10 @@ export default function Join() {
       case JoinState.UploadingCsv:
         content = (
           <>
-            <Subtitle>
+            <JoinSubText>
               Your file will be encrypted immediately, and will be uploaded to
               and stored on decentralized storage provided by IPFS.
-            </Subtitle>
+            </JoinSubText>
             <div className="mx-auto w-1/2 mt-24 py-24 px-8 py-2 border-2 border-dashed border-gray-500 rounded-xl bg-white">
               <div className="mx-auto flex flex-col items-center rounded-xl">
                 <Spinner />
@@ -226,22 +223,22 @@ export default function Join() {
       case JoinState.MintToken:
         content = (
           <>
-            <Subtitle>
+            <JoinSubText>
               Only authorized parties such as DAO admins can decrypt and access
               your data. You will be rewarded with Matic whenever your data is
               decrypted and processed.
-            </Subtitle>
+            </JoinSubText>
             <UploadBox solid>
-              <div className="flex flex-col items-center mx-auto">
+              <div className="flex flex-col items-center mx-auto w-full">
                 <div className="text-gray-500 bg-black rounded-full p-6 w-fit text-bold text-5xl border-2 border-white mb-5 icon-shadow">
                   <FaDatabase size="45" />
                 </div>
-                <p className="mb-9 font-normal text-zinc-600">
+                <p className="mb-9 font-normal text-zinc-600 text-sm md:text-lg">
                   The token is free to mint but you will pay a small gas fee in
                   Matic
                 </p>
                 <Button
-                  btnSize="w-80 h-12"
+                  btnSize="w-3/4 md:w-80 h-12"
                   className="bg-custom-purple text-white flex items-center text-xl rounded-xl mt-2 px-16"
                   onClick={() => onMintToken()}
                 >
@@ -254,33 +251,60 @@ export default function Join() {
         break;
       case JoinState.MintSuccess:
         content = (
-          <div className="flex flex-col items-center mx-auto mt-18 py-24 px-8">
-            <span className="text-md mr-10 text-red-500">
-              <AiFillStar />
-            </span>
-
-            <div className="flex">
-              <span className="text-lg mt-20 text-red-500">
-                <AiFillStar />
+          <>
+            <JoinSubText>
+              You can always burn the token in the personal dashboard if you
+              wish to exit from the DAO and stop sharing your encrypted data.
+            </JoinSubText>
+            <div className="flex flex-col items-center mx-auto mt-18 py-8 md:py-24 px-8">
+              <span className="text-md mr-40 mb-4">
+                <Image
+                  src="/assets/success-star.svg"
+                  alt="success"
+                  height="18"
+                  width="18"
+                />
               </span>
-              <div className="text-white border-4 border-blue-600 bg-gradient-to-br from-violet-700 via-red-500 to-red-200 rounded-full py-1 px-1 text-bold text-8xl">
-                <IoIosCheckmark />
+
+              <div className="flex ml-6">
+                <span className="text-lg mt-40">
+                  <Image
+                    src="/assets/success-star.svg"
+                    alt="success"
+                    height="29"
+                    width="29"
+                  />
+                </span>
+                <div className="text-white border-8 border-blue-600 mint-success-gradient rounded-full p-10 text-bold text-8xl">
+                  <BsCheckLg />
+                </div>
+                <span className="text-lg">
+                  <Image
+                    src="/assets/success-star.svg"
+                    alt="success"
+                    height="37"
+                    width="37"
+                  />
+                </span>
+                <span className="text-sm mt-16">
+                  <Image
+                    src="/assets/success-star.svg"
+                    alt="success"
+                    height="18"
+                    width="18"
+                  />
+                </span>
               </div>
-              <span className="text-lg mt-2 text-red-500">
-                <AiFillStar />
-              </span>
-              <span className="text-sm mt-10 text-red-500">
-                <AiFillStar />
-              </span>
-            </div>
 
-            <button
-              className="bg-custom-purple text-white text-bold text-xl rounded-xl mt-24 px-16 py-2"
-              onClick={() => onViewDashboard()}
-            >
-              View in dashboard
-            </button>
-          </div>
+              <button
+                className="bg-custom-purple text-white text-bold text-xl rounded-xl mt-12 md:mt-24 px-16 py-2"
+                onClick={() => onViewDashboard()}
+              >
+                View in dashboard
+              </button>
+            </div>
+            <SocialsFooter />
+          </>
         );
         break;
 
@@ -293,18 +317,18 @@ export default function Join() {
 
   return (
     <PageLayout containerClassName="bg-custom-blue bg-cover min-h-screen">
-      <div className="text-center mt-10 w-full">
+      <div className="text-center my-5 md:my-10 w-full">
         {joinState == JoinState.Start ? (
           <>
             <h4 className="text-slate-600 font-normal">
               Not a SPN DAO member yet?
             </h4>
-            <div className="w-stretch my-10 mx-28 h-fit p-10 hero">
-              <h1 className="text-3xl">
-                <span className="text-4xl">Join the party 🥳</span> <br></br>for
-                true ownership and monetization of your data
+            <div className="w-stretch m-5 md:mx-28 md:my-12 h-fit py-6 px-4 md:p-10 hero">
+              <h1 className="text-xl md:text-3xl">
+                <span className="text-2xl md:text-4xl">Join the party 🥳</span>{" "}
+                <br></br>for true ownership and monetization of your data
               </h1>
-              <div className="mt-6 m-auto w-fit flex flex-col items-start">
+              <div className="mt-3 md:mt-6 m-auto w-fit flex flex-col items-start justify-start">
                 <SplashStep
                   title="1. Upload & Encrypt"
                   subtitle="credit card transactions"
@@ -319,29 +343,27 @@ export default function Join() {
                 />
               </div>
               <div className="my-4 flex flex-row font-normal items-center w-fit m-auto">
-                {submitAttempted && !consentChecked ? (
-                  <div className="ml-4 text-red-500 flex flex-row items-center gap-1 mr-3">
-                    <BiErrorAlt height="12" width="16" />
-                    Input Missing
-                  </div>
-                ) : null}
                 <input
                   type="checkbox"
                   id="consent"
                   name="consent"
                   value="consent"
+                  className="w-3 h-3 md:w-4 md:h-4"
                   onChange={(event) => {
                     setConsentChecked(event.target.checked);
                   }}
                 />
-                <label htmlFor="consent" className="ml-2 text-neutral-900">
+                <label
+                  htmlFor="consent"
+                  className="ml-2 text-neutral-900 text-sm md:text-lg"
+                >
                   I understand how my data will be handled.
                 </label>
               </div>
               <Button
-                btnSize="w-96 m-auto"
+                btnSize="w-3/4 md:w-96 m-auto"
+                disabled={!consentChecked}
                 onClick={() => {
-                  setSubmitAttempted(true);
                   if (consentChecked) {
                     setJoinState(JoinState.PromptUpload);
                   }
@@ -349,7 +371,7 @@ export default function Join() {
               >
                 Join SPN DAO
               </Button>
-              <h3 className="mt-6 font-normal text-zinc-500 max-w-3xl m-auto">
+              <h3 className="mt-6 font-normal text-zinc-500 max-w-3xl m-auto text-xs md:text-lg">
                 Your data will be temporarily stored on a cloud server and then
                 encrypted and uploaded to IPFS. The resulting IPFS link will be
                 encrypted and immutable, and the data on the cloud server will
@@ -360,18 +382,23 @@ export default function Join() {
           </>
         ) : (
           <>
-            <h1 className="text-4xl leading-tight">{showTitle()}</h1>
+            <h1 className="text-2xl md:text-4xl leading-tight mx-4">
+              {showTitle()}
+            </h1>
             {showContent()}
-            {joinState != JoinState.MintFailure ? (
+            {joinState != JoinState.MintFailure &&
+            joinState != JoinState.MintSuccess ? (
               <>
-                <div className="w-3/5 mt-24 m-auto flex flex-row justify-between font-normal text-neutral-800">
-                  <h5 className="w-24 text-xl indent-2 text-start">Upload</h5>
-                  <h5 className="w-40 text-xl">Encrypt & Store</h5>
-                  <h5 className="w-40 text-xl">Mint SBT</h5>
-                  <h5 className="w-24 text-xl text-end">Complete</h5>
+                <div className="w-4/5 md:w-3/5 mt-8 md:mt-24 m-auto flex flex-row justify-between font-normal text-neutral-800">
+                  <h5 className="w-24 text-xs md:text-xl indent-2 text-start">
+                    Upload
+                  </h5>
+                  <h5 className="w-40 text-xs md:text-xl">Encrypt & Store</h5>
+                  <h5 className="w-40 text-xs md:text-xl">Mint SBT</h5>
+                  <h5 className="w-24 text-xs md:text-xl text-end">Complete</h5>
                 </div>
-                <div className="mx-12 w-stretch">
-                  <div className="w-3/5 h-3 bg-zinc-300 rounded-full m-auto mt-4 flex flex-row justify-between items-center relative">
+                <div className="mx-6 md:mx-12 w-stretch">
+                  <div className="w-4/5 md:w-3/5 h-3 bg-zinc-300 rounded-full m-auto mt-4 flex flex-row justify-between items-center relative">
                     <div
                       className={classNames(
                         "absolute bg-blue-500 h-full object-left rounded-full z-10 transition-width duration-300",
@@ -379,7 +406,6 @@ export default function Join() {
                           "w-0": joinState == JoinState.PromptUpload,
                           "w-1/3": joinState == JoinState.UploadingCsv,
                           "w-2/3": joinState == JoinState.MintToken,
-                          "w-full": joinState == JoinState.MintSuccess,
                         }
                       )}
                     ></div>
@@ -403,18 +429,10 @@ export default function Join() {
                     />
                     <ProgressStepsDot
                       status={
-                        joinState == JoinState.MintSuccess
-                          ? "checked"
-                          : joinState == JoinState.MintToken
-                          ? "blue"
-                          : "empty"
+                        joinState == JoinState.MintToken ? "blue" : "empty"
                       }
                     />
-                    <ProgressStepsDot
-                      status={
-                        joinState == JoinState.MintSuccess ? "checked" : "empty"
-                      }
-                    />
+                    <ProgressStepsDot status="empty" />
                   </div>
                 </div>
               </>

@@ -25,7 +25,7 @@ const PageLayout: FC<PageLayoutProps> = ({
   return (
     <div className={containerClassName || ""}>
       <Header />
-      <div className="flex">{children}</div>
+      <div className="flex pb-10">{children}</div>
     </div>
   )
 }

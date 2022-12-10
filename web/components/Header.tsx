@@ -1,8 +1,6 @@
 import { useRouter } from "next/router";
 import { FC } from "react";
 
-import useIsMounted from "../hooks/useIsMounted";
-
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 type HeaderProps = {
@@ -14,11 +12,11 @@ const Header: FC<HeaderProps> = ({ hideLogo }) => {
 
   return (
     <div className="min-h-full pt-4 w-stretch">
-      <div className="mx-20 flex items-center h-20 text-gray-600">
+      <div className="mx-6 md:mx-20 flex items-center h-20 text-gray-600">
         <div className="flex items-center justify-between w-full">
           {!hideLogo ? (
             <button
-              className="font-medium text-4xl flex text-custom-purple items-center justify-center"
+              className="font-medium text-2xl md:text-4xl flex text-custom-purple items-center justify-center"
               onClick={() => router.push("/")}
             >
               <h2>SPN DAO</h2>

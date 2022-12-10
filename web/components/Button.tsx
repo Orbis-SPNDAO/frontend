@@ -19,7 +19,7 @@ const Button: FC<ButtonProps> = ({ btnSize, children, ...props }) => {
       {...props}
       className={`group relative ${
         btnSize ?? "w-full"
-      }  flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-custom-purple hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+      }  flex justify-center items-center py-3 px-4 border border-transparent text-sm md:text-lg font-medium rounded-xl text-white bg-custom-purple hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-slate-100 disabled:text-slate-500`}
     >
       {children}
     </button>

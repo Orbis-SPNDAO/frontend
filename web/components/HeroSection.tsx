@@ -5,9 +5,9 @@ export const HeroSection: FC<{ title: string; subtitle: string }> = ({
   subtitle,
 }) => {
   return (
-    <div className="w-1/3 py-12">
-      <h3 className="text-3xl text-neutral-800">{title}</h3>
-      <h5 className="text-xl text-zinc-500">{subtitle}</h5>
+    <div className="max-w-xs mt-12 mx-8">
+      <h3 className="text-2xl text-neutral-800 md:text-3xl">{title}</h3>
+      <h5 className="text-lg text-zinc-500 md:text-xl">{subtitle}</h5>
     </div>
   );
 };
