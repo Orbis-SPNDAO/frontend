@@ -102,7 +102,7 @@ export default function UserDashData() {
       <div className="flex flex-col items-center mx-auto px-8">
         {list.map((nft, index) => {
           console.log({ nft });
-          return (
+          return nft.items ? (
             <div
               key={index}
               className="flex items-center justify-between rounded-lg bg-white py-5 px-8 shadow-md"
@@ -132,7 +132,7 @@ export default function UserDashData() {
                 {!!isBurning ? <Spinner /> : "Burn"}
               </button>
             </div>
-          );
+          ) : null;
         })}
       </div>
     );

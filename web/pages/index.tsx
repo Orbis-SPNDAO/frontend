@@ -8,6 +8,7 @@ import Button from "../components/Button";
 import Header from "../components/Header";
 import { HeroSection } from "../components/HeroSection";
 import { SocialsFooter } from "../components/SocialsFooter";
+import Spinner from "../components/Spinner";
 import useIsMounted from "../hooks/useIsMounted";
 
 enum UserType {
@@ -19,27 +20,30 @@ export default function Home() {
   const router = useRouter();
 
   const [activeChoice, setActiveChoice] = useState(UserType.EndUser);
-  const isMounted = useIsMounted();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { address, isConnected, isConnecting } = useAccount();
+  const { address, isConnected } = useAccount();
   const { data: signer } = useSigner();
   const contract = useContract({
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
     abi: SBT_ABI,
     signerOrProvider: signer,
   });
-
-  async function checkForSbtAndRoute() {
-    if (signer && address && isConnected && contract) {
-      const bal = parseInt(await contract.balanceOf(address), 10);
-      console.log({ bal });
-      if (UserType.EndUser) {
-        router.push(bal < 2 ? "/join" : '/dashboard');
-      } else {
-        router.push('/admin-dashboard');
+  useEffect(() => {
+    (async function checkForSbtAndRoute() {
+      if (signer && address && contract) {
+        setIsLoading(true);
+        const bal = parseInt(await contract.balanceOf(address), 10);
+        console.log({ bal });
+        if (UserType.EndUser) {
+          router.push(bal < 2 ? "/join" : "/dashboard");
+          // router.push("/join");
+        } else {
+          router.push("/admin-dashboard");
+        }
       }
-    }
-  }
+    })();
+  }, [signer, address, contract, router]);
 
   const boxShadowStyle = {
     boxShadow:
@@ -48,8 +52,7 @@ export default function Home() {
 
   return (
     <div className="w-full min-h-screen bg-cover bg-[url('/assets/landing_bg.png')]">
-      {isConnected ? <Header hideLogo /> : null}
-      <div className={classNames("text-center", { "pt-24": !isConnected })}>
+      <div className="text-center py-20">
         <h1 className="text-custom-purple text-9xl leading-tight">SPN DAO</h1>
         <h4 className="text-3xl mb-16">
           Your data is more valuable than you think
@@ -74,7 +77,7 @@ export default function Home() {
             DAO Admin
           </button>
         </div>
-        <div className="w-stretch my-16 mx-28 h-80 hero">
+        <div className="w-stretch my-12 mx-28 min-h-80 hero pb-8">
           <div className="flex flex-row justify-between gap-12 px-12 mb-10">
             <HeroSection
               title="Control Your Data"
@@ -90,12 +93,10 @@ export default function Home() {
             />
           </div>
           <div className="m-auto w-fit">
-            {!isConnected ? (
-              <ConnectButton label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Connect Wallet&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" />
+            {isLoading ? (
+              <Spinner />
             ) : (
-              <Button btnSize="px-24" onClick={checkForSbtAndRoute}>
-                Go to Dashboard
-              </Button>
+              <ConnectButton label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Connect Wallet&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" />
             )}
           </div>
         </div>

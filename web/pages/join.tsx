@@ -3,9 +3,9 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { FaDatabase } from "react-icons/fa";
-import { BiUpload } from "react-icons/bi";
+import { BiErrorAlt, BiUpload } from "react-icons/bi";
 import { IoIosCheckmark } from "react-icons/io";
-import { useAccount, useContract, useSigner } from "wagmi";
+import { useAccount, useContract, useContractWrite, useSigner } from "wagmi";
 import { SBT_ABI } from "../abis/currentABI";
 import Button from "../components/Button";
 import PageLayout from "../components/layouts/PageLayout";
@@ -32,17 +32,28 @@ enum JoinState {
 let cid = "";
 
 export default function Join() {
-  const { data: signer } = useSigner();
-  const contract = useContract({
+  // const { data: signer } = useSigner();
+  // const contract = useContract({
+  //   address: process.env.NEXT_PUBLIC_SBT_ADDR,
+  //   abi: SBT_ABI,
+  //   signerOrProvider: signer,
+  // });
+  const { write } = useContractWrite({
+    mode: "recklesslyUnprepared",
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
     abi: SBT_ABI,
-    signerOrProvider: signer,
+    functionName: "safeMint",
+    // overrides: {
+    //     maxFeePerGas: ethers.utils.parseEther('1'),
+    //     maxPriorityFeePerGas: ethers.utils.parseEther('1')
+    // }
   });
   const { address } = useAccount();
   const router = useRouter();
-  const isMounted = useIsMounted();
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [consentChecked, setConsentChecked] = useState(false);
 
-  const [joinState, setJoinState] = useState<JoinState>(JoinState.Start);
+  const [joinState, setJoinState] = useState<JoinState>(JoinState.MintSuccess);
 
   const fileRef = useRef<HTMLInputElement | null>();
 
@@ -91,7 +102,7 @@ export default function Join() {
 
   async function onMintToken() {
     // FOR TESTING
-    if (!contract || !address || !signer) {
+    if (!write || !address) {
       console.log("no contract, address, or signer");
       return;
     } else if (cid == undefined || cid == "") {
@@ -100,7 +111,7 @@ export default function Join() {
     }
 
     try {
-      await contract.safeMint(address, cid);
+      write({ recklesslySetUnpreparedArgs: [address, cid] });
       setJoinState(JoinState.MintSuccess);
     } catch (e) {
       console.log(e);
@@ -282,7 +293,7 @@ export default function Join() {
 
   return (
     <PageLayout containerClassName="bg-custom-blue bg-cover min-h-screen">
-      <div className="text-center mt-20 w-full">
+      <div className="text-center mt-10 w-full">
         {joinState == JoinState.Start ? (
           <>
             <h4 className="text-slate-600 font-normal">
@@ -307,24 +318,33 @@ export default function Join() {
                   subtitle="for decrypted data"
                 />
               </div>
-              <div className="my-4 flex flex-row items-center w-fit m-auto">
+              <div className="my-4 flex flex-row font-normal items-center w-fit m-auto">
+                {submitAttempted && !consentChecked ? (
+                  <div className="ml-4 text-red-500 flex flex-row items-center gap-1 mr-3">
+                    <BiErrorAlt height="12" width="16" />
+                    Input Missing
+                  </div>
+                ) : null}
                 <input
                   type="checkbox"
                   id="consent"
                   name="consent"
                   value="consent"
+                  onChange={(event) => {
+                    setConsentChecked(event.target.checked);
+                  }}
                 />
-                <label
-                  htmlFor="consent"
-                  className="ml-2 font-normal text-neutral-900"
-                >
-                  Lorem ipsum dolet
+                <label htmlFor="consent" className="ml-2 text-neutral-900">
+                  I understand how my data will be handled.
                 </label>
               </div>
               <Button
                 btnSize="w-96 m-auto"
                 onClick={() => {
-                  setJoinState(JoinState.PromptUpload);
+                  setSubmitAttempted(true);
+                  if (consentChecked) {
+                    setJoinState(JoinState.PromptUpload);
+                  }
                 }}
               >
                 Join SPN DAO
