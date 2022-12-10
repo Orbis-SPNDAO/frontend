@@ -4,8 +4,11 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAccount, useContract, useSigner } from "wagmi";
 import { SBT_ABI } from "../abis/currentABI";
+import Button from "../components/Button";
+import Header from "../components/Header";
 import { HeroSection } from "../components/HeroSection";
 import { SocialsFooter } from "../components/SocialsFooter";
+import useIsMounted from "../hooks/useIsMounted";
 
 enum UserType {
   EndUser = "endUser",
@@ -16,25 +19,28 @@ export default function Home() {
   const router = useRouter();
 
   const [activeChoice, setActiveChoice] = useState(UserType.EndUser);
+  const isMounted = useIsMounted();
 
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, isConnecting } = useAccount();
   const { data: signer } = useSigner();
   const contract = useContract({
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
     abi: SBT_ABI,
     signerOrProvider: signer,
   });
-  useEffect(() => {
-    (async function checkForSbtAndRoute() {
-      if (signer && address && isConnected && contract) {
-        const bal = parseInt(await contract.balanceOf(address), 10);
-        console.log({ bal });
-        if (UserType.EndUser && bal == 2) {
-          router.push("/join");
-        }
+
+  async function checkForSbtAndRoute() {
+    if (signer && address && isConnected && contract) {
+      const bal = parseInt(await contract.balanceOf(address), 10);
+      console.log({ bal });
+      if (UserType.EndUser) {
+        router.push(bal < 2 ? "/join" : '/dashboard');
+      } else {
+        router.push('/admin-dashboard');
       }
-    })();
-  }, [isConnected, contract, signer]);
+    }
+  }
+
   const boxShadowStyle = {
     boxShadow:
       "0px 0px 8px rgba(20, 23, 26, 0.08), 0px 0px 4px rgba(20, 23, 26, 0.04)",
@@ -42,7 +48,8 @@ export default function Home() {
 
   return (
     <div className="w-full min-h-screen bg-cover bg-[url('/assets/landing_bg.png')]">
-      <div className="text-center pt-20">
+      {isConnected ? <Header hideLogo /> : null}
+      <div className={classNames("text-center", { "pt-24": !isConnected })}>
         <h1 className="text-custom-purple text-9xl leading-tight">SPN DAO</h1>
         <h4 className="text-3xl mb-16">
           Your data is more valuable than you think
@@ -83,7 +90,13 @@ export default function Home() {
             />
           </div>
           <div className="m-auto w-fit">
-            <ConnectButton label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Connect Wallet&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" />
+            {!isConnected ? (
+              <ConnectButton label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Connect Wallet&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" />
+            ) : (
+              <Button btnSize="px-24" onClick={checkForSbtAndRoute}>
+                Go to Dashboard
+              </Button>
+            )}
           </div>
         </div>
         <SocialsFooter />

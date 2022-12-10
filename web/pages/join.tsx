@@ -1,17 +1,22 @@
+import classNames from "classnames";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
-import { AiFillDatabase, AiFillStar } from "react-icons/ai";
+import { FaDatabase } from "react-icons/fa";
 import { BiUpload } from "react-icons/bi";
 import { IoIosCheckmark } from "react-icons/io";
 import { useAccount, useContract, useSigner } from "wagmi";
 import { SBT_ABI } from "../abis/currentABI";
 import Button from "../components/Button";
 import PageLayout from "../components/layouts/PageLayout";
+import { ProgressStepsDot } from "../components/ProgressStepsDot";
 import { SocialsFooter } from "../components/SocialsFooter";
 import Spinner from "../components/Spinner";
 import { SplashStep } from "../components/SplashStep";
 import Subtitle from "../components/Subtitle";
+import { UploadBox } from "../components/UploadBox";
 import useIsMounted from "../hooks/useIsMounted";
+import { AiFillStar } from "react-icons/ai";
 var crypto = require("crypto");
 
 enum JoinState {
@@ -110,7 +115,7 @@ export default function Join() {
   function showTitle() {
     let title = null;
     switch (joinState) {
-      case JoinState.Start:
+      case JoinState.PromptUpload:
         title = "Upload a CSV file";
         break;
       case JoinState.UploadingCsv:
@@ -142,10 +147,10 @@ export default function Join() {
     let content = null;
 
     switch (joinState) {
-      case JoinState.Start:
+      case JoinState.PromptUpload:
         content = (
           <>
-            <Subtitle>
+            <div className="border border-amber-600 bg-red-50 w-fit m-auto rounded-xl p-2 text-amber-600 mt-4">
               Please remove all sensitive personal identifiable information. See
               the list{" "}
               <a
@@ -156,22 +161,22 @@ export default function Join() {
                 here
               </a>
               .
-            </Subtitle>
+            </div>
 
-            <div className="mx-auto w-1/2 mt-24 py-24 px-8 py-2 border-2 border-dashed border-gray-500 rounded-xl bg-white">
+            <UploadBox>
               <button
                 className="mx-auto flex flex-col items-center rounded-xl"
                 onClick={() => {
                   clickFileInput();
                 }}
               >
-                <div className="text-custom-purple text-bold text-5xl ">
+                <div className="text-blue-500 text-bold text-5xl ">
                   <BiUpload />
                 </div>
 
                 <p>
-                  <span className="text-custom-purple text-bold">Browse</span>{" "}
-                  your files
+                  <span className="text-blue-500 text-bold">Browse</span> your
+                  files
                 </p>
               </button>
 
@@ -182,7 +187,7 @@ export default function Join() {
                 className="hidden"
                 onChange={uploadToClient}
               />
-            </div>
+            </UploadBox>
           </>
         );
         break;
@@ -209,18 +214,31 @@ export default function Join() {
         break;
       case JoinState.MintToken:
         content = (
-          <div className="flex flex-col items-center mx-auto mt-24 py-24 px-8">
-            <div className="text-gray-500 bg-black rounded-full py-4 px-4 text-bold text-5xl ">
-              <AiFillDatabase />
-            </div>
-
-            <button
-              className="bg-custom-purple text-white text-bold text-xl rounded-xl mt-24 px-16 py-2"
-              onClick={() => onMintToken()}
-            >
-              Mint token
-            </button>
-          </div>
+          <>
+            <Subtitle>
+              Only authorized parties such as DAO admins can decrypt and access
+              your data. You will be rewarded with Matic whenever your data is
+              decrypted and processed.
+            </Subtitle>
+            <UploadBox solid>
+              <div className="flex flex-col items-center mx-auto">
+                <div className="text-gray-500 bg-black rounded-full p-6 w-fit text-bold text-5xl border-2 border-white mb-5 icon-shadow">
+                  <FaDatabase size="45" />
+                </div>
+                <p className="mb-9 font-normal text-zinc-600">
+                  The token is free to mint but you will pay a small gas fee in
+                  Matic
+                </p>
+                <Button
+                  btnSize="w-80 h-12"
+                  className="bg-custom-purple text-white flex items-center text-xl rounded-xl mt-2 px-16"
+                  onClick={() => onMintToken()}
+                >
+                  Mint token
+                </Button>
+              </div>
+            </UploadBox>
+          </>
         );
         break;
       case JoinState.MintSuccess:
@@ -303,7 +321,14 @@ export default function Join() {
                   Lorem ipsum dolet
                 </label>
               </div>
-              <Button btnSize="w-96 m-auto">Join SPN DAO</Button>
+              <Button
+                btnSize="w-96 m-auto"
+                onClick={() => {
+                  setJoinState(JoinState.PromptUpload);
+                }}
+              >
+                Join SPN DAO
+              </Button>
               <h3 className="mt-6 font-normal text-zinc-500 max-w-3xl m-auto">
                 Your data will be temporarily stored on a cloud server and then
                 encrypted and uploaded to IPFS. The resulting IPFS link will be
@@ -315,8 +340,65 @@ export default function Join() {
           </>
         ) : (
           <>
-            <h1 className="font-bold text-4xl leading-tight">{showTitle()}</h1>
+            <h1 className="text-4xl leading-tight">{showTitle()}</h1>
             {showContent()}
+            {joinState != JoinState.MintFailure ? (
+              <>
+                <div className="w-3/5 mt-24 m-auto flex flex-row justify-between font-normal text-neutral-800">
+                  <h5 className="w-24 text-xl indent-2 text-start">Upload</h5>
+                  <h5 className="w-40 text-xl">Encrypt & Store</h5>
+                  <h5 className="w-40 text-xl">Mint SBT</h5>
+                  <h5 className="w-24 text-xl text-end">Complete</h5>
+                </div>
+                <div className="mx-12 w-stretch">
+                  <div className="w-3/5 h-3 bg-zinc-300 rounded-full m-auto mt-4 flex flex-row justify-between items-center relative">
+                    <div
+                      className={classNames(
+                        "absolute bg-blue-500 h-full object-left rounded-full z-10 transition-width duration-300",
+                        {
+                          "w-0": joinState == JoinState.PromptUpload,
+                          "w-1/3": joinState == JoinState.UploadingCsv,
+                          "w-2/3": joinState == JoinState.MintToken,
+                          "w-full": joinState == JoinState.MintSuccess,
+                        }
+                      )}
+                    ></div>
+                    <ProgressStepsDot
+                      status={
+                        joinState == JoinState.PromptUpload
+                          ? "empty"
+                          : joinState == JoinState.UploadingCsv
+                          ? "blue"
+                          : "checked"
+                      }
+                    />
+                    <ProgressStepsDot
+                      status={
+                        joinState == JoinState.PromptUpload
+                          ? "empty"
+                          : joinState == JoinState.UploadingCsv
+                          ? "blue"
+                          : "checked"
+                      }
+                    />
+                    <ProgressStepsDot
+                      status={
+                        joinState == JoinState.MintSuccess
+                          ? "checked"
+                          : joinState == JoinState.MintToken
+                          ? "blue"
+                          : "empty"
+                      }
+                    />
+                    <ProgressStepsDot
+                      status={
+                        joinState == JoinState.MintSuccess ? "checked" : "empty"
+                      }
+                    />
+                  </div>
+                </div>
+              </>
+            ) : null}
           </>
         )}
       </div>
