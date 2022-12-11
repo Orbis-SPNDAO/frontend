@@ -65,7 +65,7 @@ export default function Overview({
         <Button
           buttonStyle={ButtonStyle.Outline}
           onClick={() => onManageSbt()}
-          addClassName="whitespace-nowrap bg-white text-custom-purple hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-slate-100 disabled:text-slate-500 ml-2"
+          addClassName="whitespace-nowrap bg-white text-custom-purple hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-slate-100 disabled:text-slate-500 ml-2"
         >
           Manage SBT
         </Button>
