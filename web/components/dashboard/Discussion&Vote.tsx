@@ -2,8 +2,15 @@ import { useState } from "react"
 import { IoIosCheckmark } from "react-icons/io"
 import { useContainerDimensions } from "../../hooks/useContainerDimensions"
 import { abbrevAccount } from "../../utils"
+import { DiscussionData, VoteData } from "./dummydata"
 
-export default function DiscussionNVote({ discussionData, voteData }) {
+export default function DiscussionNVote({
+  discussionData,
+  voteData,
+}: {
+  discussionData: DiscussionData[]
+  voteData: VoteData[]
+}) {
   const [voteContainer, setVoteContainer] = useState<HTMLDivElement | null>()
   const { width: containerWidth } = useContainerDimensions(
     voteContainer as HTMLDivElement
