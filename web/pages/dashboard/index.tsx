@@ -1,14 +1,13 @@
-import { ethers } from "ethers"
 import { useRouter } from "next/router"
 import { useAccount } from "wagmi"
-import DiscussionNVote from "../components/dashboard/Discussion&Vote"
+import DiscussionNVote from "../../components/dashboard/Discussion&Vote"
 import {
   discussionData,
   overviewData,
   voteData,
-} from "../components/dashboard/dummydata"
-import Overview from "../components/dashboard/Overview"
-import PageLayout from "../components/layouts/PageLayout"
+} from "../../components/dashboard/dummydata"
+import Overview from "../../components/dashboard/Overview"
+import PageLayout from "../../components/layouts/PageLayout"
 
 export default function Home() {
   const router = useRouter()
