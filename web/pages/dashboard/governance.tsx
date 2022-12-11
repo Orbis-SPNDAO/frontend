@@ -3,6 +3,7 @@ import { useState } from "react"
 import { BsChevronLeft } from "react-icons/bs"
 import { useAccount } from "wagmi"
 import { VoteData, voteData } from "../../components/dashboard/dummydata"
+import Forum from "../../components/dashboard/governance/Forum"
 import Proposals from "../../components/dashboard/governance/Proposals"
 import PageLayout from "../../components/layouts/PageLayout"
 
@@ -41,7 +42,7 @@ export default function Governance() {
             <BsChevronLeft /> <span className="ml-4">Back to Dashboard</span>
           </button>
 
-          <div className="">
+          <div>
             <button
               className={`mr-2 ${
                 activeTab === ActiveTab.Forum
@@ -68,6 +69,7 @@ export default function Governance() {
         </div>
 
         <div className="w-stretch m-5 md:mx-28 md:my-12 h-fit py-6 px-4 md:p-10 hero">
+          {activeTab === ActiveTab.Forum && <Forum />}
           {activeTab === ActiveTab.Proposal && (
             <Proposals voteData={voteData} onProposalClick={onProposalClick} />
           )}
