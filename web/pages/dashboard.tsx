@@ -1,6 +1,7 @@
 import { ethers } from "ethers"
 import { useRouter } from "next/router"
 import { useAccount } from "wagmi"
+import Button, { ButtonStyle, ButtonTypes } from "../components/Button"
 import PageLayout from "../components/layouts/PageLayout"
 import UserDashData from "../components/UserDashData"
 
@@ -14,6 +15,9 @@ export default function Home() {
     votesParticipated: 12,
     discussions: 63,
   }
+
+  function onDiscussVote() {}
+  function onManageSbt() {}
 
   return (
     <>
@@ -70,6 +74,24 @@ export default function Home() {
                   </div>
                   <div>Discussions</div>
                 </div>
+              </div>
+
+              <div className="mx-auto w-fit flex">
+                <Button
+                  onClick={() => onDiscussVote()}
+                  addClassName="mr-2 whitespace-nowrap"
+                >
+                  Discuss & Vote
+                </Button>
+
+                <Button
+                  buttonStyle={ButtonStyle.Outline}
+                  onClick={() => onManageSbt()}
+                  addClassName="whitespace-nowrap bg-white text-custom-purple hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-slate-100 disabled:text-slate-500 ml-2"
+                  
+                >
+                  Manage SBT
+                </Button>
               </div>
             </div>
 
