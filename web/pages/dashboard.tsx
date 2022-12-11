@@ -1,19 +1,23 @@
 import { ethers } from "ethers"
 import { useRouter } from "next/router"
+import { useRef, useState } from "react"
+import { IoIosCheckmark } from "react-icons/io"
 import { useAccount } from "wagmi"
-import Button, { ButtonStyle, ButtonTypes } from "../components/Button"
 import Overview from "../components/dashboard/Overview"
 import PageLayout from "../components/layouts/PageLayout"
-import UserDashData from "../components/UserDashData"
+import { useContainerDimensions } from "../hooks/useContainerDimensions"
+
 import { abbrevAccount } from "../utils"
-import { IoIosCheckmark } from "react-icons/io"
-import { LegacyRef, useRef } from "react"
 
 export default function Home() {
   const router = useRouter()
   const { isConnecting, address } = useAccount()
 
-  const voteContainerRef = useRef<HTMLDivElement | null>()
+  // const voteContainerRef = useRef<HTMLDivElement | null>()
+  const [voteContainer, setVoteContainer] = useState<HTMLDivElement | null>()
+  const { width: containerWidth } = useContainerDimensions(
+    voteContainer as HTMLDivElement
+  )
 
   const overviewData = {
     totalRewards: ethers.utils.parseEther("1.27"),
@@ -141,10 +145,7 @@ export default function Home() {
               <h2 className="text-left text-2xl font-normal mt-8">Vote</h2>
 
               <div
-                ref={voteContainerRef}
-                // ref={(ref) => {
-                //   voteContainerRef.current = ref
-                // }}
+                ref={(ref) => setVoteContainer(ref)}
                 className="flex flex-col w-full text-left text-sm mt-4 py-2"
               >
                 {voteData?.map((vote) => {
@@ -157,8 +158,6 @@ export default function Home() {
                     ...vote.options.map((o) => o.voteCount)
                   )
 
-                  const containerWidth =
-                    voteContainerRef.current?.offsetWidth ?? 1
                   const widthPerVote = containerWidth / totalVotes
 
                   return (
