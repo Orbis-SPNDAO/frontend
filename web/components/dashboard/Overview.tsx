@@ -12,7 +12,7 @@ export default function Overview({
   onManageSbt: Function
 }) {
   return (
-    <div className="w-stretch m-5 md:mx-28 md:my-12 h-fit py-6 px-4 md:p-10 hero border-2">
+    <div className="w-stretch m-5 md:mx-28 md:my-12 h-fit py-6 px-4 md:p-10 hero">
       <h1 className="text-xl md:text-4xl font-normal">
         Your data is more valuable than you think
       </h1>
