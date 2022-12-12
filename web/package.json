@@ -30,6 +30,7 @@
     "web3.storage": "^4.4.0"
   },
   "devDependencies": {
+    "@types/lodash.merge": "^4.6.7",
     "@types/node": "18.11.9",
     "@types/react": "18.0.25",
     "@types/react-dom": "18.0.9",
