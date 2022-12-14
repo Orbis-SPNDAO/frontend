@@ -1,19 +1,19 @@
-import React, { Dispatch, useState } from "react"
-import { IoIosCheckmark } from "react-icons/io"
-import { useContainerDimensions } from "../../../hooks/useContainerDimensions"
-import { VoteData } from "../dummydata"
+import React, { Dispatch, useState } from "react";
+import { IoIosCheckmark } from "react-icons/io";
+import { useContainerDimensions } from "../../../hooks/useContainerDimensions";
+import { VoteData } from "../dummydata";
 
 export default function Proposals({
   voteData,
   onProposalClick,
 }: {
-  voteData: VoteData[]
-  onProposalClick
+  voteData: VoteData[];
+  onProposalClick: any;
 }) {
-  const [voteContainer, setVoteContainer] = useState<HTMLDivElement | null>()
+  const [voteContainer, setVoteContainer] = useState<HTMLDivElement | null>();
   const { width: containerWidth } = useContainerDimensions(
     voteContainer as HTMLDivElement
-  )
+  );
 
   return (
     <>
@@ -27,11 +27,13 @@ export default function Proposals({
           const totalVotes = vote.options.reduce(
             (total, o) => total + o.voteCount,
             0
-          )
+          );
 
-          const maxVoteCount = Math.max(...vote.options.map((o) => o.voteCount))
+          const maxVoteCount = Math.max(
+            ...vote.options.map((o) => o.voteCount)
+          );
 
-          const widthPerVote = containerWidth / totalVotes
+          const widthPerVote = containerWidth / totalVotes;
 
           return (
             <button
@@ -75,13 +77,13 @@ export default function Proposals({
                         </span>
                       </div>
                     </span>
-                  )
+                  );
                 })}
               </div>
             </button>
-          )
+          );
         })}
       </div>
     </>
-  )
+  );
 }

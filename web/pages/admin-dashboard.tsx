@@ -17,7 +17,7 @@ export default function Home() {
   const { address } = useAccount();
   const router = useRouter();
 
-  useEffect(() => {
+useEffect(() => {
     // check for admin NFT
     async function checkForAdminNFT() {
       if (!provider) {
