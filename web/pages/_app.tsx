@@ -38,7 +38,7 @@ const App = ({ Component, pageProps }: AppProps) => {
   );
 
   const { connectors } = getDefaultWallets({
-    appName: "Pattern DAO",
+    appName: "SPN DAO",
     chains,
   });
 
