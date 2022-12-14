@@ -8,13 +8,13 @@ import { FaDatabase } from "react-icons/fa";
 import { useAccount, useContractWrite } from "wagmi";
 import { SBT_ABI } from "../abis/currentABI";
 import Button from "../components/Button";
-import { JoinSubText } from "../components/JoinSubText";
+import { JoinSubText } from "../components/join/JoinSubText";
 import PageLayout from "../components/layouts/PageLayout";
-import { ProgressStepsDot } from "../components/ProgressStepsDot";
+import { ProgressStepsDot } from "../components/join/ProgressStepsDot";
 import { SocialsFooter } from "../components/SocialsFooter";
 import Spinner from "../components/Spinner";
-import { SplashStep } from "../components/SplashStep";
-import { UploadBox } from "../components/UploadBox";
+import { SplashStep } from "../components/join/SplashStep";
+import { UploadBox } from "../components/join/UploadBox";
 var crypto = require("crypto");
 
 enum JoinState {
@@ -30,21 +30,11 @@ enum JoinState {
 let cid = "";
 
 export default function Join() {
-  // const { data: signer } = useSigner();
-  // const contract = useContract({
-  //   address: process.env.NEXT_PUBLIC_SBT_ADDR,
-  //   abi: SBT_ABI,
-  //   signerOrProvider: signer,
-  // });
   const { write } = useContractWrite({
     mode: "recklesslyUnprepared",
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
     abi: SBT_ABI,
     functionName: "safeMint",
-    // overrides: {
-    //     maxFeePerGas: ethers.utils.parseEther('1'),
-    //     maxPriorityFeePerGas: ethers.utils.parseEther('1')
-    // }
   });
   const { address } = useAccount();
   const router = useRouter();
@@ -355,9 +345,9 @@ export default function Join() {
                 />
                 <label
                   htmlFor="consent"
-                  className="ml-2 text-neutral-900 text-sm md:text-lg"
+                  className="ml-2 text-neutral-900 text-sm md:text-md"
                 >
-                  I understand how my data will be handled.
+                  By checking the box, I agree to SPN DAO&apos;s <a>Terms of Use</a> and <a>Privacy Policy</a>. 
                 </label>
               </div>
               <Button

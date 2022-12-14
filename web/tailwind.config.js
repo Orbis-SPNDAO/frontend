@@ -12,8 +12,9 @@ module.exports = {
         "custom-purple": "#5D5FEF",
         "custom-border": "#B4B4B4",
         "custom-gray": "#828282",
+        "error-red": "#FF0420"
       },
     },
   },
   plugins: [],
-}
+};

@@ -1,24 +1,36 @@
-import { useState } from "react"
-import { IoIosCheckmark } from "react-icons/io"
-import { useContainerDimensions } from "../../hooks/useContainerDimensions"
-import { abbrevAccount } from "../../utils"
-import { DiscussionData, VoteData } from "./dummydata"
+import Link from "next/link";
+import { useState } from "react";
+import { IoIosCheckmark } from "react-icons/io";
+import { useContainerDimensions } from "../../hooks/useContainerDimensions";
+import { abbrevAccount } from "../../utils";
+import { DiscussionData, VoteData } from "./dummydata";
 
 export default function DiscussionNVote({
   discussionData,
   voteData,
 }: {
-  discussionData: DiscussionData[]
-  voteData: VoteData[]
+  discussionData: DiscussionData[];
+  voteData: VoteData[];
 }) {
-  const [voteContainer, setVoteContainer] = useState<HTMLDivElement | null>()
+  const [voteContainer, setVoteContainer] = useState<HTMLDivElement | null>();
   const { width: containerWidth } = useContainerDimensions(
     voteContainer as HTMLDivElement
-  )
+  );
 
   return (
     <div className="w-stretch m-5 md:mx-28 md:my-12 h-fit py-6 px-4 md:p-10 hero">
-      <h2 className="text-left text-2xl font-normal">Discussion</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-left text-2xl font-normal">Discussion</h2>
+        <Link
+          href={{
+            pathname: "/dashboard/governance",
+            query: { "initial-active-tab": "forum" },
+          }}
+          className="font-normal text-custom-purple"
+        >
+          View All Discussions
+        </Link>
+      </div>
 
       <div className="flex w-full overflow-x-auto text-left text-md mt-4 py-2">
         {discussionData?.map((discussion) => {
@@ -37,14 +49,24 @@ export default function DiscussionNVote({
                 </div>
               </div>
             </div>
-          )
+          );
         })}
       </div>
 
       <div className="my-8 w-full h-0.5 bg-custom-border opacity-25"></div>
 
-      <h2 className="text-left text-2xl font-normal mt-8">Vote</h2>
-
+      <div className="flex justify-between items-center">
+        <h2 className="text-left text-2xl font-normal">Vote</h2>
+        <Link
+          href={{
+            pathname: "/dashboard/governance",
+            query: { "initial-active-tab": "proposal" },
+          }}
+          className="font-normal text-custom-purple"
+        >
+          View All Proposals
+        </Link>
+      </div>
       <div
         ref={(ref) => setVoteContainer(ref)}
         className="flex flex-col w-full text-left text-sm mt-4 py-2"
@@ -53,11 +75,13 @@ export default function DiscussionNVote({
           const totalVotes = vote.options.reduce(
             (total, o) => total + o.voteCount,
             0
-          )
+          );
 
-          const maxVoteCount = Math.max(...vote.options.map((o) => o.voteCount))
+          const maxVoteCount = Math.max(
+            ...vote.options.map((o) => o.voteCount)
+          );
 
-          const widthPerVote = containerWidth / totalVotes
+          const widthPerVote = containerWidth / totalVotes;
 
           return (
             <div key={vote.id} className="border-2 rounded-lg mb-4 p-4">
@@ -97,13 +121,13 @@ export default function DiscussionNVote({
                         </span>
                       </div>
                     </span>
-                  )
+                  );
                 })}
               </div>
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }

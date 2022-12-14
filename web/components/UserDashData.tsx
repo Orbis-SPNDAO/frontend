@@ -101,7 +101,6 @@ export default function UserDashData() {
     return (
       <div className="flex flex-col items-center mx-auto px-8">
         {list.map((nft, index) => {
-          console.log({ nft });
           return nft.items ? (
             <div
               key={index}

@@ -36,6 +36,9 @@ a {
   background: linear-gradient(146.56deg, #7d4efb 9.86%, #f9082a 88.88%);
 }
 
+.rc-tooltip-placement-top .rc-tooltip-arrow {
+  border-top-color: black !important;
+}
 @layer utilities {
   .big-btn {
     @apply px-4 py-3 rounded-full text-center flex items-center justify-center text-black font-medium drop-shadow-sm hover:drop-shadow-lg;
