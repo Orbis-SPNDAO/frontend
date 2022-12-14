@@ -5,9 +5,10 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 type HeaderProps = {
   hideLogo?: boolean;
+  hideButton?: boolean;
 };
 
-const Header: FC<HeaderProps> = ({ hideLogo }) => {
+const Header: FC<HeaderProps> = ({ hideLogo, hideButton }) => {
   const router = useRouter();
 
   return (
@@ -23,9 +24,9 @@ const Header: FC<HeaderProps> = ({ hideLogo }) => {
             </button>
           ) : null}
 
-          <div className="flex items-center space-x-6 ml-auto">
+          {!hideButton ? <div className="flex items-center space-x-6 ml-auto">
             <ConnectButton />
-          </div>
+          </div> : null}
         </div>
       </div>
     </div>

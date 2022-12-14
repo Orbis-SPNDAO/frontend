@@ -1,7 +1,8 @@
 import { FC } from "react";
+import Home from "../components/Home";
 
 const ComeBack: FC = () => {
-  return <div>Come Back</div>;
+  return <Home justBurned />;
 };
 
 export default ComeBack;

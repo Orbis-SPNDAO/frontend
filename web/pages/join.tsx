@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BiUpload } from "react-icons/bi";
 import { BsCheckLg } from "react-icons/bs";
 import { FaDatabase } from "react-icons/fa";
@@ -9,12 +9,12 @@ import { useAccount, useContractWrite } from "wagmi";
 import { SBT_ABI } from "../abis/currentABI";
 import Button from "../components/Button";
 import { JoinSubText } from "../components/join/JoinSubText";
-import PageLayout from "../components/layouts/PageLayout";
 import { ProgressStepsDot } from "../components/join/ProgressStepsDot";
-import { SocialsFooter } from "../components/SocialsFooter";
-import Spinner from "../components/Spinner";
 import { SplashStep } from "../components/join/SplashStep";
 import { UploadBox } from "../components/join/UploadBox";
+import PageLayout from "../components/layouts/PageLayout";
+import { SocialsFooter } from "../components/SocialsFooter";
+import Spinner from "../components/Spinner";
 var crypto = require("crypto");
 
 enum JoinState {
@@ -23,6 +23,7 @@ enum JoinState {
   UploadingCsv = "uploading-csv",
   UploadFailure = "upload-failure",
   MintToken = "mint-token",
+  MintInProgress = "mint-in-progress",
   MintSuccess = "mint-success",
   MintFailure = "mint-failure",
 }
@@ -30,7 +31,7 @@ enum JoinState {
 let cid = "";
 
 export default function Join() {
-  const { write } = useContractWrite({
+  const { write, isLoading, isSuccess } = useContractWrite({
     mode: "recklesslyUnprepared",
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
     abi: SBT_ABI,
@@ -43,6 +44,14 @@ export default function Join() {
   const [joinState, setJoinState] = useState<JoinState>(JoinState.Start);
 
   const fileRef = useRef<HTMLInputElement | null>();
+
+  useEffect(() => {
+    if (isSuccess) setJoinState(JoinState.MintSuccess);
+  }, [isSuccess]);
+
+  useEffect(() => {
+    if (isLoading) setJoinState(JoinState.MintInProgress);
+  }, [isLoading]);
 
   // loads file client side so server can see it
   const uploadToClient = async (event: any) => {
@@ -99,7 +108,6 @@ export default function Join() {
 
     try {
       write({ recklesslySetUnpreparedArgs: [address, cid] });
-      setJoinState(JoinState.MintSuccess);
     } catch (e) {
       console.log(e);
       setJoinState(JoinState.MintFailure);
@@ -130,6 +138,9 @@ export default function Join() {
         break;
       case JoinState.MintToken:
         title = "Upload successful! Mint your token now";
+        break;
+      case JoinState.MintInProgress:
+        title = "Confirm minting in your wallet";
         break;
       case JoinState.MintSuccess:
         title = "Token mint successful";
@@ -233,6 +244,35 @@ export default function Join() {
                   onClick={() => onMintToken()}
                 >
                   Mint token
+                </Button>
+              </div>
+            </UploadBox>
+          </>
+        );
+        break;
+      case JoinState.MintInProgress:
+        content = (
+          <>
+            <JoinSubText>
+              You will be asked to review and confirm the minting from your
+              wallet.
+            </JoinSubText>
+            <UploadBox solid>
+              <div className="flex flex-col items-center mx-auto w-full">
+                <div className="text-gray-500 bg-black rounded-full p-6 w-fit text-bold text-5xl border-2 border-white mb-5 icon-shadow">
+                  <FaDatabase size="45" />
+                </div>
+                <p className="mb-9 font-normal text-zinc-600 text-sm md:text-lg">
+                  The token is free to mint but you will pay a small gas fee in
+                  Matic
+                </p>
+                <Button
+                  btnSize="w-3/4 md:w-80 h-12"
+                  className="bg-custom-purple text-white flex items-center text-xl rounded-xl mt-2 px-16"
+                  onClick={() => onMintToken()}
+                  disabled
+                >
+                  Waiting for approval...
                 </Button>
               </div>
             </UploadBox>
@@ -347,7 +387,8 @@ export default function Join() {
                   htmlFor="consent"
                   className="ml-2 text-neutral-900 text-sm md:text-md"
                 >
-                  By checking the box, I agree to SPN DAO&apos;s <a>Terms of Use</a> and <a>Privacy Policy</a>. 
+                  By checking the box, I agree to SPN DAO&apos;s{" "}
+                  <a>Terms of Use</a> and <a>Privacy Policy</a>.
                 </label>
               </div>
               <Button
@@ -396,6 +437,7 @@ export default function Join() {
                           "w-0": joinState == JoinState.PromptUpload,
                           "w-1/3": joinState == JoinState.UploadingCsv,
                           "w-2/3": joinState == JoinState.MintToken,
+                          "w-5/6": joinState == JoinState.MintInProgress,
                         }
                       )}
                     ></div>
@@ -419,7 +461,11 @@ export default function Join() {
                     />
                     <ProgressStepsDot
                       status={
-                        joinState == JoinState.MintToken ? "blue" : "empty"
+                        joinState == JoinState.MintToken
+                          ? "blue"
+                          : joinState == JoinState.MintInProgress
+                          ? "checked"
+                          : "empty"
                       }
                     />
                     <ProgressStepsDot status="empty" />

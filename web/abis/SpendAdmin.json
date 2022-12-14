@@ -1,7 +1,7 @@
 {
   "_format": "hh-sol-artifact-1",
-  "contractName": "PatternDAOAdmin",
-  "sourceName": "contracts/PatternDAOAdmin.sol",
+  "contractName": "SpendAdmin",
+  "sourceName": "contracts/SpendAdmin.sol",
   "abi": [
     {
       "inputs": [],
