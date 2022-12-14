@@ -63,7 +63,7 @@ const Home: FC<{ justBurned?: boolean }> = ({ justBurned }) => {
   return (
     <div className="w-stretch min-h-screen bg-cover bg-[url('/assets/landing_bg.png')]">
       {justBurned ? <Header hideButton /> : null}
-      <div className={`text-center ${justBurned ? "py-6" : "py-10"} sm:pb-20`}>
+      <div className={`text-center ${justBurned ? "py-2 sm:py-10" : "py-6 sm:py-20"}`}>
         {justBurned ? (
           <div className="w-stretch">
             <h2 className="text-2xl sm:text-4xl mx-5">Sorry to see you go 🥺</h2>
