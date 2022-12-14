@@ -25,6 +25,7 @@
     "next": "13.0.4",
     "npm": "^9.1.2",
     "pinata-submarine": "^0.1.6",
+    "rc-tooltip": "^5.2.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.6.0",
