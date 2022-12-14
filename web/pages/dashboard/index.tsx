@@ -8,6 +8,7 @@ import {
 } from "../../components/dashboard/dummydata"
 import Overview from "../../components/dashboard/Overview"
 import PageLayout from "../../components/layouts/PageLayout"
+import { SocialsFooter } from "../../components/SocialsFooter"
 
 export default function Home() {
   const router = useRouter()
@@ -17,7 +18,7 @@ export default function Home() {
     router.push("/dashboard/governance")
   }
   function onManageSbt() {
-    router.push("/dashboard/manage-sbt")
+    router.push("/dashboard/manage-membership")
   }
 
   return (
@@ -43,6 +44,7 @@ export default function Home() {
               discussionData={discussionData}
               voteData={voteData}
             />
+            <SocialsFooter />
           </div>
         </PageLayout>
       )}

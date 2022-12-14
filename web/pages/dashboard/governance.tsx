@@ -1,11 +1,12 @@
-import { useRouter } from "next/router"
-import { useState } from "react"
-import { BsChevronLeft } from "react-icons/bs"
-import { useAccount } from "wagmi"
-import { VoteData, voteData } from "../../components/dashboard/dummydata"
-import Forum from "../../components/dashboard/governance/Forum"
-import Proposals from "../../components/dashboard/governance/Proposals"
-import PageLayout from "../../components/layouts/PageLayout"
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { BsChevronLeft } from "react-icons/bs";
+import { useAccount } from "wagmi";
+import { VoteData, voteData } from "../../components/dashboard/dummydata";
+import Forum from "../../components/dashboard/governance/Forum";
+import Proposals from "../../components/dashboard/governance/Proposals";
+import { SignInPrompt } from "../../components/dashboard/SignInPrompt";
+import PageLayout from "../../components/layouts/PageLayout";
 
 enum ActiveTab {
   Forum = "forum",
@@ -13,26 +14,25 @@ enum ActiveTab {
 }
 
 export default function Governance() {
-  const router = useRouter()
-  const { isConnecting, address } = useAccount()
+  const router = useRouter();
+  const { "initial-active-tab": initialActiveTab } = router.query;
+  const { isConnecting, address } = useAccount();
 
-  const [activeTab, setActiveTab] = useState(ActiveTab.Proposal)
+  const [activeTab, setActiveTab] = useState(
+    initialActiveTab ?? ActiveTab.Proposal
+  );
 
   function navigateBack() {
-    router.push("/dashboard")
+    router.push("/dashboard");
   }
 
   function onProposalClick(proposal: VoteData) {
-    router.push(`/dashboard/governance/${proposal.id}`)
+    router.push(`/dashboard/governance/${proposal.id}`);
   }
 
   return !address || isConnecting ? (
     <PageLayout containerClassName="bg-custom-blue bg-cover min-h-screen">
-      <div className="text-center mt-20 min-w-full">
-        <h1 className="font-bold text-custom-purple text-3xl leading-tight">
-          Please Sign In To View Dashboard
-        </h1>
-      </div>
+      <SignInPrompt />
     </PageLayout>
   ) : (
     <PageLayout containerClassName="bg-custom-blue bg-cover min-h-screen">
@@ -46,8 +46,8 @@ export default function Governance() {
             <button
               className={`mr-2 ${
                 activeTab === ActiveTab.Forum
-                  ? "text-custom-purple underline"
-                  : ""
+                  ? ""
+                  : "text-custom-purple underline"
               }`}
               onClick={() => setActiveTab(ActiveTab.Forum)}
             >
@@ -56,8 +56,8 @@ export default function Governance() {
             <button
               className={`ml-2 ${
                 activeTab === ActiveTab.Proposal
-                  ? "text-custom-purple underline"
-                  : ""
+                  ? ""
+                  : "text-custom-purple underline"
               }`}
               onClick={() => setActiveTab(ActiveTab.Proposal)}
             >
@@ -76,5 +76,5 @@ export default function Governance() {
         </div>
       </div>
     </PageLayout>
-  )
+  );
 }

@@ -2,7 +2,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import classNames from "classnames";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useAccount, useContract, useSigner } from "wagmi";
+import { useAccount, useContract, useProvider, useSigner, useSwitchNetwork } from "wagmi";
 import { SBT_ABI } from "../abis/currentABI";
 import Button from "../components/Button";
 import Header from "../components/Header";
@@ -21,13 +21,19 @@ export default function Home() {
 
   const [activeChoice, setActiveChoice] = useState(UserType.EndUser);
   const [isLoading, setIsLoading] = useState(false);
+  const provider = useProvider();
+
+  const network = useSwitchNetwork({
+    chainId: 80001,
+    onError: () => null,
+  });
 
   const { address } = useAccount();
   const { data: signer } = useSigner();
   const contract = useContract({
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
     abi: SBT_ABI,
-    signerOrProvider: signer,
+    signerOrProvider: provider,
   });
   useEffect(() => {
     (async function checkForSbtAndRoute() {
@@ -52,7 +58,9 @@ export default function Home() {
   return (
     <div className="min-w-screen min-h-screen bg-cover bg-[url('/assets/landing_bg.png')]">
       <div className="text-center py-10 sm:py-20">
-        <h1 className="text-6xl text-custom-purple sm:text-9xl leading-tight">SPN DAO</h1>
+        <h1 className="text-6xl text-custom-purple sm:text-9xl leading-tight">
+          SPN DAO
+        </h1>
         <h4 className="text-md sm:text-3xl mb-16">
           Your data is more valuable than you think
         </h4>
