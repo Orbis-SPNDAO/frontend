@@ -30,21 +30,11 @@ enum JoinState {
 let cid = "";
 
 export default function Join() {
-  // const { data: signer } = useSigner();
-  // const contract = useContract({
-  //   address: process.env.NEXT_PUBLIC_SBT_ADDR,
-  //   abi: SBT_ABI,
-  //   signerOrProvider: signer,
-  // });
   const { write } = useContractWrite({
     mode: "recklesslyUnprepared",
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
     abi: SBT_ABI,
     functionName: "safeMint",
-    // overrides: {
-    //     maxFeePerGas: ethers.utils.parseEther('1'),
-    //     maxPriorityFeePerGas: ethers.utils.parseEther('1')
-    // }
   });
   const { address } = useAccount();
   const router = useRouter();

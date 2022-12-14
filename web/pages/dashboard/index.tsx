@@ -1,24 +1,25 @@
-import { useRouter } from "next/router"
-import { useAccount } from "wagmi"
-import DiscussionNVote from "../../components/dashboard/Discussion&Vote"
+import { useRouter } from "next/router";
+import { useAccount } from "wagmi";
+import DiscussionNVote from "../../components/dashboard/Discussion&Vote";
 import {
   discussionData,
   overviewData,
   voteData,
-} from "../../components/dashboard/dummydata"
-import Overview from "../../components/dashboard/Overview"
-import PageLayout from "../../components/layouts/PageLayout"
-import { SocialsFooter } from "../../components/SocialsFooter"
+} from "../../components/dashboard/dummydata";
+import Overview from "../../components/dashboard/Overview";
+import PageLayout from "../../components/layouts/PageLayout";
+import { SocialsFooter } from "../../components/SocialsFooter";
 
 export default function Home() {
-  const router = useRouter()
-  const { isConnecting, address } = useAccount()
+  const router = useRouter();
+  const { isConnecting, address } = useAccount();
+  const { bal } = router.query;
 
   function onDiscussVote() {
-    router.push("/dashboard/governance")
+    router.push("/dashboard/governance");
   }
   function onManageSbt() {
-    router.push("/dashboard/manage-membership")
+    router.push({ pathname: "/dashboard/manage-membership", query: { bal } });
   }
 
   return (
@@ -49,5 +50,5 @@ export default function Home() {
         </PageLayout>
       )}
     </>
-  )
+  );
 }

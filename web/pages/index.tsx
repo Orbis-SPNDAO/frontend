@@ -2,7 +2,13 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import classNames from "classnames";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { useAccount, useContract, useProvider, useSigner, useSwitchNetwork } from "wagmi";
+import {
+  useAccount,
+  useContract,
+  useProvider,
+  useSigner,
+  useSwitchNetwork,
+} from "wagmi";
 import { SBT_ABI } from "../abis/currentABI";
 import Button from "../components/Button";
 import Header from "../components/Header";
@@ -42,7 +48,8 @@ export default function Home() {
         const bal = parseInt(await contract.balanceOf(address), 10);
         console.log({ bal });
         if (UserType.EndUser) {
-          router.push(bal < 2 ? "/join" : "/dashboard");
+          if (bal === 0) router.push("/join");
+          else router.push({ pathname: "/dashboard", query: { bal } });
         } else {
           router.push("/admin-dashboard");
         }

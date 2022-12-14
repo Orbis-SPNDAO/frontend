@@ -2,10 +2,10 @@ import { add } from "lodash";
 import { useRouter } from "next/router";
 import Tooltip from "rc-tooltip";
 import "rc-tooltip/assets/bootstrap_white.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdContentCopy } from "react-icons/md";
 import { RxCaretLeft, RxCross2 } from "react-icons/rx";
-import { useAccount, useContract, useSigner } from "wagmi";
+import { useAccount, useContract, useContractWrite, useSigner } from "wagmi";
 import { SBT_ABI } from "../../abis/currentABI";
 import Button, { ButtonStyle } from "../../components/Button";
 import { MembershipSection } from "../../components/dashboard/membership/MembershipSection";
@@ -22,14 +22,30 @@ export default function ManageMembership() {
     abi: SBT_ABI,
     signerOrProvider: signer,
   });
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [isBurning, setIsBurning] = useState(false);
+  const { write, isLoading, isSuccess } = useContractWrite({
+    abi: SBT_ABI,
+    address: process.env.NEXT_PUBLIC_SBT_ADDR,
+    functionName: "userBurn",
+    mode: "recklesslyUnprepared",
+  });
+  useEffect(() => {
+    if (isSuccess) router.push("/come-back");
+  }, [isSuccess, router]);
 
-  async function burnToken(tokenId: number) {
-    if (contract && signer) {
-      setIsBurning(true);
-      await contract.userBurn(address, tokenId);
-      setIsBurning(false);
+  const { bal } = router.query;
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+
+  async function burnToken() {
+    console.log({ signer, contract });
+    if (contract && signer && write) {
+      console.log("click");
+      const tokenId = await contract
+        .ownerToTokenIds(address, Number(bal) - 1)
+        .then(parseInt);
+      console.log(tokenId);
+      // TODO: fix smart contract to
+      // delete token IDs from ownerToTokenIds upon burn
+      write({ recklesslySetUnpreparedArgs: [tokenId] });
     }
   }
 
@@ -62,21 +78,26 @@ export default function ManageMembership() {
                   membership and stop sharing your data. You will also stop
                   receiving rewards.
                 </span>
-                <div className="flex justify-between w-full gap-5">
-                  <Button
-                    buttonStyle={ButtonStyle.Error}
-                    btnSize="w-1/2"
-                    onClick={() => setConfirmModalOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    buttonStyle={ButtonStyle.ErrorOutline}
-                    btnSize="w-1/2"
-                  >
-                    Burn Anyway
-                  </Button>
-                </div>
+                {isLoading || isSuccess ? (
+                  <Button disabled>Waiting for approval...</Button>
+                ) : (
+                  <div className="flex justify-between w-full gap-5">
+                    <Button
+                      buttonStyle={ButtonStyle.Error}
+                      btnSize="w-1/2"
+                      onClick={() => setConfirmModalOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      buttonStyle={ButtonStyle.ErrorOutline}
+                      btnSize="w-1/2"
+                      onClick={() => burnToken()}
+                    >
+                      Burn Anyway
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           ) : null}
