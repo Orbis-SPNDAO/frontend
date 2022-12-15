@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@composedb/client": "^0.3.1",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "@rainbow-me/rainbowkit": "^0.8.0",
@@ -33,6 +34,9 @@
     "web3.storage": "^4.4.0"
   },
   "devDependencies": {
+    "@composedb/devtools": "^0.3.1",
+    "@composedb/devtools-node": "^0.3.1",
+    "@composedb/types": "^0.3.1",
     "@types/lodash.merge": "^4.6.7",
     "@types/node": "18.11.9",
     "@types/react": "18.0.25",
