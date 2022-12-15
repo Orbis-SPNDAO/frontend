@@ -20,26 +20,18 @@ export default function Home() {
 useEffect(() => {
     // check for admin NFT
     async function checkForAdminNFT() {
-      if (!provider) {
-        console.log("no provider");
-        return;
-      } else if (!contract) {
-        console.log("No Contract");
-        return;
-      }
-      try {
-        const bal = await contract.balanceOf(address);
+      if (!provider || !address || !contract) return; 
 
-        if (bal > 0) {
-          console.log("admin NFT found");
-        } else {
-          console.log("NOT found");
-          // router.push("/")
-        }
-      } catch (e) {
-        console.log(address);
-        // router.push("/");
+      try {        
+        const bal = await contract.balanceOf(address);
+        
+        if (bal <= 0) 
+          router.push("/")        
+
+      } catch (e) {        
+        router.push("/");
       }
+
     }
 
     checkForAdminNFT();
