@@ -1,32 +1,44 @@
+import merge from "lodash.merge";
 import type { AppProps } from "next/app";
-import merge from 'lodash.merge';
 
 import MainLayout from "../components/layouts/MainLayout";
 import "../styles/globals.css";
 
-  import "@rainbow-me/rainbowkit/styles.css";
+import "@rainbow-me/rainbowkit/styles.css";
 
-import { darkTheme, getDefaultWallets, lightTheme, RainbowKitProvider, Theme } from "@rainbow-me/rainbowkit";
+import {
+  getDefaultWallets,
+  lightTheme,
+  RainbowKitProvider,
+  Theme,
+} from "@rainbow-me/rainbowkit";
 import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
+import { alchemyProvider } from "wagmi/providers/alchemy";
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { publicProvider } from "wagmi/providers/public";
 
 const myTheme = merge(lightTheme(), {
   colors: {
-    accentColor: '#5D5FEF',
+    accentColor: "#5D5FEF",
   },
   fonts: {
-    body: 'Rubik',
-  }
+    body: "Rubik",
+  },
 } as Theme);
 
 const App = ({ Component, pageProps }: AppProps) => {
+  const ALCHEMY_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
   const { chains, provider } = configureChains(
     [chain.polygonMumbai],
-    [publicProvider()]
+    [
+      alchemyProvider({ apiKey: ALCHEMY_KEY as string }),
+      jsonRpcProvider({ rpc: (chain) => ({ http: chain.rpcUrls.default }) }),
+      publicProvider(),
+    ]
   );
 
   const { connectors } = getDefaultWallets({
-    appName: "Pattern DAO",
+    appName: "SPN DAO",
     chains,
   });
 
@@ -39,9 +51,9 @@ const App = ({ Component, pageProps }: AppProps) => {
   return (
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider chains={chains} theme={myTheme}>
-          <MainLayout>
-            <Component {...pageProps} />
-          </MainLayout>
+        <MainLayout>
+          <Component {...pageProps} />
+        </MainLayout>
       </RainbowKitProvider>
     </WagmiConfig>
   );

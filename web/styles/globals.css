@@ -6,7 +6,8 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: 'Rubik', sans-serif;
+  min-width: 100vw;
+  font-family: "Rubik", sans-serif;
   font-weight: 500;
 }
 
@@ -25,6 +26,19 @@ a {
   border-radius: 1.5rem;
 }
 
+.icon-shadow {
+  box-shadow: 0px 0px 8px -4px rgba(20, 23, 26, 0.12),
+    0px 4px 16px -1px rgba(20, 23, 26, 0.08);
+  filter: drop-shadow(0px 4px 20px rgba(0, 0, 0, 0.15));
+}
+
+.mint-success-gradient {
+  background: linear-gradient(146.56deg, #7d4efb 9.86%, #f9082a 88.88%);
+}
+
+.rc-tooltip-placement-top .rc-tooltip-arrow {
+  border-top-color: black !important;
+}
 @layer utilities {
   .big-btn {
     @apply px-4 py-3 rounded-full text-center flex items-center justify-center text-black font-medium drop-shadow-sm hover:drop-shadow-lg;

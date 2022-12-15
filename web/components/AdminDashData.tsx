@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { Contract, providers, Signer } from "ethers";
+import { useAccount, useContract, useSigner } from "wagmi";
 import { SBT_ABI } from "../abis/currentABI";
 import Spinner from "./Spinner";
-import { useAccount, useContract, useProvider, useSigner } from "wagmi";
 
 type Nft = {
   status: number;
@@ -24,7 +23,7 @@ type Nft = {
   ];
 };
 
-export default function UserDashData() {
+export default function AdminDashData() {
   const [list, setList] = useState<Nft[]>([]);
   const [loaded, setLoaded] = useState<boolean>(false);
   const [isBurning, setIsBurning] = useState(false);

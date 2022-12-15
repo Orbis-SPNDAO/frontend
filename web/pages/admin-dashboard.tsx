@@ -17,7 +17,7 @@ export default function Home() {
   const { address } = useAccount();
   const router = useRouter();
 
-  useEffect(() => {
+useEffect(() => {
     // check for admin NFT
     async function checkForAdminNFT() {
       if (!provider) {
@@ -43,7 +43,7 @@ export default function Home() {
     }
 
     checkForAdminNFT();
-  }, [address, contract, router]);
+  }, [address, contract, provider, router]);
 
   return (
     <PageLayout containerClassName="bg-custom-blue min-h-screen">
