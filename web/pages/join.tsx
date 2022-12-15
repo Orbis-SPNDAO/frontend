@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { BiUpload } from "react-icons/bi";
 import { BsCheckLg } from "react-icons/bs";
 import { FaDatabase } from "react-icons/fa";
-import { useAccount, useContractWrite } from "wagmi";
+import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
 import { SBT_ABI } from "../abis/currentABI";
 import Button from "../components/Button";
 import { JoinSubText } from "../components/join/JoinSubText";
@@ -15,6 +15,7 @@ import { UploadBox } from "../components/join/UploadBox";
 import PageLayout from "../components/layouts/PageLayout";
 import { SocialsFooter } from "../components/SocialsFooter";
 import Spinner from "../components/Spinner";
+
 var crypto = require("crypto");
 
 enum JoinState {
@@ -31,12 +32,20 @@ enum JoinState {
 let cid = "";
 
 export default function Join() {
-  const { write, isLoading, isSuccess } = useContractWrite({
-    mode: "recklesslyUnprepared",
+  // const { write, isLoading, isSuccess } = useContractWrite({
+  //   mode: "recklesslyUnprepared",
+  //   address: process.env.NEXT_PUBLIC_SBT_ADDR,
+  //   abi: SBT_ABI,
+  //   functionName: "safeMint",
+  // });
+  
+  const {config, error} = usePrepareContractWrite({
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
     abi: SBT_ABI,
-    functionName: "safeMint",
+    functionName: "mintLitSBT",
   });
+  const { write, isLoading, isSuccess } = useContractWrite(config);
+
   const { address } = useAccount();
   const router = useRouter();
   const [consentChecked, setConsentChecked] = useState(false);
@@ -76,16 +85,19 @@ export default function Join() {
       body.append("file", file);
       body.append("id", file_id);
 
-      fetch("/api/saveFile", { method: "POST", body }).then(() => {
-        fetch("/api/ipfs", { method: "POST", body: path })
-          .then((res) => res.json())
-          .then((new_cid) => {
-            cid = new_cid;
-          })
-          .then(() => {
-            fetch("/api/cleanup", { method: "POST", body: path });
-          });
-      });
+      fetch("/api/saveFile", { method: "POST", body });
+
+      // previous mint process
+      // fetch("/api/saveFile", { method: "POST", body }).then(() => {
+      //   fetch("/api/ipfs", { method: "POST", body: path })
+      //     .then((res) => res.json())
+      //     .then((new_cid) => {
+      //       cid = new_cid;
+      //     })
+      //     .then(() => {
+      //       fetch("/api/cleanup", { method: "POST", body: path });
+      //     });
+      // });
 
       setJoinState(JoinState.MintToken);
     } catch (e: any) {
@@ -98,13 +110,12 @@ export default function Join() {
 
   async function onMintToken() {
     // FOR TESTING
-    if (!write || !address) {
-      console.log("no contract, address, or signer");
-      return;
-    } else if (cid == undefined || cid == "") {
-      console.log("invalid cid");
-      return;
-    }
+    if (!write || !address) return;
+    
+    // } else if (cid == undefined || cid == "") {
+    //   console.log("invalid cid");
+    //   return;
+    // }
 
     try {
       write({ recklesslySetUnpreparedArgs: [address, cid] });
