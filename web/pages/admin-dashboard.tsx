@@ -38,7 +38,7 @@ useEffect(() => {
         }
       } catch (e) {
         console.log(address);
-        router.push("/");
+        // router.push("/");
       }
     }
 
