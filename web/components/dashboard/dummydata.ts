@@ -1,3 +1,4 @@
+import { ProposalData } from "./dummydata";
 import { ethers } from "ethers";
 
 export interface OverviewData {
@@ -14,7 +15,7 @@ export interface DiscussionData {
   numberComments: number;
 }
 
-export interface ProposalData {
+export type ProposalData = {
   id: number;
   title: string;
   description: string;
@@ -25,12 +26,21 @@ export interface ProposalData {
   discussions: number[];
   organisation: string;
   ipfs: string;
-  votingSystem: "basic-voting"; // TODO: others?
+  votingSystem: VotingSystem;
+  start: string;
+  end: string;
+  snapshot: number;
+};
+
+export type VotingSystem = "basic-voting"; // TODO: others?
+export type ProposalStatus = "in-progress" | "upcoming" | "closed";
+
+export type ProposalType = ProposalData & {
   startDate: Date;
   endDate: Date;
-  snapshot: number;
-  status?: "in-progress" | "upcoming" | "closed";
-}
+  getStatus(): ProposalStatus;
+  getStatusDisplay(): string;
+};
 
 export interface VoteData {
   proposalId: number;
@@ -95,8 +105,8 @@ export const proposalData: ProposalData[] = [
     organisation: "SPN DAO",
     ipfs: "cid123456asdfgzxcv",
     votingSystem: "basic-voting",
-    startDate: new Date(new Date().getTime() + 3600 * 24 * 10),
-    endDate: new Date(new Date().getTime() + 3600 * 24 * 10),
+    start: new Date(new Date().getTime() + 3600 * 24 * 10).toISOString(),
+    end: new Date(new Date().getTime() + 3600 * 24 * 10).toISOString(),
     snapshot: 1234,
   },
   {
@@ -122,8 +132,8 @@ export const proposalData: ProposalData[] = [
     organisation: "EARN DAO",
     ipfs: "cidasdfgzxcv123456",
     votingSystem: "basic-voting",
-    startDate: new Date(new Date().getTime() - 3600 * 24 * 5),
-    endDate: new Date(new Date().getTime() + 3600 * 24 * 10),
+    start: new Date(new Date().getTime() - 3600 * 24 * 5).toISOString(),
+    end: new Date(new Date().getTime() + 3600 * 24 * 10).toISOString(),
     snapshot: 2345,
   },
 ];

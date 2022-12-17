@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { IoIosCheckmark } from "react-icons/io";
+import Proposal from "../../dataclass/Proposal";
 import { useContainerDimensions } from "../../hooks/useContainerDimensions";
 import { abbrevAccount } from "../../utils";
 import { DiscussionData, ProposalData, VoteData } from "./dummydata";
@@ -78,10 +79,8 @@ export default function DiscussionNVote({
         ref={(ref) => setVoteContainer(ref)}
         className="flex flex-col w-full text-left text-sm mt-4 py-2"
       >
-        {proposalData?.map((proposal) => {
-          const votes = voteData.filter(
-            (vote) => vote.proposalId === proposal.id
-          );
+        {proposalData?.map((p) => {
+          const votes = voteData.filter((vote) => vote.proposalId === p.id);
 
           const votesByOption: Record<number, number> = {};
           votes.forEach((vote) => {
@@ -92,27 +91,19 @@ export default function DiscussionNVote({
 
           const widthPerVote = containerWidth / votes.length!;
 
-          const status =
-            proposal.endDate < new Date()
-              ? "closed"
-              : proposal.startDate > new Date()
-              ? "upcoming"
-              : "in-progress";
-
-          proposal.status = status;
+          const proposal = new Proposal(p);
 
           return (
             <button
               key={proposal.id}
-              className="border-2 rounded-lg mb-4 p-4"
+              className="border-2 text-left rounded-lg mb-4 p-4"
               onClick={() => onProposal(proposal.id)}
             >
               <div className="flex flex-col">
                 <div className="flex justify-between items-center">
                   <span className="text-2xl">{proposal.title}</span>
                   <span className="text-md rounded-full border-2 border-gray py-1 px-4">
-                    {proposal.status[0].toUpperCase() +
-                      proposal.status.slice(1)}
+                    {proposal.getStatusDisplay()}
                   </span>
                 </div>
 
