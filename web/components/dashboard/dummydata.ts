@@ -14,16 +14,28 @@ export interface DiscussionData {
   numberComments: number;
 }
 
-export interface VoteData {
+export interface ProposalData {
   id: number;
   title: string;
   description: string;
-  status: string;
   options: {
     id: number;
     name: string;
-    voteCount: number;
   }[];
+  discussions: number[];
+  organisation: string;
+  ipfs: string;
+  votingSystem: "basic-voting"; // TODO: others?
+  startDate: Date;
+  endDate: Date;
+  snapshot: number;
+  status?: "in-progress" | "upcoming" | "closed";
+}
+
+export interface VoteData {
+  proposalId: number;
+  voter: string;
+  option: number;
 }
 
 export interface DaoManagementData {
@@ -67,44 +79,295 @@ export const discussionData: DiscussionData[] = [
   },
 ];
 
-export const voteData: VoteData[] = [
+export const proposalData: ProposalData[] = [
   {
     id: 1,
     title: "Proposal 1",
     description: "Lorem Ipsum",
-    status: "Closed",
     options: [
       {
         id: 1,
         name: "Option 1",
-        voteCount: 751,
       },
-      { id: 2, name: "Option 2", voteCount: 1578 },
+      { id: 2, name: "Option 2" },
     ],
+    discussions: [1, 3],
+    organisation: "SPN DAO",
+    ipfs: "cid123456asdfgzxcv",
+    votingSystem: "basic-voting",
+    startDate: new Date(new Date().getTime() + 3600 * 24 * 10),
+    endDate: new Date(new Date().getTime() + 3600 * 24 * 10),
+    snapshot: 1234,
   },
   {
     id: 2,
     title: "Proposal 2",
     description:
       "Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem IpsumLorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem IpsumLorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem IpsumLorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum",
-    status: "In Progress",
     options: [
       {
         id: 1,
         name: "Option 1",
-        voteCount: 751,
       },
       {
         id: 2,
         name: "Option 2",
-        voteCount: 1578,
       },
       {
         id: 3,
         name: "Option 3",
-        voteCount: 12,
       },
     ],
+    discussions: [2, 4],
+    organisation: "EARN DAO",
+    ipfs: "cidasdfgzxcv123456",
+    votingSystem: "basic-voting",
+    startDate: new Date(new Date().getTime() - 3600 * 24 * 5),
+    endDate: new Date(new Date().getTime() + 3600 * 24 * 10),
+    snapshot: 2345,
+  },
+];
+
+export const voteData: VoteData[] = [
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 2,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 2,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 2,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 2,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 2,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 2,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 2,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 2,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 1,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 2,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 2,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 2,
+    voter: ethers.constants.AddressZero,
+    option: 1,
+  },
+  {
+    proposalId: 2,
+    voter: ethers.constants.AddressZero,
+    option: 2,
+  },
+  {
+    proposalId: 2,
+    voter: ethers.constants.AddressZero,
+    option: 2,
+  },
+  {
+    proposalId: 2,
+    voter: ethers.constants.AddressZero,
+    option: 2,
+  },
+  {
+    proposalId: 2,
+    voter: ethers.constants.AddressZero,
+    option: 2,
+  },
+  {
+    proposalId: 2,
+    voter: ethers.constants.AddressZero,
+    option: 2,
+  },
+  {
+    proposalId: 2,
+    voter: ethers.constants.AddressZero,
+    option: 2,
+  },
+  {
+    proposalId: 2,
+    voter: ethers.constants.AddressZero,
+    option: 2,
+  },
+  {
+    proposalId: 2,
+    voter: ethers.constants.AddressZero,
+    option: 2,
+  },
+  {
+    proposalId: 2,
+    voter: ethers.constants.AddressZero,
+    option: 3,
+  },
+  {
+    proposalId: 2,
+    voter: ethers.constants.AddressZero,
+    option: 3,
+  },
+  {
+    proposalId: 2,
+    voter: ethers.constants.AddressZero,
+    option: 3,
+  },
+  {
+    proposalId: 2,
+    voter: ethers.constants.AddressZero,
+    option: 3,
+  },
+  {
+    proposalId: 2,
+    voter: ethers.constants.AddressZero,
+    option: 3,
+  },
+  {
+    proposalId: 2,
+    voter: ethers.constants.AddressZero,
+    option: 3,
   },
 ];
 

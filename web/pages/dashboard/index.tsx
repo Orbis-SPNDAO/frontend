@@ -4,6 +4,7 @@ import DiscussionNVote from "../../components/dashboard/Discussion&Vote";
 import {
   discussionData,
   overviewData,
+  proposalData,
   voteData,
 } from "../../components/dashboard/dummydata";
 import Overview from "../../components/dashboards-shared/Overview";
@@ -16,10 +17,13 @@ export default function Dashboard() {
   const { bal } = router.query;
 
   function onDiscussVote() {
-    router.push("/dashboard/governance");
+    document.querySelector("#discussion")?.scrollIntoView();
   }
   function onManageSbt() {
     router.push({ pathname: "/dashboard/manage-membership", query: { bal } });
+  }
+  function onProposal(proposalId: number) {
+    router.push({ pathname: `/dashboard/governance/${proposalId}` });
   }
 
   return (
@@ -43,7 +47,9 @@ export default function Dashboard() {
 
             <DiscussionNVote
               discussionData={discussionData}
+              proposalData={proposalData}
               voteData={voteData}
+              onProposal={onProposal}
             />
             <SocialsFooter />
           </div>

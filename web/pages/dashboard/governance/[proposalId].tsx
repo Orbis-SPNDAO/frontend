@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { IoIosCheckmark } from "react-icons/io";
 import { useAccount } from "wagmi";
-import { VoteData, voteData } from "../../../components/dashboard/dummydata";
+import { ProposalData, proposalData } from "../../../components/dashboard/dummydata";
 import BackButton from "../../../components/dashboards-shared/BackButton";
 import PageLayout from "../../../components/layouts/PageLayout";
 import { useContainerDimensions } from "../../../hooks/useContainerDimensions";
@@ -16,7 +16,7 @@ export default function ProposalId() {
     voteContainer as HTMLDivElement
   );
 
-  function onProposalClick(proposal: VoteData) {
+  function onProposalClick(proposal: ProposalData) {
     router.push(`/dashboard/governance/${proposal.id}`);
   }
 
@@ -45,7 +45,7 @@ export default function ProposalId() {
             ref={(ref) => setVoteContainer(ref)}
             className="flex flex-col w-full text-left text-sm mt-4 py-2"
           >
-            {voteData
+            {proposalData
               ?.filter((v) => v.id.toString() === router.query?.proposalId)
               .map((vote) => {
                 const totalVotes = vote.options.reduce(

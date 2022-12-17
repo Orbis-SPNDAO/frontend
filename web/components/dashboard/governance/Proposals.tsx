@@ -1,13 +1,13 @@
 import React, { Dispatch, useState } from "react";
 import { IoIosCheckmark } from "react-icons/io";
 import { useContainerDimensions } from "../../../hooks/useContainerDimensions";
-import { VoteData } from "../dummydata";
+import { ProposalData } from "../dummydata";
 
 export default function Proposals({
   voteData,
   onProposalClick,
 }: {
-  voteData: VoteData[];
+  voteData: ProposalData[];
   onProposalClick: any;
 }) {
   const [voteContainer, setVoteContainer] = useState<HTMLDivElement | null>();
