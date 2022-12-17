@@ -1,27 +1,23 @@
-import { useRouter } from "next/router"
-import { useState } from "react"
-import { BsChevronLeft } from "react-icons/bs"
-import { IoIosCheckmark } from "react-icons/io"
-import { useAccount } from "wagmi"
-import { VoteData, voteData } from "../../../components/dashboard/dummydata"
-import PageLayout from "../../../components/layouts/PageLayout"
-import { useContainerDimensions } from "../../../hooks/useContainerDimensions"
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { IoIosCheckmark } from "react-icons/io";
+import { useAccount } from "wagmi";
+import { VoteData, voteData } from "../../../components/dashboard/dummydata";
+import BackButton from "../../../components/dashboards-shared/BackButton";
+import PageLayout from "../../../components/layouts/PageLayout";
+import { useContainerDimensions } from "../../../hooks/useContainerDimensions";
 
 export default function ProposalId() {
-  const router = useRouter()
-  const { isConnecting, address } = useAccount()
+  const router = useRouter();
+  const { isConnecting, address } = useAccount();
 
-  const [voteContainer, setVoteContainer] = useState<HTMLDivElement | null>()
+  const [voteContainer, setVoteContainer] = useState<HTMLDivElement | null>();
   const { width: containerWidth } = useContainerDimensions(
     voteContainer as HTMLDivElement
-  )
-
-  function navigateBack() {
-    router.push("/dashboard/governance")
-  }
+  );
 
   function onProposalClick(proposal: VoteData) {
-    router.push(`/dashboard/governance/${proposal.id}`)
+    router.push(`/dashboard/governance/${proposal.id}`);
   }
 
   return !address || isConnecting ? (
@@ -36,9 +32,10 @@ export default function ProposalId() {
     <PageLayout containerClassName="bg-custom-blue bg-cover min-h-screen">
       <div className="text-center my-5 md:my-10 w-full">
         <div className="flex justify-between md:mx-28">
-          <button className="flex items-center" onClick={() => navigateBack()}>
-            <BsChevronLeft /> <span className="ml-4">Back to Dashboard</span>
-          </button>
+          <BackButton
+            backRoute="/dashboard/governance"
+            text="Back to all proposals"
+          />
         </div>
 
         <div className="w-stretch m-5 md:mx-28 md:my-12 h-fit py-6 px-4 md:p-10 hero">
@@ -54,13 +51,13 @@ export default function ProposalId() {
                 const totalVotes = vote.options.reduce(
                   (total, o) => total + o.voteCount,
                   0
-                )
+                );
 
                 const maxVoteCount = Math.max(
                   ...vote.options.map((o) => o.voteCount)
-                )
+                );
 
-                const widthPerVote = containerWidth / totalVotes
+                const widthPerVote = containerWidth / totalVotes;
 
                 return (
                   <button
@@ -104,15 +101,15 @@ export default function ProposalId() {
                               </span>
                             </div>
                           </span>
-                        )
+                        );
                       })}
                     </div>
                   </button>
-                )
+                );
               })}
           </div>
         </div>
       </div>
     </PageLayout>
-  )
+  );
 }

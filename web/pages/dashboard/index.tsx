@@ -6,11 +6,11 @@ import {
   overviewData,
   voteData,
 } from "../../components/dashboard/dummydata";
-import Overview from "../../components/dashboard/Overview";
+import Overview from "../../components/dashboards-shared/Overview";
 import PageLayout from "../../components/layouts/PageLayout";
 import { SocialsFooter } from "../../components/SocialsFooter";
 
-export default function Home() {
+export default function Dashboard() {
   const router = useRouter();
   const { isConnecting, address } = useAccount();
   const { bal } = router.query;
@@ -37,8 +37,8 @@ export default function Home() {
           <div className="text-center my-5 md:my-10 w-full">
             <Overview
               overviewData={overviewData}
-              onDiscussVote={onDiscussVote}
-              onManageSbt={onManageSbt}
+              onClick1={onDiscussVote}
+              onClick2={onManageSbt}
             />
 
             <DiscussionNVote

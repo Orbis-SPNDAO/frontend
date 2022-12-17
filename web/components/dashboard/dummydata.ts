@@ -1,29 +1,36 @@
-import { ethers } from "ethers"
+import { ethers } from "ethers";
 
 export interface OverviewData {
-  totalRewards: ethers.BigNumber
-  decryptionSessions: number
-  votesParticipated: number
-  discussions: number
+  totalRewards: ethers.BigNumber;
+  decryptionSessions: number;
+  votesParticipated: number;
+  discussions: number;
 }
 
 export interface DiscussionData {
-  id: number
-  title: string
-  creator: string
-  numberComments: number
+  id: number;
+  title: string;
+  creator: string;
+  numberComments: number;
 }
 
 export interface VoteData {
-  id: number
-  title: string
-  description: string
-  status: string
+  id: number;
+  title: string;
+  description: string;
+  status: string;
   options: {
-    id: number
-    name: string
-    voteCount: number
-  }[]
+    id: number;
+    name: string;
+    voteCount: number;
+  }[];
+}
+
+export interface DaoManagementData {
+  walletAddress: string;
+  sessionPayment: number;
+  isDecrypted: boolean;
+  selected: boolean;
 }
 
 export const overviewData: OverviewData = {
@@ -31,7 +38,7 @@ export const overviewData: OverviewData = {
   decryptionSessions: 5,
   votesParticipated: 12,
   discussions: 63,
-}
+};
 
 export const discussionData: DiscussionData[] = [
   {
@@ -58,7 +65,7 @@ export const discussionData: DiscussionData[] = [
     creator: ethers.constants.AddressZero,
     numberComments: 17,
   },
-]
+];
 
 export const voteData: VoteData[] = [
   {
@@ -99,4 +106,127 @@ export const voteData: VoteData[] = [
       },
     ],
   },
-]
+];
+
+export const dummyDaoMgmtData: DaoManagementData[] = [
+  {
+    walletAddress: "0x1zP1e93G8TbCc68s4w8B3rt58gs30GT097Dif751",
+    sessionPayment: 0.74,
+    isDecrypted: false,
+    selected: false,
+  },
+  {
+    walletAddress: "0x8ef1e93G8TbCc68s4w8B3rt58gs30GT097Dif799",
+    sessionPayment: 2.68,
+    isDecrypted: true,
+    selected: false,
+  },
+  {
+    walletAddress: "0x6e2fe93G8TbCc68s4w8B3rt58gs30GT097Dif7yn",
+    sessionPayment: 0.002,
+    isDecrypted: false,
+    selected: false,
+  },
+  {
+    walletAddress: "0x85fwe93G8TbCc68s4w8B3rt58gs30GT097Dif751",
+    sessionPayment: 1.28,
+    isDecrypted: true,
+    selected: false,
+  },
+  {
+    walletAddress: "0x1zP1e93G8TbCc68s4w8B3rt58gs30GT097Dif751",
+    sessionPayment: 0.74,
+    isDecrypted: false,
+    selected: false,
+  },
+  {
+    walletAddress: "0x8ef1e93G8TbCc68s4w8B3rt58gs30GT097Dif799",
+    sessionPayment: 2.68,
+    isDecrypted: true,
+    selected: false,
+  },
+  {
+    walletAddress: "0x6e2fe93G8TbCc68s4w8B3rt58gs30GT097Dif7yn",
+    sessionPayment: 0.002,
+    isDecrypted: false,
+    selected: false,
+  },
+  {
+    walletAddress: "0x85fwe93G8TbCc68s4w8B3rt58gs30GT097Dif751",
+    sessionPayment: 1.28,
+    isDecrypted: true,
+    selected: false,
+  },
+  {
+    walletAddress: "0x1zP1e93G8TbCc68s4w8B3rt58gs30GT097Dif751",
+    sessionPayment: 0.74,
+    isDecrypted: false,
+    selected: false,
+  },
+  {
+    walletAddress: "0x8ef1e93G8TbCc68s4w8B3rt58gs30GT097Dif799",
+    sessionPayment: 2.68,
+    isDecrypted: true,
+    selected: false,
+  },
+  {
+    walletAddress: "0x6e2fe93G8TbCc68s4w8B3rt58gs30GT097Dif7yn",
+    sessionPayment: 0.002,
+    isDecrypted: false,
+    selected: false,
+  },
+  {
+    walletAddress: "0x85fwe93G8TbCc68s4w8B3rt58gs30GT097Dif751",
+    sessionPayment: 1.28,
+    isDecrypted: true,
+    selected: false,
+  },
+  {
+    walletAddress: "0x1zP1e93G8TbCc68s4w8B3rt58gs30GT097Dif751",
+    sessionPayment: 0.74,
+    isDecrypted: false,
+    selected: false,
+  },
+  {
+    walletAddress: "0x8ef1e93G8TbCc68s4w8B3rt58gs30GT097Dif799",
+    sessionPayment: 2.68,
+    isDecrypted: true,
+    selected: false,
+  },
+  {
+    walletAddress: "0x6e2fe93G8TbCc68s4w8B3rt58gs30GT097Dif7yn",
+    sessionPayment: 0.002,
+    isDecrypted: false,
+    selected: false,
+  },
+  {
+    walletAddress: "0x85fwe93G8TbCc68s4w8B3rt58gs30GT097Dif751",
+    sessionPayment: 1.28,
+    isDecrypted: true,
+    selected: false,
+  },
+  {
+    walletAddress: "0x1zP1e93G8TbCc68s4w8B3rt58gs30GT097Dif751",
+    sessionPayment: 0.74,
+    isDecrypted: false,
+    selected: false,
+  },
+  {
+    walletAddress: "0x8ef1e93G8TbCc68s4w8B3rt58gs30GT097Dif799",
+    sessionPayment: 2.68,
+    isDecrypted: true,
+    selected: false,
+  },
+  {
+    walletAddress: "0x6e2fe93G8TbCc68s4w8B3rt58gs30GT097Dif7yn",
+    sessionPayment: 0.002,
+    isDecrypted: false,
+    selected: false,
+  },
+  {
+    walletAddress: "0x85fwe93G8TbCc68s4w8B3rt58gs30GT097Dif751",
+    sessionPayment: 1.28,
+    isDecrypted: true,
+    selected: false,
+  },
+];
