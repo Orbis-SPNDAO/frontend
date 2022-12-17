@@ -35,8 +35,6 @@ export default function ProposalId() {
     votesByOption[vote.option] = (votesByOption[vote.option] || 0) + 1;
   });
 
-  const maxVoteCount = Math.max(...Object.values(votesByOption));
-
   const widthPerVote = containerWidth / votes.length!;
 
   const proposal = p && new Proposal(p);
@@ -75,7 +73,7 @@ export default function ProposalId() {
 
         <div className="w-stretch m-5 md:mx-28 md:my-12 h-fit py-6 px-4 md:p-10 hero">
           <div className="flex flex-col w-full text-left text-sm mt-4 py-2">
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
               <div className="flex flex-col lg:col-span-3">
                 <span className="text-2xl">{proposal?.title}</span>
 
@@ -147,6 +145,27 @@ export default function ProposalId() {
                             {discussion.content}
                           </div>
                         </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="w-full text-left text-sm mt-4 py-2 border-2 rounded-lg my-4 p-4">
+                  <h2 className="text-left text-2xl font-normal mb-2">
+                    Votes
+                    <span className="rounded-full bg-custom-purple-light p-1 ml-4">
+                      {votes?.length}
+                    </span>
+                  </h2>
+
+                  {votes?.map((vote) => {
+                    return (
+                      <div key={vote.id} className="flex justify-center">
+                        <span className="text-custom-gray">
+                          {abbrevAccount(vote.voter)}
+                        </span>
+
+                        <span className="ml-4">Option {vote.option}</span>
                       </div>
                     );
                   })}

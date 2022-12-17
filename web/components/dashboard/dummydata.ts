@@ -45,6 +45,7 @@ export type ProposalType = ProposalData & {
 };
 
 export interface VoteData {
+  id: number;
   proposalId: number;
   voter: string;
   option: number;
@@ -69,7 +70,8 @@ export const discussionData: DiscussionData[] = [
     id: 1,
     creator: ethers.constants.AddressZero,
     title: "Topic 1 xxxxxxxxxxxxxxxxxxxxxxxxxx sadf asdf asd f",
-    content: "Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum ",
+    content:
+      "Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum ",
     numberComments: 5,
   },
   {
@@ -100,7 +102,8 @@ export const proposalData: ProposalData[] = [
     id: 1,
     creator: ethers.constants.AddressZero,
     title: "Proposal 1",
-    description: "Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum",
+    description:
+      "Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum",
     options: [
       {
         id: 1,
@@ -147,246 +150,54 @@ export const proposalData: ProposalData[] = [
 ];
 
 export const voteData: VoteData[] = [
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 2,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 2,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 2,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 2,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 2,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 2,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 2,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 2,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 1,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 2,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 2,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 2,
-    voter: ethers.constants.AddressZero,
-    option: 1,
-  },
-  {
-    proposalId: 2,
-    voter: ethers.constants.AddressZero,
-    option: 2,
-  },
-  {
-    proposalId: 2,
-    voter: ethers.constants.AddressZero,
-    option: 2,
-  },
-  {
-    proposalId: 2,
-    voter: ethers.constants.AddressZero,
-    option: 2,
-  },
-  {
-    proposalId: 2,
-    voter: ethers.constants.AddressZero,
-    option: 2,
-  },
-  {
-    proposalId: 2,
-    voter: ethers.constants.AddressZero,
-    option: 2,
-  },
-  {
-    proposalId: 2,
-    voter: ethers.constants.AddressZero,
-    option: 2,
-  },
-  {
-    proposalId: 2,
-    voter: ethers.constants.AddressZero,
-    option: 2,
-  },
-  {
-    proposalId: 2,
-    voter: ethers.constants.AddressZero,
-    option: 2,
-  },
-  {
-    proposalId: 2,
-    voter: ethers.constants.AddressZero,
-    option: 3,
-  },
-  {
-    proposalId: 2,
-    voter: ethers.constants.AddressZero,
-    option: 3,
-  },
-  {
-    proposalId: 2,
-    voter: ethers.constants.AddressZero,
-    option: 3,
-  },
-  {
-    proposalId: 2,
-    voter: ethers.constants.AddressZero,
-    option: 3,
-  },
-  {
-    proposalId: 2,
-    voter: ethers.constants.AddressZero,
-    option: 3,
-  },
-  {
-    proposalId: 2,
-    voter: ethers.constants.AddressZero,
-    option: 3,
-  },
+  { id: 1, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 2, proposalId: 1, voter: ethers.constants.AddressZero, option: 2 },
+  { id: 3, proposalId: 1, voter: ethers.constants.AddressZero, option: 2 },
+  { id: 4, proposalId: 1, voter: ethers.constants.AddressZero, option: 2 },
+  { id: 5, proposalId: 1, voter: ethers.constants.AddressZero, option: 2 },
+  { id: 6, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 7, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 8, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 9, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 10, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 11, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 12, proposalId: 1, voter: ethers.constants.AddressZero, option: 2 },
+  { id: 13, proposalId: 1, voter: ethers.constants.AddressZero, option: 2 },
+  { id: 14, proposalId: 1, voter: ethers.constants.AddressZero, option: 2 },
+  { id: 15, proposalId: 1, voter: ethers.constants.AddressZero, option: 2 },
+  { id: 16, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 17, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 18, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 19, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 20, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 21, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 22, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 23, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 24, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 25, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 26, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 27, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 28, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 29, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 30, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 31, proposalId: 1, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 32, proposalId: 2, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 33, proposalId: 2, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 34, proposalId: 2, voter: ethers.constants.AddressZero, option: 1 },
+  { id: 35, proposalId: 2, voter: ethers.constants.AddressZero, option: 2 },
+  { id: 36, proposalId: 2, voter: ethers.constants.AddressZero, option: 2 },
+  { id: 37, proposalId: 2, voter: ethers.constants.AddressZero, option: 2 },
+  { id: 38, proposalId: 2, voter: ethers.constants.AddressZero, option: 2 },
+  { id: 39, proposalId: 2, voter: ethers.constants.AddressZero, option: 2 },
+  { id: 40, proposalId: 2, voter: ethers.constants.AddressZero, option: 2 },
+  { id: 41, proposalId: 2, voter: ethers.constants.AddressZero, option: 2 },
+  { id: 42, proposalId: 2, voter: ethers.constants.AddressZero, option: 2 },
+  { id: 43, proposalId: 2, voter: ethers.constants.AddressZero, option: 3 },
+  { id: 44, proposalId: 2, voter: ethers.constants.AddressZero, option: 3 },
+  { id: 45, proposalId: 2, voter: ethers.constants.AddressZero, option: 3 },
+  { id: 46, proposalId: 2, voter: ethers.constants.AddressZero, option: 3 },
+  { id: 47, proposalId: 2, voter: ethers.constants.AddressZero, option: 3 },
+  { id: 48, proposalId: 2, voter: ethers.constants.AddressZero, option: 3 },
 ];
 
 export const dummyDaoMgmtData: DaoManagementData[] = [
