@@ -8,12 +8,14 @@ type PageLayoutProps = {
   isProtected?: boolean
   children?: React.ReactNode
   containerClassName?: string
+  isAdmin?: boolean
 }
 
 const PageLayout: FC<PageLayoutProps> = ({
   isProtected,
   children,
   containerClassName,
+  isAdmin
 }) => {
   const router = useRouter()
   useEffect(() => {
@@ -24,7 +26,7 @@ const PageLayout: FC<PageLayoutProps> = ({
 
   return (
     <div className={containerClassName || ""}>
-      <Header />
+      <Header isAdmin={isAdmin} />
       <div className="flex pb-10">{children}</div>
     </div>
   )

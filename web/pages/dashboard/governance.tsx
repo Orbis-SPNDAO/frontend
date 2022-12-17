@@ -6,6 +6,7 @@ import { VoteData, voteData } from "../../components/dashboard/dummydata";
 import Forum from "../../components/dashboard/governance/Forum";
 import Proposals from "../../components/dashboard/governance/Proposals";
 import { SignInPrompt } from "../../components/dashboard/SignInPrompt";
+import BackButton from "../../components/dashboards-shared/BackButton";
 import PageLayout from "../../components/layouts/PageLayout";
 
 enum ActiveTab {
@@ -22,10 +23,6 @@ export default function Governance() {
     initialActiveTab ?? ActiveTab.Proposal
   );
 
-  function navigateBack() {
-    router.push("/dashboard");
-  }
-
   function onProposalClick(proposal: VoteData) {
     router.push(`/dashboard/governance/${proposal.id}`);
   }
@@ -38,16 +35,13 @@ export default function Governance() {
     <PageLayout containerClassName="bg-custom-blue bg-cover min-h-screen">
       <div className="text-center my-5 md:my-10 w-full">
         <div className="columns-3 md:mx-28">
-          <button className="flex items-center" onClick={() => navigateBack()}>
-            <BsChevronLeft /> <span className="ml-4">Back to Dashboard</span>
-          </button>
-
+          <BackButton />
           <div>
             <button
               className={`mr-2 ${
                 activeTab === ActiveTab.Forum
-                  ? ""
-                  : "text-custom-purple underline"
+                  ? "text-custom-purple underline"
+                  : "text-neutral-400"
               }`}
               onClick={() => setActiveTab(ActiveTab.Forum)}
             >
@@ -56,8 +50,8 @@ export default function Governance() {
             <button
               className={`ml-2 ${
                 activeTab === ActiveTab.Proposal
-                  ? ""
-                  : "text-custom-purple underline"
+                  ? "text-custom-purple underline"
+                  : "text-neutral-400"
               }`}
               onClick={() => setActiveTab(ActiveTab.Proposal)}
             >

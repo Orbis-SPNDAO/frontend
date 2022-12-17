@@ -6,9 +6,10 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 type HeaderProps = {
   hideLogo?: boolean;
   hideButton?: boolean;
+  isAdmin?: boolean;
 };
 
-const Header: FC<HeaderProps> = ({ hideLogo, hideButton }) => {
+const Header: FC<HeaderProps> = ({ hideLogo, hideButton, isAdmin }) => {
   const router = useRouter();
 
   return (
@@ -21,12 +22,17 @@ const Header: FC<HeaderProps> = ({ hideLogo, hideButton }) => {
               onClick={() => router.push("/")}
             >
               <h2>SPN DAO</h2>
+              {isAdmin ? (
+                <h4 className="text-sm sm:text-xl font-normal mx-2">Admin</h4>
+              ) : null}
             </button>
           ) : null}
 
-          {!hideButton ? <div className="flex items-center space-x-6 ml-auto">
-            <ConnectButton />
-          </div> : null}
+          {!hideButton ? (
+            <div className="flex items-center space-x-6 ml-auto">
+              <ConnectButton />
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

@@ -39,6 +39,11 @@ a {
 .rc-tooltip-placement-top .rc-tooltip-arrow {
   border-top-color: black !important;
 }
+
+.table-header-border {
+  border-left: 1px solid rgba(38, 38, 38, 0.15);
+}
+
 @layer utilities {
   .big-btn {
     @apply px-4 py-3 rounded-full text-center flex items-center justify-center text-black font-medium drop-shadow-sm hover:drop-shadow-lg;
