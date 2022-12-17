@@ -2,12 +2,17 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { BsChevronLeft } from "react-icons/bs";
 import { useAccount } from "wagmi";
-import { VoteData, voteData } from "../../components/dashboard/dummydata";
+import {
+  ProposalData,
+  proposalData,
+  voteData,
+} from "../../components/dashboard/dummydata";
 import Forum from "../../components/dashboard/governance/Forum";
 import Proposals from "../../components/dashboard/governance/Proposals";
 import { SignInPrompt } from "../../components/dashboard/SignInPrompt";
 import BackButton from "../../components/dashboards-shared/BackButton";
 import PageLayout from "../../components/layouts/PageLayout";
+import { SocialsFooter } from "../../components/SocialsFooter";
 
 enum ActiveTab {
   Forum = "forum",
@@ -23,7 +28,7 @@ export default function Governance() {
     initialActiveTab ?? ActiveTab.Proposal
   );
 
-  function onProposalClick(proposal: VoteData) {
+  function onProposalClick(proposal: ProposalData) {
     router.push(`/dashboard/governance/${proposal.id}`);
   }
 
@@ -44,6 +49,7 @@ export default function Governance() {
                   : "text-neutral-400"
               }`}
               onClick={() => setActiveTab(ActiveTab.Forum)}
+              disabled
             >
               Forum
             </button>
@@ -65,9 +71,15 @@ export default function Governance() {
         <div className="w-stretch m-5 md:mx-28 md:my-12 h-fit py-6 px-4 md:p-10 hero">
           {activeTab === ActiveTab.Forum && <Forum />}
           {activeTab === ActiveTab.Proposal && (
-            <Proposals voteData={voteData} onProposalClick={onProposalClick} />
+            <Proposals
+              proposalData={proposalData}
+              voteData={voteData}
+              onProposalClick={onProposalClick}
+            />
           )}
         </div>
+
+        <SocialsFooter />
       </div>
     </PageLayout>
   );
