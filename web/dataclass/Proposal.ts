@@ -6,6 +6,7 @@ import { ProposalType } from "../components/dashboard/dummydata";
 
 export default class Proposal implements ProposalType {
   id: number;
+  creator: string;
   title: string;
   description: string;
   options: {
@@ -25,6 +26,7 @@ export default class Proposal implements ProposalType {
 
   constructor(proposalData: ProposalData) {
     this.id = proposalData.id;
+    this.creator = proposalData.creator;
     this.title = proposalData.title;
     this.description = proposalData.description;
     this.options = proposalData.options;

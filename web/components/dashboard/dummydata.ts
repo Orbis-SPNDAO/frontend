@@ -17,6 +17,7 @@ export interface DiscussionData {
 
 export type ProposalData = {
   id: number;
+  creator: string;
   title: string;
   description: string;
   options: {
@@ -92,6 +93,7 @@ export const discussionData: DiscussionData[] = [
 export const proposalData: ProposalData[] = [
   {
     id: 1,
+    creator: ethers.constants.AddressZero,
     title: "Proposal 1",
     description: "Lorem Ipsum",
     options: [
@@ -111,6 +113,7 @@ export const proposalData: ProposalData[] = [
   },
   {
     id: 2,
+    creator: ethers.constants.AddressZero,
     title: "Proposal 2",
     description:
       "Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem IpsumLorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem IpsumLorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem IpsumLorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum Lorem Ipsum",

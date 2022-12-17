@@ -3,7 +3,7 @@ import { useState } from "react";
 import { IoIosCheckmark } from "react-icons/io";
 import Proposal from "../../dataclass/Proposal";
 import { useContainerDimensions } from "../../hooks/useContainerDimensions";
-import { abbrevAccount } from "../../utils";
+import { abbrevAccount } from "../../utils/string";
 import { DiscussionData, ProposalData, VoteData } from "./dummydata";
 
 export default function DiscussionNVote({
