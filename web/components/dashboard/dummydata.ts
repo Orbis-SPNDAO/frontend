@@ -1,4 +1,3 @@
-import { ProposalData } from "./dummydata";
 import { ethers } from "ethers";
 
 export interface OverviewData {
