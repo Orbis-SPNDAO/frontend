@@ -69,10 +69,7 @@ export default function ProposalId() {
         </div>
 
         <div className="w-stretch m-5 md:mx-28 md:my-12 h-fit py-6 px-4 md:p-10 hero">
-          <div
-            ref={(ref) => setVoteContainer(ref)}
-            className="flex flex-col w-full text-left text-sm mt-4 py-2"
-          >
+          <div className="flex flex-col w-full text-left text-sm mt-4 py-2">
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
               <div className="flex flex-col lg:col-span-3">
                 <span className="text-2xl">{proposal?.title}</span>
@@ -155,14 +152,39 @@ export default function ProposalId() {
                   </div>
                 </div>
 
-                <div className="flex flex-col text-left text-sm mt-4 py-2 border-2 rounded-lg mb-4 p-4 divide-y">
-                  <h2 className="text-left text-2xl font-normal">
+                <div
+                  ref={(ref) => setVoteContainer(ref)}
+                  className="flex flex-col text-left text-sm mt-4 py-2 border-2 rounded-lg mb-4 p-4 divide-y"
+                >
+                  <h2 className="text-left text-2xl font-normal mb-2">
                     Current results
                   </h2>
 
-                  {proposal?.options?.map((option) => {
-                    return <button key={`${option.id}`}>{option.name}</button>;
-                  })}
+                  <div className="pt-2">
+                    {proposal?.options?.map((option) => {
+                      const optionVoteCount = votesByOption[option.id] || 0;
+
+                      return (
+                        <div key={`${option.id}`}>
+                          <div className="">{option.name}</div>
+                          <div className="relative h-6 mb-2">
+                            <div
+                              className="absolute bg-custom-purple-light my-2 py-1 px-2 rounded-lg h-3"
+                              style={{
+                                width: containerWidth - 48,
+                              }}
+                            />
+                            <div
+                              className="absolute bg-custom-purple my-2 py-1 px-2 rounded-lg h-3"
+                              style={{
+                                width: widthPerVote * optionVoteCount,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
