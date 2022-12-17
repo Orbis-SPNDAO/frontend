@@ -10,8 +10,9 @@ export interface OverviewData {
 
 export interface DiscussionData {
   id: number;
-  title: string;
   creator: string;
+  title: string;
+  content: string;
   numberComments: number;
 }
 
@@ -66,26 +67,30 @@ export const overviewData: OverviewData = {
 export const discussionData: DiscussionData[] = [
   {
     id: 1,
-    title: "Topic 1 xxxxxxxxxxxxxxxxxxxxxxxxxx sadf asdf asd f",
     creator: ethers.constants.AddressZero,
+    title: "Topic 1 xxxxxxxxxxxxxxxxxxxxxxxxxx sadf asdf asd f",
+    content: "Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum ",
     numberComments: 5,
   },
   {
     id: 2,
-    title: "Topic 2 xxxxx",
     creator: ethers.constants.AddressZero,
+    title: "Topic 2 xxxxx",
+    content: "Lorem ipsum",
     numberComments: 2,
   },
   {
     id: 3,
-    title: "Topic 3 xxxxx",
     creator: ethers.constants.AddressZero,
+    title: "Topic 3 xxxxx",
+    content: "Lorem ipsum",
     numberComments: 3,
   },
   {
     id: 4,
-    title: "Topic 4 xxxxx",
     creator: ethers.constants.AddressZero,
+    title: "Topic 4 xxxxx",
+    content: "Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum",
     numberComments: 17,
   },
 ];
@@ -95,7 +100,7 @@ export const proposalData: ProposalData[] = [
     id: 1,
     creator: ethers.constants.AddressZero,
     title: "Proposal 1",
-    description: "Lorem Ipsum",
+    description: "Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum Lorem ipsum",
     options: [
       {
         id: 1,

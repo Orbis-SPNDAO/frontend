@@ -3,6 +3,7 @@ import { useState } from "react";
 import { IoIosCheckmark } from "react-icons/io";
 import { useAccount } from "wagmi";
 import {
+  discussionData,
   ProposalData,
   proposalData,
   voteData,
@@ -39,6 +40,10 @@ export default function ProposalId() {
   const widthPerVote = containerWidth / votes.length!;
 
   const proposal = p && new Proposal(p);
+
+  function navigateToDiscussion(discussionId: number) {
+    router.push(`/dashboard/governance/discussion/${discussionId}`);
+  }
 
   function onSelectOption(optionId: number) {
     setSelectedOption(optionId);
@@ -115,6 +120,36 @@ export default function ProposalId() {
                       Submit your vote
                     </button>
                   )}
+                </div>
+
+                <div className="w-full text-left text-sm mt-4 py-2 border-2 rounded-lg my-4 p-4">
+                  <h2 className="text-left text-2xl font-normal mb-2">
+                    Discussion
+                  </h2>
+
+                  {proposal?.discussions?.map((discussionId) => {
+                    const discussion = discussionData.find(
+                      (d) => d.id === discussionId
+                    );
+
+                    if (!discussion) return;
+
+                    return (
+                      <div
+                        key={discussion.id}
+                        className="border-2 rounded-lg p-4 my-4 cursor-pointer"
+                        onClick={() => navigateToDiscussion(discussionId)}
+                      >
+                        <div className="flex flex-col truncate text-2xl">
+                          <div>{discussion.title}</div>
+
+                          <div className="text-custom-gray text-sm mt-2">
+                            {discussion.content}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
