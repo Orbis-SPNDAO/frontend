@@ -77,7 +77,7 @@ export default function Proposals({
                           )}
                         </div>
 
-                        <span> {option.name}</span>
+                        <span>{option.name}</span>
 
                         <span className="ml-2 text-custom-gray">
                           {optionVoteCount} vote

@@ -160,9 +160,9 @@ export default function ProposalId() {
 
                   {votes?.map((vote) => {
                     return (
-                      <div key={vote.id} className="flex justify-center">
-                        <span className="text-custom-gray">
-                          {abbrevAccount(vote.voter)}
+                      <div key={vote.id} className="flex justify-between">
+                        <span className="text-custom-gray break-all">
+                          {vote.voter}
                         </span>
 
                         <span className="ml-4">Option {vote.option}</span>
