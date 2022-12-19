@@ -32,4 +32,4 @@ const PageLayout: FC<PageLayoutProps> = ({
   )
 }
 
-export default PageLayout
+export default PageLayout;

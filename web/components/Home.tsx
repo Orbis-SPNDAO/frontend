@@ -23,7 +23,7 @@ enum UserType {
   DaoAdmin = "daoAdmin",
 }
 
-const Home: FC<{ justBurned?: boolean; adminTokenMissing?: boolean }> = ({
+const Home: FC<{ justBurned?: boolean }> = ({
   justBurned,
 }) => {
   const [hasJustBurned, setHasJustBurned] = useState(justBurned);
@@ -31,7 +31,7 @@ const Home: FC<{ justBurned?: boolean; adminTokenMissing?: boolean }> = ({
 
   const [activeChoice, setActiveChoice] = useState(UserType.EndUser);
   const [isLoading, setIsLoading] = useState(false);
-  const [isMissingAdminToken, setIsMissingAdminToken] = useState(true);
+  const [isMissingAdminToken, setIsMissingAdminToken] = useState(false);
   const provider = useProvider();
 
   const { chain } = useNetwork();
