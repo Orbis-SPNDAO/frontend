@@ -7,14 +7,24 @@ type HeaderProps = {
   hideLogo?: boolean;
   hideButton?: boolean;
   isAdmin?: boolean;
+  hideMargin?: boolean;
 };
 
-const Header: FC<HeaderProps> = ({ hideLogo, hideButton, isAdmin }) => {
+const Header: FC<HeaderProps> = ({
+  hideLogo,
+  hideButton,
+  isAdmin,
+  hideMargin,
+}) => {
   const router = useRouter();
 
   return (
     <div className="min-h-full pt-4 w-stretch">
-      <div className="mx-6 md:mx-20 flex items-center h-20 text-gray-600">
+      <div
+        className={`${
+          hideMargin ? "" : "mx-6 md:mx-20"
+        } flex items-center h-20 text-gray-600`}
+      >
         <div className="flex items-center justify-between w-full">
           {!hideLogo ? (
             <button

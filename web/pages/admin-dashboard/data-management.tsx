@@ -76,6 +76,7 @@ const DataManagement: FC = () => {
   return (
     <PageLayout
       isAdmin
+      hideHeaderMargin
       containerClassName="bg-custom-blue min-h-screen overflow-hidden px-2 sm:px-4 sm:px-8 md:px-20 relative"
     >
       {isDecrypting ? (
