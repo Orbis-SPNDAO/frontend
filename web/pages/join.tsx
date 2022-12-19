@@ -32,19 +32,19 @@ enum JoinState {
 let cid = "";
 
 export default function Join() {
-  // const { write, isLoading, isSuccess } = useContractWrite({
-  //   mode: "recklesslyUnprepared",
-  //   address: process.env.NEXT_PUBLIC_SBT_ADDR,
-  //   abi: SBT_ABI,
-  //   functionName: "safeMint",
-  // });
-  
-  const {config, error} = usePrepareContractWrite({
+  const { write, isLoading, isSuccess } = useContractWrite({
+    mode: "recklesslyUnprepared",
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
     abi: SBT_ABI,
-    functionName: "mintLitSBT",
+    functionName: "safeMint",
   });
-  const { write, isLoading, isSuccess } = useContractWrite(config);
+
+  // const { config, error } = usePrepareContractWrite({
+  //   address: process.env.NEXT_PUBLIC_SBT_ADDR,
+  //   abi: SBT_ABI,
+  //   functionName: "mintLitSBT",
+  // });
+  // const { write, isLoading, isSuccess } = useContractWrite(config);
 
   const { address } = useAccount();
   const router = useRouter();
@@ -53,6 +53,7 @@ export default function Join() {
   const [joinState, setJoinState] = useState<JoinState>(JoinState.Start);
 
   const fileRef = useRef<HTMLInputElement | null>();
+  const [userFile, setUserFile] = useState<File>();
 
   useEffect(() => {
     if (isSuccess) setJoinState(JoinState.MintSuccess);
@@ -64,28 +65,37 @@ export default function Join() {
 
   // loads file client side so server can see it
   const uploadToClient = async (event: any) => {
-    const file = event.target.files[0];
-
-    uploadToServer(file);
+    setUserFile(event.target.files[0]);
   };
 
-  function clickFileInput() {
-    fileRef?.current?.click();
-  }
-
-  const uploadToServer = async (file: File) => {
+  const uploadToServer = async () => {
     setJoinState(JoinState.UploadingCsv);
 
     try {
       const file_id = crypto.randomBytes(20).toString("hex");
-
       const path = JSON.stringify({ path: `./public/uploads/${file_id}.csv` });
 
       const body = new FormData();
-      body.append("file", file);
-      body.append("id", file_id);
+      body.append("file", userFile!);
+      body.append("fields", file_id);
 
-      fetch("/api/saveFile", { method: "POST", body });
+      await fetch("/api/fs", { method: "POST", body }).then((res) => {
+        console.log(res);
+      });
+      // await fetch(`/api/fs?` + new URLSearchParams({ path: path }), {
+      //   method: "GET",
+      // }).then((fileData) => {
+      //   if (fileData.status !== 200) return;
+
+      //   fetch("/api/lit", { method: "POST", body: fileData.body })
+      //     .then((res) => res.json())
+      //     .then((res) => {
+      //       let { encryptedString, encryptedSymmetricKey } = res;
+      //       console.log(encryptedString, encryptedSymmetricKey);
+      //     });
+      // });
+
+      // await fetch("/api/lit", { method: "POST", body:  })
 
       // previous mint process
       // fetch("/api/saveFile", { method: "POST", body }).then(() => {
@@ -111,7 +121,7 @@ export default function Join() {
   async function onMintToken() {
     // FOR TESTING
     if (!write || !address) return;
-    
+
     // } else if (cid == undefined || cid == "") {
     //   console.log("invalid cid");
     //   return;
@@ -184,11 +194,18 @@ export default function Join() {
             </JoinSubText>
 
             <UploadBox>
-              <button
+              <form onSubmit={uploadToServer}>
+                <input
+                  id="images"
+                  type="file"
+                  onChange={uploadToClient}                  
+                />
+                <br></br>
+                <button>Upload</button>
+              </form>
+              {/* <button
                 className="mx-auto flex flex-col items-center rounded-xl"
-                onClick={() => {
-                  clickFileInput();
-                }}
+                onClick={uploadToServer}
               >
                 <div className="text-blue-500 text-bold text-5xl ">
                   <BiUpload />
@@ -200,13 +217,12 @@ export default function Join() {
                 </p>
               </button>
 
-              <input
-                ref={(ref) => (fileRef.current = ref)}
+              <input                
                 type="file"
                 accept=".csv"
                 className="hidden"
                 onChange={uploadToClient}
-              />
+              /> */}
             </UploadBox>
           </>
         );
