@@ -10,7 +10,6 @@ interface IPosts {
 }
   
 
-
 export default function Forum() {
 
   const [user, setUser] = useState();
@@ -67,11 +66,9 @@ export default function Forum() {
     let res = await orbis.connect();
 
     if (res.status == 200) {
-      setUser(res.did);
-      console.log(res);
+      setUser(res.did);      
     } else {
-      console.log("Error connecting to Ceramic: ", res);
-      alert("Error connecting to Ceramic.");
+      console.log("Error connecting to Ceramic: ", res);      
     }
   }
 
@@ -98,8 +95,7 @@ export default function Forum() {
           !posts || !posts.data ? (
             <p>No posts found</p>
           ) : (
-            posts.data.map((post: any) => {
-              console.log(post)
+            posts.data.map((post: any) => {              
               return (                
                 <div key={post.timestamp} className="p-5">
                   <h1>Title: {post.content.title}</h1>
