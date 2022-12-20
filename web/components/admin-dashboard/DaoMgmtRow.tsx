@@ -33,7 +33,7 @@ const DaoMgmtRow: FC<{
           {walletAddress}
         </span>
       </div>
-      <div className="w-1/5 pl-2">{sessionPayment}</div>
+      <div className="w-1/5 pl-2">{sessionPayment + " Matic"}</div>
       {isDecrypted ? (
         <div className="w-1/5 pl-3 flex gap-3 items-center">
           <Image

@@ -35,7 +35,7 @@ export default function Join() {
     mode: "recklesslyUnprepared",
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
     abi: SBT_ABI,
-    functionName: "safeMint",
+    functionName: "mintLitSBT",
   });
   const { address } = useAccount();
   const router = useRouter();

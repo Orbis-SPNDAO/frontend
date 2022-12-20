@@ -6,7 +6,7 @@ import { Submarine } from "pinata-submarine";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     try {
-        const submarine = new Submarine(process.env.IPFS_SUB_KEY!, "https://ccdao.mypinata.cloud");
+        const submarine = new Submarine(process.env.IPFS_SUB_KEY!, "https://patterndao.mypinata.cloud");
         const path = JSON.parse(req.body).path;
         
         return new Promise((resolve, reject) => {
