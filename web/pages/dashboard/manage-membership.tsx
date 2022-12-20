@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import Tooltip from "rc-tooltip";
 import "rc-tooltip/assets/bootstrap_white.css";
 import { useEffect, useState } from "react";
+import { BsChevronLeft } from "react-icons/bs";
 import { MdContentCopy } from "react-icons/md";
 import { RxCaretLeft, RxCross2 } from "react-icons/rx";
 import { useAccount, useContract, useContractWrite, useSigner } from "wagmi";
@@ -10,6 +11,7 @@ import { SBT_ABI } from "../../abis/currentABI";
 import Button, { ButtonStyle } from "../../components/Button";
 import { MembershipSection } from "../../components/dashboard/membership/MembershipSection";
 import { SignInPrompt } from "../../components/dashboard/SignInPrompt";
+import BackButton from "../../components/dashboards-shared/BackButton";
 import PageLayout from "../../components/layouts/PageLayout";
 import { SocialsFooter } from "../../components/SocialsFooter";
 
@@ -104,15 +106,7 @@ export default function ManageMembership() {
           <div className="h-full w-full flex flex-col">
             <div className="text-center m-5 md:my-10 md:mx-20 2xl:mx-auto max-w-7xl p-3 md:p-6 w-stretch 2xl:w-full hero">
               <div className="flex justify-between items-center mb-4 w-stretch">
-                <button
-                  className="flex items-center font-normal text-sm md:text-base hover:text-custom-purple"
-                  onClick={() => {
-                    router.push("/dashboard");
-                  }}
-                >
-                  <RxCaretLeft className="w-6 h-6 md:w-8 md:h-8" />
-                  Back to dashboard
-                </button>
+                <BackButton/>
                 <Button
                   buttonStyle={ButtonStyle.HiddenError}
                   btnSize="w-fit"

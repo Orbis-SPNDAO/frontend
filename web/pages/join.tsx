@@ -1,3 +1,4 @@
+import LitJsSdk from "@lit-protocol/sdk-browser";
 import classNames from "classnames";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -5,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { BiUpload } from "react-icons/bi";
 import { BsCheckLg } from "react-icons/bs";
 import { FaDatabase } from "react-icons/fa";
-import { useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
+import { useAccount, useContractWrite } from "wagmi";
 import { SBT_ABI } from "../abis/currentABI";
 import Button from "../components/Button";
 import { JoinSubText } from "../components/join/JoinSubText";
@@ -15,8 +16,6 @@ import { UploadBox } from "../components/join/UploadBox";
 import PageLayout from "../components/layouts/PageLayout";
 import { SocialsFooter } from "../components/SocialsFooter";
 import Spinner from "../components/Spinner";
-
-var crypto = require("crypto");
 
 enum JoinState {
   Start = "start",
@@ -36,24 +35,20 @@ export default function Join() {
     mode: "recklesslyUnprepared",
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
     abi: SBT_ABI,
-    functionName: "safeMint",
+    functionName: "mintLitSBT",
   });
-
-  // const { config, error } = usePrepareContractWrite({
-  //   address: process.env.NEXT_PUBLIC_SBT_ADDR,
-  //   abi: SBT_ABI,
-  //   functionName: "mintLitSBT",
-  // });
-  // const { write, isLoading, isSuccess } = useContractWrite(config);
 
   const { address } = useAccount();
   const router = useRouter();
   const [consentChecked, setConsentChecked] = useState(false);
+  const [encryptedData, setEncryptedData] = useState<{
+    encryptedFileString: File;
+    symmetricKeyString: string;
+  } | null>(null);
 
   const [joinState, setJoinState] = useState<JoinState>(JoinState.Start);
 
   const fileRef = useRef<HTMLInputElement | null>();
-  const [userFile, setUserFile] = useState<File>();
 
   useEffect(() => {
     if (isSuccess) setJoinState(JoinState.MintSuccess);
@@ -64,56 +59,22 @@ export default function Join() {
   }, [isLoading]);
 
   // loads file client side so server can see it
-  const uploadToClient = async (event: any) => {
-    setUserFile(event.target.files[0]);
-  };
-
-  const uploadToServer = async () => {
+  const upload = async (event: any) => {
     setJoinState(JoinState.UploadingCsv);
 
     try {
-      const file_id = crypto.randomBytes(20).toString("hex");
-      const path = `./public/uploads/${file_id}.csv`;
-
-      const body = new FormData();
-      body.append("file", userFile!);
-      body.append("fields", file_id);
-
-      // await fetch("/api/lit", { method: "POST", body:'./public/uploads/2f2cf08b4cb811b22d95fcbf447b284ec0c46aed.csv' });
-      await fetch("/api/fs", { method: "POST", body });
-      await fetch("/api/lit", { method: "POST", body: path })      
-      .then( (res) => (res.json()))
-      .then( (res) => {           
-        let { encryptedString, encryptedSymmetricKey } = res;        
+      const { encryptedFile, symmetricKey } = await LitJsSdk.encryptFile({
+        file: event.target.files[0],
       });
-
-      // await fetch(`/api/fs?` + new URLSearchParams({ path: path }), {
-      //   method: "GET",
-      // }).then((fileData) => {
-      //   if (fileData.status !== 200) return;
-
-      //   fetch("/api/lit", { method: "POST", body: fileData.body })
-      //     .then((res) => res.json())
-      //     .then((res) => {
-      //       let { encryptedString, encryptedSymmetricKey } = res;
-      //       console.log(encryptedString, encryptedSymmetricKey);
-      //     });
-      // });
-
-      // await fetch("/api/lit", { method: "POST", body:  })
-
-      // previous mint process
-      // fetch("/api/saveFile", { method: "POST", body }).then(() => {
-      //   fetch("/api/ipfs", { method: "POST", body: path })
-      //     .then((res) => res.json())
-      //     .then((new_cid) => {
-      //       cid = new_cid;
-      //     })
-      //     .then(() => {
-      //       fetch("/api/cleanup", { method: "POST", body: path });
-      //     });
-      // });
-
+      const encryptedFileString = await LitJsSdk.blobToBase64String(
+        encryptedFile
+      );
+      const symmetricKeyString = LitJsSdk.uint8arrayToString(
+        symmetricKey,
+        "base64"
+      );
+      console.log({ symmetricKeyString, encryptedFileString });
+      setEncryptedData({ encryptedFileString, symmetricKeyString });
       setJoinState(JoinState.MintToken);
     } catch (e: any) {
       console.error(
@@ -126,18 +87,22 @@ export default function Join() {
   async function onMintToken() {
     // FOR TESTING
     if (!write || !address) return;
-
-    // } else if (cid == undefined || cid == "") {
-    //   console.log("invalid cid");
-    //   return;
-    // }
-
     try {
-      write({ recklesslySetUnpreparedArgs: [address, cid] });
+      write({
+        recklesslySetUnpreparedArgs: [
+          "test",
+          encryptedData?.encryptedFileString,
+          encryptedData?.symmetricKeyString,
+        ],
+      });
     } catch (e) {
       console.log(e);
       setJoinState(JoinState.MintFailure);
     }
+  }
+
+  function clickFileInput() {
+    fileRef?.current?.click();
   }
 
   function onViewDashboard() {
@@ -186,31 +151,26 @@ export default function Join() {
         content = (
           <>
             <JoinSubText amber>
-              Please remove all sensitive personal identifiable information. See
-              the list{" "}
-              <a
-                href="https://www.investopedia.com/terms/p/personally-identifiable-information-pii.asp#:~:text=Key%20Takeaways%201%20Personally%20identifiable%20information%20%28PII%29%20uses,license%2C%20financial%20information%2C%20and%20medical%20records.%20More%20items"
-                target="blank"
-                className="underline text-blue-500"
-              >
-                here
-              </a>
-              .
+              <span>
+                Please remove all sensitive personal identifiable information.
+                See the list{" "}
+                <a
+                  href="https://www.investopedia.com/terms/p/personally-identifiable-information-pii.asp#:~:text=Key%20Takeaways%201%20Personally%20identifiable%20information%20%28PII%29%20uses,license%2C%20financial%20information%2C%20and%20medical%20records.%20More%20items"
+                  target="blank"
+                  className="underline text-blue-500"
+                >
+                  here
+                </a>
+                .
+              </span>
             </JoinSubText>
 
             <UploadBox>
-              <form onSubmit={uploadToServer}>
-                <input
-                  id="images"
-                  type="file"
-                  onChange={uploadToClient}                  
-                />
-                <br></br>
-                <button>Upload</button>
-              </form>
-              {/* <button
+              <button
                 className="mx-auto flex flex-col items-center rounded-xl"
-                onClick={uploadToServer}
+                onClick={() => {
+                  clickFileInput();
+                }}
               >
                 <div className="text-blue-500 text-bold text-5xl ">
                   <BiUpload />
@@ -221,13 +181,13 @@ export default function Join() {
                   files
                 </p>
               </button>
-
-              <input                
+              <input
+                ref={(ref) => (fileRef.current = ref)}
                 type="file"
                 accept=".csv"
                 className="hidden"
-                onChange={uploadToClient}
-              /> */}
+                onChange={upload}
+              />
             </UploadBox>
           </>
         );
