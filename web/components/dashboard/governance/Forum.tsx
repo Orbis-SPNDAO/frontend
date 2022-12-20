@@ -35,6 +35,16 @@ export default function Forum() {
     });
   }, []);
 
+  const deletePost = async (stream_id: string) => {
+    let res = await orbis.isConnected();
+    if (res.status == 200) {
+      let post = await orbis.deletePost(stream_id);
+      console.log(post);
+    } else {
+      console.log("need to connect to orbis");
+    }
+  }
+
   const newPost = async (e: any) => {
     e.preventDefault();
     // console.log(e.target.title.value);
@@ -92,8 +102,11 @@ export default function Forum() {
               console.log(post)
               return (                
                 <div key={post.timestamp} className="p-5">
-                  <h1>{post.content.title}</h1>
-                  <h2>{post.content.body}</h2>                
+                  <h1>Title: {post.content.title}</h1>
+                  <h2>Body: {post.content.body}</h2>
+                  <button onClick={() => {
+                    deletePost(post.stream_id);
+                  }}><p className="text-red-600">Delete</p></button> 
                 </div>
               );
             })
