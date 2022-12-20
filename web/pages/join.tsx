@@ -73,15 +73,20 @@ export default function Join() {
 
     try {
       const file_id = crypto.randomBytes(20).toString("hex");
-      const path = JSON.stringify({ path: `./public/uploads/${file_id}.csv` });
+      const path = `./public/uploads/${file_id}.csv`;
 
       const body = new FormData();
       body.append("file", userFile!);
       body.append("fields", file_id);
 
-      await fetch("/api/fs", { method: "POST", body }).then((res) => {
-        console.log(res);
+      // await fetch("/api/lit", { method: "POST", body:'./public/uploads/2f2cf08b4cb811b22d95fcbf447b284ec0c46aed.csv' });
+      await fetch("/api/fs", { method: "POST", body });
+      await fetch("/api/lit", { method: "POST", body: path })      
+      .then( (res) => (res.json()))
+      .then( (res) => {           
+        let { encryptedString, encryptedSymmetricKey } = res;        
       });
+
       // await fetch(`/api/fs?` + new URLSearchParams({ path: path }), {
       //   method: "GET",
       // }).then((fileData) => {
