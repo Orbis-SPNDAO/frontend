@@ -186,16 +186,18 @@ export default function Join() {
         content = (
           <>
             <JoinSubText amber>
-              Please remove all sensitive personal identifiable information. See
-              the list{" "}
-              <a
-                href="https://www.investopedia.com/terms/p/personally-identifiable-information-pii.asp#:~:text=Key%20Takeaways%201%20Personally%20identifiable%20information%20%28PII%29%20uses,license%2C%20financial%20information%2C%20and%20medical%20records.%20More%20items"
-                target="blank"
-                className="underline text-blue-500"
-              >
-                here
-              </a>
-              .
+              <span>
+                Please remove all sensitive personal identifiable information.
+                See the list{" "}
+                <a
+                  href="https://www.investopedia.com/terms/p/personally-identifiable-information-pii.asp#:~:text=Key%20Takeaways%201%20Personally%20identifiable%20information%20%28PII%29%20uses,license%2C%20financial%20information%2C%20and%20medical%20records.%20More%20items"
+                  target="blank"
+                  className="underline text-blue-500"
+                >
+                  here
+                </a>
+                .
+              </span>
             </JoinSubText>
 
             <UploadBox>

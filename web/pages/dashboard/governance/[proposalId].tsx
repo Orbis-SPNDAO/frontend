@@ -1,27 +1,56 @@
-import { useRouter } from "next/router"
-import { useState } from "react"
-import { BsChevronLeft } from "react-icons/bs"
-import { IoIosCheckmark } from "react-icons/io"
-import { useAccount } from "wagmi"
-import { VoteData, voteData } from "../../../components/dashboard/dummydata"
-import PageLayout from "../../../components/layouts/PageLayout"
-import { useContainerDimensions } from "../../../hooks/useContainerDimensions"
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { IoIosCheckmark } from "react-icons/io";
+import { useAccount } from "wagmi";
+import {
+  discussionData,
+  ProposalData,
+  proposalData,
+  voteData,
+} from "../../../components/dashboard/dummydata";
+import BackButton from "../../../components/dashboards-shared/BackButton";
+import PageLayout from "../../../components/layouts/PageLayout";
+import Proposal from "../../../dataclass/Proposal";
+import { useContainerDimensions } from "../../../hooks/useContainerDimensions";
+import { abbrevAccount } from "../../../utils/string";
 
 export default function ProposalId() {
-  const router = useRouter()
-  const { isConnecting, address } = useAccount()
+  const router = useRouter();
+  const { isConnecting, address } = useAccount();
 
-  const [voteContainer, setVoteContainer] = useState<HTMLDivElement | null>()
+  const [voteContainer, setVoteContainer] = useState<HTMLDivElement | null>();
   const { width: containerWidth } = useContainerDimensions(
     voteContainer as HTMLDivElement
-  )
+  );
+  const [selectedOption, setSelectedOption] = useState(0);
 
-  function navigateBack() {
-    router.push("/dashboard/governance")
+  const p = proposalData?.find(
+    (p) => p.id.toString() === router.query?.proposalId
+  );
+
+  const votes = voteData.filter((vote) => vote.proposalId === p?.id);
+
+  const votesByOption: Record<number, number> = {};
+  votes.forEach((vote) => {
+    votesByOption[vote.option] = (votesByOption[vote.option] || 0) + 1;
+  });
+
+  const widthPerVote = containerWidth / votes.length!;
+
+  const proposal = p && new Proposal(p);
+
+  function navigateToDiscussion(discussionId: number) {
+    router.push(`/dashboard/governance/discussion/${discussionId}`);
   }
 
-  function onProposalClick(proposal: VoteData) {
-    router.push(`/dashboard/governance/${proposal.id}`)
+  function onSelectOption(optionId: number) {
+    setSelectedOption(optionId);
+  }
+
+  function onCastVote() {
+    if (!selectedOption) return;
+
+    console.log("onCastVote");
   }
 
   return !address || isConnecting ? (
@@ -36,83 +65,186 @@ export default function ProposalId() {
     <PageLayout containerClassName="bg-custom-blue bg-cover min-h-screen">
       <div className="text-center my-5 md:my-10 w-full">
         <div className="flex justify-between md:mx-28">
-          <button className="flex items-center" onClick={() => navigateBack()}>
-            <BsChevronLeft /> <span className="ml-4">Back to Dashboard</span>
-          </button>
+          <BackButton
+            backRoute="/dashboard/governance"
+            text="Back to all proposals"
+          />
         </div>
 
         <div className="w-stretch m-5 md:mx-28 md:my-12 h-fit py-6 px-4 md:p-10 hero">
-          <h2 className="text-left text-2xl font-normal">Proposals</h2>
+          <div className="flex flex-col w-full text-left text-sm mt-4 py-2">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+              <div className="flex flex-col lg:col-span-3">
+                <span className="text-2xl">{proposal?.title}</span>
 
-          <div
-            ref={(ref) => setVoteContainer(ref)}
-            className="flex flex-col w-full text-left text-sm mt-4 py-2"
-          >
-            {voteData
-              ?.filter((v) => v.id.toString() === router.query?.proposalId)
-              .map((vote) => {
-                const totalVotes = vote.options.reduce(
-                  (total, o) => total + o.voteCount,
-                  0
-                )
+                <div className="mt-4">
+                  <span className="text-md rounded-full border-2 border-gray py-1 px-4">
+                    {proposal?.getStatusDisplay()}
+                  </span>
 
-                const maxVoteCount = Math.max(
-                  ...vote.options.map((o) => o.voteCount)
-                )
+                  <span className="text-custom-gray text-md ml-4">
+                    By {abbrevAccount(proposal?.creator ?? "")}
+                  </span>
+                </div>
 
-                const widthPerVote = containerWidth / totalVotes
+                <div className="text-custom-gray text-sm my-8">
+                  {proposal?.description}
+                </div>
 
-                return (
-                  <button
-                    key={vote.id}
-                    className="border-2 rounded-lg mb-4 p-4 text-left"
-                    onClick={() => onProposalClick(vote)}
-                  >
-                    <div className="flex flex-col">
-                      <div className="flex justify-between items-center">
-                        <span className="text-2xl">{vote.title}</span>
-                        <span className="text-md rounded-full border-2 border-gray py-1 px-4">
-                          {vote.status}
-                        </span>
+                <div className="w-full text-left text-sm mt-4 py-2 border-2 rounded-lg my-4 p-4">
+                  <h2 className="text-left text-2xl font-normal mb-2">
+                    Cast your vote
+                  </h2>
+
+                  {proposal?.options?.map((option) => {
+                    return (
+                      <button
+                        key={`${option.id}`}
+                        className={`w-full ${
+                          selectedOption === option.id ? "bg-gray-200" : ""
+                        } hover:bg-gray-300 p-2 rounded-lg border-2 border-gray my-2`}
+                        onClick={() => onSelectOption(option.id)}
+                      >
+                        {option.name}
+                      </button>
+                    );
+                  })}
+
+                  {(proposal?.options?.length ?? 0) > 0 && (
+                    <button
+                      className="w-full hover:bg-gray-300 p-2 rounded-lg border-2 border-gray my-2"
+                      onClick={onCastVote}
+                    >
+                      Submit your vote
+                    </button>
+                  )}
+                </div>
+
+                <div className="w-full text-left text-sm mt-4 py-2 border-2 rounded-lg my-4 p-4">
+                  <h2 className="text-left text-2xl font-normal mb-2">
+                    Discussion
+                  </h2>
+
+                  {proposal?.discussions?.map((discussionId) => {
+                    const discussion = discussionData.find(
+                      (d) => d.id === discussionId
+                    );
+
+                    if (!discussion) return;
+
+                    return (
+                      <div
+                        key={discussion.id}
+                        className="border-2 rounded-lg p-4 my-4 cursor-pointer"
+                        onClick={() => navigateToDiscussion(discussionId)}
+                      >
+                        <div className="flex flex-col truncate text-2xl">
+                          <div>{discussion.title}</div>
+
+                          <div className="text-custom-gray text-sm mt-2">
+                            {discussion.content}
+                          </div>
+                        </div>
                       </div>
+                    );
+                  })}
+                </div>
 
-                      <span className="text-custom-gray text-sm my-4">
-                        {vote.description}
-                      </span>
+                <div className="w-full text-left text-sm mt-4 py-2 border-2 rounded-lg my-4 p-4">
+                  <h2 className="text-left text-2xl font-normal mb-2">
+                    Votes
+                    <span className="rounded-full bg-custom-purple-light p-1 ml-4">
+                      {votes?.length}
+                    </span>
+                  </h2>
 
-                      {vote.options.map((option) => {
-                        return (
-                          <span key={`${option.id}`}>
+                  {votes?.map((vote) => {
+                    return (
+                      <div key={vote.id} className="flex justify-between">
+                        <span className="text-custom-gray break-all">
+                          {vote.voter}
+                        </span>
+
+                        <span className="ml-4">Option {vote.option}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="lg:col-span-2">
+                <div className="flex flex-col text-left text-sm mt-4 py-2 border-2 rounded-lg mb-4 p-4 divide-y">
+                  <h2 className="text-left text-2xl font-normal my-2">
+                    Information
+                  </h2>
+
+                  <div className="grid-cols-2 pt-2">
+                    <div className="flex justify-between text-custom-gray mb-2">
+                      <span>Organisation</span>
+                      <span>{proposal?.organisation}</span>
+                    </div>
+                    <div className="flex justify-between text-custom-gray mb-2">
+                      <span>IPFS</span>
+                      <span>{proposal?.ipfs}</span>
+                    </div>
+                    <div className="flex justify-between text-custom-gray mb-2">
+                      <span>Voting System</span>
+                      <span>{proposal?.votingSystem}</span>
+                    </div>
+                    <div className="flex justify-between text-custom-gray mb-2">
+                      <span>Start Date</span>
+                      <span>{proposal?.startDate?.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-custom-gray mb-2">
+                      <span>End Date</span>
+                      <span>{proposal?.endDate?.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between text-custom-gray mb-2">
+                      <span>Snapshot</span>
+                      <span>{proposal?.snapshot}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  ref={(ref) => setVoteContainer(ref)}
+                  className="flex flex-col text-left text-sm mt-4 py-2 border-2 rounded-lg mb-4 p-4 divide-y"
+                >
+                  <h2 className="text-left text-2xl font-normal mb-2">
+                    Current results
+                  </h2>
+
+                  <div className="pt-2">
+                    {proposal?.options?.map((option) => {
+                      const optionVoteCount = votesByOption[option.id] || 0;
+
+                      return (
+                        <div key={`${option.id}`}>
+                          <div className="">{option.name}</div>
+                          <div className="relative h-6 mb-2">
                             <div
-                              className="absolute flex items-center bg-custom-purple bg-opacity-20 my-2 py-2 px-4 rounded-lg h-9"
+                              className="absolute bg-custom-purple-light my-2 py-1 px-2 rounded-lg h-3"
                               style={{
-                                width: widthPerVote * option.voteCount,
+                                width: containerWidth - 48,
                               }}
                             />
-
-                            <div className="flex items-center my-2 py-2 px-4 rounded-lg">
-                              <div className="mx-2 w-6">
-                                {option.voteCount === maxVoteCount && (
-                                  <IoIosCheckmark size="20" />
-                                )}
-                              </div>
-
-                              <span> {option.name}</span>
-
-                              <span className="ml-2 text-custom-gray">
-                                {option.voteCount} vote
-                              </span>
-                            </div>
-                          </span>
-                        )
-                      })}
-                    </div>
-                  </button>
-                )
-              })}
+                            <div
+                              className="absolute bg-custom-purple my-2 py-1 px-2 rounded-lg h-3"
+                              style={{
+                                width: widthPerVote * optionVoteCount,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </PageLayout>
-  )
+  );
 }

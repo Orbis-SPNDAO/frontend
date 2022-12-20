@@ -40,3 +40,5 @@ next-env.d.ts
 uploads/
 
 /pages/tester.tsx
+
+yarn.lock
