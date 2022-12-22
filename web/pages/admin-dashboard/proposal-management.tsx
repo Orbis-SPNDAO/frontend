@@ -13,7 +13,7 @@ const ProposalManagement: FC = () => {
   const { data: sbtHolders } = useContractRead({      
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
     abi: SBT_ABI,
-    functionName: "fetchNfts",
+    functionName: "fetchHolders",
   });  
 
   useEffect(() => {
@@ -43,7 +43,9 @@ const ProposalManagement: FC = () => {
     if (client.current) accountHandler();
   }, [client]);
 
-  const createProposal = async () => {};
+  const createProposal = async () => {
+    // console.log(sbtHolders)
+  };
 
   return (
     <PageLayout
