@@ -44,7 +44,7 @@ const ProposalManagement: FC = () => {
   }, [client]);
 
   const createProposal = async () => {
-    // console.log(sbtHolders)
+    console.log(sbtHolders)
   };
 
   return (
