@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { BsFillCheckCircleFill } from "react-icons/bs";
 import { RxCross2 } from "react-icons/rx";
 import DaoMgmtRow from "../../components/admin-dashboard/DaoMgmtRow";
@@ -140,9 +140,9 @@ const DataManagement: FC = () => {
               <h4>{`Successfully decrypted ${successMsg.numDecrypted} data set${
                 successMsg.numDecrypted > 1 ? "s" : ""
               }`}</h4>
-              <span className="font-normal text-sm">{`Total ${
-                successMsg.totalPayment.toPrecision(4)
-              } paid to token holder${
+              <span className="font-normal text-sm">{`Total ${successMsg.totalPayment.toPrecision(
+                4
+              )} paid to token holder${
                 successMsg.numDecrypted > 1 ? "s" : ""
               }`}</span>
             </div>
@@ -216,17 +216,25 @@ const DataManagement: FC = () => {
             </div>
             <div className="w-1/5 table-header-border px-2">Status</div>
           </div>
-          {daoMgmtData.map((datum, i) => (
-            <DaoMgmtRow
-              data={datum}
-              key={i}
-              hideBorder={i === daoMgmtData.length - 1}
-              setRowChecked={(isChecked: boolean) =>
-                setRowChecked(i, isChecked)
-              }
-              decrypt={() => decryptSingleRow(i)}
-            />
-          ))}
+          {daoMgmtData
+            .filter((datum) => {
+              return (
+                activeTab === DataSelectType.All ||
+                (activeTab === DataSelectType.Decrypted && datum.isDecrypted) ||
+                (activeTab === DataSelectType.Undecrypted && !datum.isDecrypted)
+              );
+            })
+            .map((datum, i) => (
+              <DaoMgmtRow
+                data={datum}
+                key={i}
+                hideBorder={i === daoMgmtData.length - 1}
+                setRowChecked={(isChecked: boolean) =>
+                  setRowChecked(i, isChecked)
+                }
+                decrypt={() => decryptSingleRow(i)}
+              />
+            ))}
         </div>
       </div>
     </PageLayout>

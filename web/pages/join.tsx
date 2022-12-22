@@ -1,3 +1,4 @@
+import LitJsSdk from "@lit-protocol/sdk-browser";
 import classNames from "classnames";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -15,7 +16,6 @@ import { UploadBox } from "../components/join/UploadBox";
 import PageLayout from "../components/layouts/PageLayout";
 import { SocialsFooter } from "../components/SocialsFooter";
 import Spinner from "../components/Spinner";
-var crypto = require("crypto");
 
 enum JoinState {
   Start = "start",
@@ -35,11 +35,16 @@ export default function Join() {
     mode: "recklesslyUnprepared",
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
     abi: SBT_ABI,
-    functionName: "safeMint",
+    functionName: "mintLitSBT",
   });
+
   const { address } = useAccount();
   const router = useRouter();
   const [consentChecked, setConsentChecked] = useState(false);
+  const [encryptedData, setEncryptedData] = useState<{
+    encryptedFileString: File;
+    symmetricKeyString: string;
+  } | null>(null);
 
   const [joinState, setJoinState] = useState<JoinState>(JoinState.Start);
 
@@ -54,39 +59,22 @@ export default function Join() {
   }, [isLoading]);
 
   // loads file client side so server can see it
-  const uploadToClient = async (event: any) => {
-    const file = event.target.files[0];
-
-    uploadToServer(file);
-  };
-
-  function clickFileInput() {
-    fileRef?.current?.click();
-  }
-
-  const uploadToServer = async (file: File) => {
+  const upload = async (event: any) => {
     setJoinState(JoinState.UploadingCsv);
 
     try {
-      const file_id = crypto.randomBytes(20).toString("hex");
-
-      const path = JSON.stringify({ path: `./public/uploads/${file_id}.csv` });
-
-      const body = new FormData();
-      body.append("file", file);
-      body.append("id", file_id);
-
-      fetch("/api/saveFile", { method: "POST", body }).then(() => {
-        fetch("/api/ipfs", { method: "POST", body: path })
-          .then((res) => res.json())
-          .then((new_cid) => {
-            cid = new_cid;
-          })
-          .then(() => {
-            fetch("/api/cleanup", { method: "POST", body: path });
-          });
+      const { encryptedFile, symmetricKey } = await LitJsSdk.encryptFile({
+        file: event.target.files[0],
       });
-
+      const encryptedFileString = await LitJsSdk.blobToBase64String(
+        encryptedFile
+      );
+      const symmetricKeyString = LitJsSdk.uint8arrayToString(
+        symmetricKey,
+        "base64"
+      );
+      console.log({ symmetricKeyString, encryptedFileString });
+      setEncryptedData({ encryptedFileString, symmetricKeyString });
       setJoinState(JoinState.MintToken);
     } catch (e: any) {
       console.error(
@@ -98,20 +86,23 @@ export default function Join() {
 
   async function onMintToken() {
     // FOR TESTING
-    if (!write || !address) {
-      console.log("no contract, address, or signer");
-      return;
-    } else if (cid == undefined || cid == "") {
-      console.log("invalid cid");
-      return;
-    }
-
+    if (!write || !address) return;
     try {
-      write({ recklesslySetUnpreparedArgs: [address, cid] });
+      write({
+        recklesslySetUnpreparedArgs: [
+          "test",
+          encryptedData?.encryptedFileString,
+          encryptedData?.symmetricKeyString,
+        ],
+      });
     } catch (e) {
       console.log(e);
       setJoinState(JoinState.MintFailure);
     }
+  }
+
+  function clickFileInput() {
+    fileRef?.current?.click();
   }
 
   function onViewDashboard() {
@@ -190,13 +181,12 @@ export default function Join() {
                   files
                 </p>
               </button>
-
               <input
                 ref={(ref) => (fileRef.current = ref)}
                 type="file"
                 accept=".csv"
                 className="hidden"
-                onChange={uploadToClient}
+                onChange={upload}
               />
             </UploadBox>
           </>
