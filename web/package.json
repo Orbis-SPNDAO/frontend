@@ -11,6 +11,7 @@
   "dependencies": {
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
+    "@orbisclub/orbis-sdk": "^0.4.4-beta.42",
     "@lit-protocol/sdk-browser": "^1.1.241",
     "@lit-protocol/sdk-nodejs": "^1.1.241",
     "@rainbow-me/rainbowkit": "^0.8.0",
@@ -35,7 +36,7 @@
   },
   "devDependencies": {
     "@types/lodash.merge": "^4.6.7",
-    "@types/node": "18.11.9",
+    "@types/node": "^18.11.9",
     "@types/react": "18.0.25",
     "@types/react-dom": "18.0.9",
     "autoprefixer": "^10.4.13",
