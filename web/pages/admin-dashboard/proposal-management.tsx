@@ -1,4 +1,4 @@
-import { VocdoniSDKClient, EnvOptions } from "@vocdoni/sdk";
+import { VocdoniSDKClient, EnvOptions, AccountData } from "@vocdoni/sdk";
 import { FC, useEffect, useState, useRef } from "react";
 
 import { useSigner } from "wagmi";
@@ -8,6 +8,7 @@ import PageLayout from "../../components/layouts/PageLayout";
 const ProposalManagement: FC = () => {
   
   const client = useRef<VocdoniSDKClient>();  
+  const vocAccount = useRef<AccountData>();
 
   const { data: signer } = useSigner();
 
@@ -21,12 +22,16 @@ const ProposalManagement: FC = () => {
         
     const accountHandler = async () => {
       try {
-        let info = await client.current!.fetchAccountInfo();
-        console.log("account exists", info)
+        vocAccount.current = await client.current!.fetchAccountInfo();        
       } catch (e) { // account not created yet
-        const info = await client.current!.createAccount();
-        console.log("account created", info)
+        vocAccount.current = await client.current!.createAccount();        
+      }      
+      
+      // top up account with faucet tokens
+      if (vocAccount.current.balance === 0) {
+        await client.current!.collectFaucetTokens()
       }
+
     }
 
     if (client.current)
@@ -37,17 +42,8 @@ const ProposalManagement: FC = () => {
   
   
   const createProposal = async () => {
-        
-
-    // can switch to client.fetchAccountInfo later for performance
-    // returns existing account info if already created
-    // let vocAccount = await client.createAccount();
-    // console.log("vocAccount", vocAccount)
-    
-    // // get tokens
-    // if (vocAccount.balance === 0) {
-    //   await client.collectFaucetTokens()
-    // }
+            
+  
 
   };
 
