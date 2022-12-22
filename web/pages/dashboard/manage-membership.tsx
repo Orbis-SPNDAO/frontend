@@ -34,7 +34,6 @@ export default function ManageMembership() {
     if (isSuccess) router.push("/come-back");
   }, [isSuccess, router]);
 
-  const { bal } = router.query;
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
   async function burnToken() {
@@ -42,11 +41,9 @@ export default function ManageMembership() {
     if (contract && signer && write) {
       console.log("click");
       const tokenId = await contract
-        .ownerToTokenIds(address, Number(bal) - 1)
+        .ownerToTokenId(address)
         .then(parseInt);
       console.log(tokenId);
-      // TODO: fix smart contract to
-      // delete token IDs from ownerToTokenIds upon burn
       write({ recklesslySetUnpreparedArgs: [tokenId] });
     }
   }
