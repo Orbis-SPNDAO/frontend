@@ -38,7 +38,6 @@ export default function ManageMembership() {
 
   async function burnToken() {
     if (contract && signer && write) {
-      console.log("click");
       const tokenId = await contract.ownerToTokenId(address).then(parseInt);
       console.log(tokenId);
       write({ recklesslySetUnpreparedArgs: [tokenId] });
