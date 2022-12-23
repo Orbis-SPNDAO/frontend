@@ -20,15 +20,14 @@ import Spinner from "../components/Spinner";
 enum JoinState {
   Start = "start",
   PromptUpload = "prompt-upload",
-  UploadingCsv = "uploading-csv",
+  Encrypting = "encrypting",
+  Uploading = "uploading",
   UploadFailure = "upload-failure",
   MintToken = "mint-token",
   MintInProgress = "mint-in-progress",
   MintSuccess = "mint-success",
   MintFailure = "mint-failure",
 }
-
-let cid = "";
 
 export default function Join() {
   const { write, isLoading, isSuccess } = useContractWrite({
@@ -42,7 +41,7 @@ export default function Join() {
   const router = useRouter();
   const [consentChecked, setConsentChecked] = useState(false);
   const [encryptedData, setEncryptedData] = useState<{
-    encryptedFileString: File;
+    encryptedCidString: string;
     symmetricKeyString: string;
   } | null>(null);
 
@@ -60,12 +59,13 @@ export default function Join() {
 
   // loads file client side so server can see it
   const upload = async (event: any) => {
-    setJoinState(JoinState.UploadingCsv);
+    setJoinState(JoinState.Encrypting);
 
     try {
       const { encryptedFile, symmetricKey } = await LitJsSdk.encryptFile({
         file: event.target.files[0],
       });
+
       const encryptedFileString = await LitJsSdk.blobToBase64String(
         encryptedFile
       );
@@ -73,8 +73,25 @@ export default function Join() {
         symmetricKey,
         "base64"
       );
-      console.log({ symmetricKeyString, encryptedFileString });
-      setEncryptedData({ encryptedFileString, symmetricKeyString });
+      setJoinState(JoinState.Uploading);
+      const rawRes = await fetch("/api/upload", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ encryptedFileString }),
+      });
+
+      const { cid } = await rawRes.json();
+      const importedSymmKey = await LitJsSdk.importSymmetricKey(symmetricKey);
+      const encryptedCid = await LitJsSdk.encryptWithSymmetricKey(
+        importedSymmKey,
+        new TextEncoder().encode(cid).buffer
+      );
+      const encryptedCidString = await LitJsSdk.blobToBase64String(
+        encryptedCid
+      );
+      setEncryptedData({ encryptedCidString, symmetricKeyString });
       setJoinState(JoinState.MintToken);
     } catch (e: any) {
       console.error(
@@ -85,13 +102,12 @@ export default function Join() {
   };
 
   async function onMintToken() {
-    // FOR TESTING
     if (!write || !address) return;
     try {
       write({
         recklesslySetUnpreparedArgs: [
-          "test",
-          encryptedData?.encryptedFileString,
+          "",
+          encryptedData?.encryptedCidString,
           encryptedData?.symmetricKeyString,
         ],
       });
@@ -115,7 +131,9 @@ export default function Join() {
       case JoinState.PromptUpload:
         title = "Upload a CSV file";
         break;
-      case JoinState.UploadingCsv:
+      case JoinState.Encrypting:
+        title = "Encrypting your file...";
+      case JoinState.Uploading:
         title = "Uploading to IPFS...";
         break;
       case JoinState.UploadFailure:
@@ -192,12 +210,13 @@ export default function Join() {
           </>
         );
         break;
-      case JoinState.UploadingCsv:
+      case JoinState.Encrypting:
+      case JoinState.Uploading:
         content = (
           <>
             <JoinSubText>
-              Your file will be encrypted immediately, and will be uploaded to
-              and stored on decentralized storage provided by IPFS.
+              After encryption, your file will be stored on decentralized
+              storage provided by IPFS.
             </JoinSubText>
             <div className="mx-auto w-1/2 mt-24 py-24 px-8 py-2 border-2 border-dashed border-gray-500 rounded-xl bg-white">
               <div className="mx-auto flex flex-col items-center rounded-xl">
@@ -427,7 +446,8 @@ export default function Join() {
                         "absolute bg-blue-500 h-full object-left rounded-full z-10 transition-width duration-300",
                         {
                           "w-0": joinState == JoinState.PromptUpload,
-                          "w-1/3": joinState == JoinState.UploadingCsv,
+                          "w-1/4": joinState == JoinState.Encrypting,
+                          "w-1/2": joinState == JoinState.Uploading,
                           "w-2/3": joinState == JoinState.MintToken,
                           "w-5/6": joinState == JoinState.MintInProgress,
                         }
@@ -437,26 +457,26 @@ export default function Join() {
                       status={
                         joinState == JoinState.PromptUpload
                           ? "empty"
-                          : joinState == JoinState.UploadingCsv
+                          : joinState == JoinState.Encrypting
                           ? "blue"
                           : "checked"
                       }
                     />
                     <ProgressStepsDot
                       status={
-                        joinState == JoinState.PromptUpload
+                        joinState == JoinState.PromptUpload ||
+                        joinState == JoinState.Encrypting
                           ? "empty"
-                          : joinState == JoinState.UploadingCsv
+                          : joinState == JoinState.Uploading
                           ? "blue"
                           : "checked"
                       }
                     />
                     <ProgressStepsDot
                       status={
-                        joinState == JoinState.MintToken
+                        joinState == JoinState.MintToken ||
+                        joinState == JoinState.MintInProgress
                           ? "blue"
-                          : joinState == JoinState.MintInProgress
-                          ? "checked"
                           : "empty"
                       }
                     />

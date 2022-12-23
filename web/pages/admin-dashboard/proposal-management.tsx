@@ -1,6 +1,6 @@
-import { VocdoniSDKClient, EnvOptions, AccountData } from "@vocdoni/sdk";
-import { FC, useEffect, useState, useRef } from "react";
-import { useSigner, useContractRead } from "wagmi";
+import { AccountData, EnvOptions, VocdoniSDKClient } from "@vocdoni/sdk";
+import { FC, useEffect, useRef } from "react";
+import { useContractRead, useSigner } from "wagmi";
 import { SBT_ABI } from "../../abis/currentABI";
 import PageLayout from "../../components/layouts/PageLayout";
 

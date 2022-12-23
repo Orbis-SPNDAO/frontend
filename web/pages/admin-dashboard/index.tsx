@@ -31,10 +31,10 @@ export default function AdminDashboard() {
         if (bal > 0) {
           console.log("admin NFT found");
         } else {
-          // router.push("/");
+          router.push("/");
         }
       } catch (e) {
-        // router.push("/");
+        router.push("/");
       }
     }
 
