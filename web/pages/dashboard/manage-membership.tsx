@@ -37,12 +37,9 @@ export default function ManageMembership() {
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
   async function burnToken() {
-    console.log({ signer, contract });
     if (contract && signer && write) {
       console.log("click");
-      const tokenId = await contract
-        .ownerToTokenId(address)
-        .then(parseInt);
+      const tokenId = await contract.ownerToTokenId(address).then(parseInt);
       console.log(tokenId);
       write({ recklesslySetUnpreparedArgs: [tokenId] });
     }
@@ -103,7 +100,7 @@ export default function ManageMembership() {
           <div className="h-full w-full flex flex-col">
             <div className="text-center m-5 md:my-10 md:mx-20 2xl:mx-auto max-w-7xl p-3 md:p-6 w-stretch 2xl:w-full hero">
               <div className="flex justify-between items-center mb-4 w-stretch">
-                <BackButton/>
+                <BackButton />
                 <Button
                   buttonStyle={ButtonStyle.HiddenError}
                   btnSize="w-fit"
