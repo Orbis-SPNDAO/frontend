@@ -23,9 +23,7 @@ enum UserType {
   DaoAdmin = "daoAdmin",
 }
 
-const Home: FC<{ justBurned?: boolean }> = ({
-  justBurned,
-}) => {
+const Home: FC<{ justBurned?: boolean }> = ({ justBurned }) => {
   const [hasJustBurned, setHasJustBurned] = useState(justBurned);
   const router = useRouter();
 
@@ -61,12 +59,14 @@ const Home: FC<{ justBurned?: boolean }> = ({
         !isMissingAdminToken
       ) {
         setIsLoading(true);
-        if (activeChoice === UserType.EndUser) {
-          const bal = parseInt(await endUserContract!.balanceOf(address), 10);
-          if (bal === 0) router.push("/join");
-          else router.push("/dashboard");
-        } else {
-          const bal = parseInt(await adminContract!.balanceOf(address), 10);
+        if (activeChoice === UserType.EndUser && endUserContract) {
+          const tokenId = await endUserContract
+            .ownerToTokenId(address)
+            .then(parseInt);
+          if (tokenId) router.push("/dashboard");
+          else router.push("/join");
+        } else if (adminContract) {
+          const bal = parseInt(await adminContract.balanceOf(address), 10);
           if (bal === 0) setIsMissingAdminToken(true);
           else router.push("/admin-dashboard");
         }
