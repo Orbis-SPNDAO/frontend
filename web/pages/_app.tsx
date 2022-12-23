@@ -12,9 +12,9 @@ import {
   RainbowKitProvider,
   Theme,
 } from "@rainbow-me/rainbowkit";
-import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
+import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { polygonMumbai } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
-import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { publicProvider } from "wagmi/providers/public";
 
 const myTheme = merge(lightTheme(), {
@@ -29,12 +29,8 @@ const myTheme = merge(lightTheme(), {
 const App = ({ Component, pageProps }: AppProps) => {
   const ALCHEMY_KEY = process.env.NEXT_PUBLIC_ALCHEMY_KEY;
   const { chains, provider } = configureChains(
-    [chain.polygonMumbai],
-    [
-      alchemyProvider({ apiKey: ALCHEMY_KEY as string }),
-      jsonRpcProvider({ rpc: (chain) => ({ http: chain.rpcUrls.default }) }),
-      publicProvider(),
-    ]
+    [polygonMumbai],
+    [alchemyProvider({ apiKey: ALCHEMY_KEY as string }), publicProvider()]
   );
 
   const { connectors } = getDefaultWallets({
