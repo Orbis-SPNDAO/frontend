@@ -154,6 +154,19 @@
     },
     {
       "inputs": [],
+      "name": "fetchHolders",
+      "outputs": [
+        {
+          "internalType": "address[]",
+          "name": "",
+          "type": "address[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
       "name": "fetchNfts",
       "outputs": [
         {
@@ -165,12 +178,7 @@
             },
             {
               "internalType": "string",
-              "name": "encryptedData",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "encryptedSymmetricKey",
+              "name": "encryptedCid",
               "type": "string"
             }
           ],
@@ -234,12 +242,12 @@
         },
         {
           "internalType": "string",
-          "name": "encryptedData",
+          "name": "encryptedCid",
           "type": "string"
         },
         {
           "internalType": "string",
-          "name": "encryptedSymmetricKey",
+          "name": "symmetricKey",
           "type": "string"
         }
       ],
@@ -374,6 +382,19 @@
       "inputs": [
         {
           "internalType": "address",
+          "name": "adminContractAddress",
+          "type": "address"
+        }
+      ],
+      "name": "setAdminContract",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
           "name": "operator",
           "type": "address"
         },
@@ -386,6 +407,19 @@
       "name": "setApprovalForAll",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "spendAdminContract",
+      "outputs": [
+        {
+          "internalType": "contract SpendAdmin",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     },
     {
