@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import { IoIosCheckmark } from "react-icons/io";
 import { useAccount } from "wagmi";
+import BaseModal from "../../../components/BaseModal";
 import {
   discussionData,
   ProposalData,
@@ -23,6 +24,8 @@ export default function ProposalId() {
     voteContainer as HTMLDivElement
   );
   const [selectedOption, setSelectedOption] = useState(0);
+
+  const [showCastModal, setShowCastModal] = useState(false);
 
   const p = proposalData?.find(
     (p) => p.id.toString() === router.query?.proposalId
@@ -50,7 +53,17 @@ export default function ProposalId() {
   function onCastVote() {
     if (!selectedOption) return;
 
-    console.log("onCastVote");
+    setShowCastModal(true);
+  }
+
+  async function onModalConfirm() {
+    console.log("onCastVote call contract for vote async");
+
+    setShowCastModal(false);
+  }
+
+  function onModalCancel() {
+    setShowCastModal(false);
   }
 
   return !address || isConnecting ? (
@@ -63,6 +76,34 @@ export default function ProposalId() {
     </PageLayout>
   ) : (
     <PageLayout containerClassName="bg-custom-blue bg-cover min-h-screen">
+      <BaseModal
+        open={showCastModal}
+        onClose={onModalCancel}
+        title="Cast your vote"
+        footerActions={[
+          { type: "cancel", action: onModalCancel },
+          { type: "confirm", action: onModalConfirm },
+        ]}
+      >
+        <div className="grid-cols-2 pt-2">
+          <div className="flex justify-between">
+            <span>Choice:</span>
+            <span className="text-custom-gray mb-2">
+              {proposal?.options?.[selectedOption - 1]?.name}
+            </span>
+          </div>
+
+          <div className="flex justify-between">
+            <span>Snapshot:</span>
+            <span className="text-custom-gray mb-2">{proposal?.snapshot}</span>
+          </div>
+
+          <div className="flex justify-between">
+            <span>Voting Power:</span>
+            <span className="text-custom-gray mb-2">??? Implement me!!!</span>
+          </div>
+        </div>
+      </BaseModal>
       <div className="text-center my-5 md:my-10 w-full">
         <div className="flex justify-between md:mx-28">
           <BackButton
