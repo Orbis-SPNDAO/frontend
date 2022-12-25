@@ -55,7 +55,7 @@ const ProposalManagement: FC = () => {
   }, [client]);
 
   const createProposal = async () => {
-    console.log(sbtHolders);
+    router.push("/admin-dashboard/proposal-management/create-proposal");
   };
 
   function onProposalClick(proposal: ProposalData) {
