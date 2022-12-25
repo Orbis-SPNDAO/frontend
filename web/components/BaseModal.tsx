@@ -1,20 +1,21 @@
-import { FC, ElementType } from "react"
-import { VscClose } from "react-icons/vsc"
-import { BsCheckCircle } from "react-icons/bs"
+import { FC, ElementType } from "react";
+import { VscClose } from "react-icons/vsc";
+import { BsCheckCircle } from "react-icons/bs";
 import {
   AiOutlineCloseCircle,
   AiOutlineDownload,
   AiOutlineUserAdd,
-} from "react-icons/ai"
-import Button, { ButtonTypes } from "./Button"
+} from "react-icons/ai";
+import Button, { ButtonTypes } from "./Button";
+import { upperFirstChar } from "../utils/string";
 
 export type BaseModalProps = {
-  open: boolean
-  onClose: () => void
-  title?: string
-  TitleIcon?: ElementType
-  footerActions?: { type: string; action: any }[]
-} & React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>
+  open: boolean;
+  onClose: () => void;
+  title?: string;
+  TitleIcon?: ElementType;
+  footerActions?: { type: string; action: any }[];
+} & React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
 
 const BaseModal: FC<BaseModalProps> = ({
   open,
@@ -26,13 +27,15 @@ const BaseModal: FC<BaseModalProps> = ({
 }) => {
   const footerIcons = {
     yes: { title: "yes", icon: <BsCheckCircle size={24} /> },
+    confirm: { title: "confirm", icon: <BsCheckCircle size={24} /> },
     no: { title: "no", icon: <AiOutlineCloseCircle size={24} /> },
     ok: { title: "ok", icon: <BsCheckCircle size={24} /> },
     save: { title: "save", icon: <BsCheckCircle size={24} /> },
     draft: { title: "draft", icon: <BsCheckCircle size={24} /> },
     update: { title: "update", icon: <BsCheckCircle size={24} /> },
     close: { title: "close", icon: <AiOutlineCloseCircle size={24} /> },
-  }
+    cancel: { title: "cancel", icon: <AiOutlineCloseCircle size={24} /> },
+  };
   return (
     <>
       {open && (
@@ -60,33 +63,35 @@ const BaseModal: FC<BaseModalProps> = ({
                 {footerActions && (
                   <div className="flex items-center justify-end p-4 border-t border-solid border-slate-200 rounded-b">
                     {footerActions.map((item, index) => {
-                      const { type, action } = item
-                      const iconInfo = (footerIcons as any)[type]
+                      const { type, action } = item;
+                      const iconInfo = (footerIcons as any)[type];
                       return (
                         <div key={index}>
-                          {type.toLowerCase() !== "close" ? (
+                          {!["close", "cancel"].includes(type.toLowerCase()) ? (
                             <Button
                               type={ButtonTypes.Submit}
                               btnSize="w-40 ml-4"
                               onClick={action}
                             >
-                              {iconInfo.title.toUpperCase()}
+                              {upperFirstChar(iconInfo.title)}
                             </Button>
                           ) : (
                             <button
                               className={`${
-                                type.toLocaleLowerCase() === "close"
+                                ["close", "cancel"].includes(
+                                  type.toLocaleLowerCase()
+                                )
                                   ? "text-red-500"
                                   : "text-gray-600"
-                              } background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150`}
+                              } background-transparent font-bold px-6 py-2 text-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150`}
                               onClick={action}
                               type="button"
                             >
-                              {iconInfo.title}
+                              {upperFirstChar(iconInfo.title)}
                             </button>
                           )}
                         </div>
-                      )
+                      );
                     })}
                   </div>
                 )}
@@ -97,7 +102,7 @@ const BaseModal: FC<BaseModalProps> = ({
         </>
       )}
     </>
-  )
-}
+  );
+};
 
-export default BaseModal
+export default BaseModal;
