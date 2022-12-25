@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { forwardRef, useRef, useState } from "react";
 import { AiFillCloseCircle } from "react-icons/ai";
+import DatePicker from "tailwind-datepicker-react";
+import BaseModal from "../../../components/BaseModal";
 import Button, { ButtonStyle } from "../../../components/Button";
 import BackButton from "../../../components/dashboards-shared/BackButton";
 import PageLayout from "../../../components/layouts/PageLayout";
@@ -18,7 +20,13 @@ export default function CreateProposal() {
   const [description, setDescription] = useState("");
   const [discussion, setDiscussion] = useState("");
 
-  const [timeWindow, setTimeWindow] = useState("");
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [timeWindow, setTimeWindow] = useState({
+    startDate: null,
+    endDate: null,
+    // startDate: new Date(),
+    // endDate: new Date((Date.now() / 1000) * 3600 * 24 * 30),
+  });
   const [voteOptions, setVoteOptions] = useState<[string, string][]>([]);
 
   const isValidStep1 = title && description;
@@ -39,7 +47,7 @@ export default function CreateProposal() {
   }
 
   function onSelectTimeWindow() {
-    console.log("onSelectTimeWindow");
+    setShowDatePicker(true);
   }
 
   function onAddOption() {
@@ -73,6 +81,8 @@ export default function CreateProposal() {
         : []),
     ]);
   }
+
+  function onPickerClick() {}
 
   return (
     <PageLayout
@@ -133,69 +143,100 @@ export default function CreateProposal() {
           )}
 
           {pageState === CreateProposalState.Step2VoteOptions && (
-            <div className="grid grid-cols-3 mt-8 mb-16">
-              <div className="col-span-2 mr-8">
-                <div className="flex flex-col items-start">
-                  <span className="text-2xl mb-2">{title}</span>
-
-                  <span className="bg-custom-purple text-white rounded-full text-sm px-2 py-1">
-                    Overview
-                  </span>
-
-                  <span className="text-custom-gray text-sm my-8">
-                    {description}
-                  </span>
-                </div>
-
-                <div className="flex flex-col items-start">
-                  Cast your vote
-                  {voteOptions?.map((opt: [string, string], index: number) => {
-                    return (
-                      <>
-                        <div className="w-full relative" key={opt[0]}>
-                          <button
-                            className="opacity-100 hover:opacity-100 absolute text-custom-gray -right-2 top-0"
-                            onClick={() => onRemoveOption(index)}
-                          >
-                            <AiFillCloseCircle size={20} />
-                          </button>
-                        </div>
-
-                        <input
-                          type="text"
-                          className="mt-2 w-full text-center py-2 border-2 border-gray px-4 rounded-lg"
-                          placeholder={"Option" + opt[0]}
-                          value={opt[1]}
-                          onChange={(e) =>
-                            updateVoteOptionText(e.target.value, index)
-                          }
-                        />
-                      </>
+            <>
+              <BaseModal
+                open={showDatePicker}
+                onClose={() => setShowDatePicker(false)}
+              >
+                {/* <DatePicker
+                  // value={timeWindow}
+                  onChange={(newValue) => {
+                    setShowDatePicker(false);
+                    setTimeWindow(
+                      newValue as { startDate: Date; endDate: Date }
                     );
-                  })}
-                  <button
-                    className="w-full text-custom-purple mt-4"
-                    onClick={onAddOption}
+                  }}
+                  show={showDatePicker}
+                  setShow={() => setShowDatePicker(false)}
+                /> */}
+              </BaseModal>
+
+              <div className="grid grid-cols-3 mt-8 mb-16">
+                <div className="col-span-2 mr-8">
+                  <div className="flex flex-col items-start">
+                    <span className="text-2xl mb-2">{title}</span>
+
+                    <span className="bg-custom-purple text-white rounded-full text-sm px-2 py-1">
+                      Overview
+                    </span>
+
+                    <span className="text-custom-gray text-sm my-8">
+                      {description}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col items-start">
+                    Cast your vote
+                    {voteOptions?.map(
+                      (opt: [string, string], index: number) => {
+                        return (
+                          <>
+                            <div className="w-full relative" key={opt[0]}>
+                              <button
+                                className="opacity-100 hover:opacity-100 absolute text-custom-gray -right-2 top-0"
+                                onClick={() => onRemoveOption(index)}
+                              >
+                                <AiFillCloseCircle size={20} />
+                              </button>
+                            </div>
+
+                            <input
+                              type="text"
+                              className="mt-2 w-full text-center py-2 border-2 border-gray px-4 rounded-lg"
+                              placeholder={"Option" + opt[0]}
+                              value={opt[1]}
+                              onChange={(e) =>
+                                updateVoteOptionText(e.target.value, index)
+                              }
+                            />
+                          </>
+                        );
+                      }
+                    )}
+                    <button
+                      className="w-full text-custom-purple mt-4"
+                      onClick={onAddOption}
+                    >
+                      Add another option
+                    </button>
+                  </div>
+                </div>
+
+                <div className="col-span-1 ml-8">
+                  <Button
+                    addClassName="mb-2"
+                    onClick={onSelectTimeWindow}
+                    buttonStyle={ButtonStyle.Outline}
                   >
-                    Add another option
-                  </button>
+                    {timeWindow.startDate || timeWindow.endDate ? (
+                      <input
+                        value={
+                          !timeWindow?.startDate || !timeWindow?.endDate
+                            ? ""
+                            : `${timeWindow?.startDate} - ${timeWindow?.endDate}`
+                        }
+                      />
+                    ) : (
+                      "Select time window"
+                    )}
+                  </Button>
+
+                  <Button onClick={onStep2Continue} disabled={!isValidStep2}>
+                    Publish
+                  </Button>
                 </div>
               </div>
-
-              <div className="col-span-1 ml-8">
-                <Button
-                  addClassName="mb-2"
-                  onClick={onSelectTimeWindow}
-                  buttonStyle={ButtonStyle.Outline}
-                >
-                  Select time window
-                </Button>
-
-                <Button onClick={onStep2Continue} disabled={!isValidStep2}>
-                  Publish
-                </Button>
-              </div>
-            </div>
+            </>
           )}
         </div>
       </div>
