@@ -51,10 +51,12 @@ export interface VoteData {
 }
 
 export interface DaoManagementData {
+  encryptedCid: string;
   walletAddress: string;
   sessionPayment: number;
   isDecrypted: boolean;
   selected: boolean;
+  tokenId: number;
 }
 
 export const overviewData: OverviewData = {
@@ -199,125 +201,33 @@ export const voteData: VoteData[] = [
   { id: 48, proposalId: 2, voter: ethers.constants.AddressZero, option: 3 },
 ];
 
-export const dummyDaoMgmtData: DaoManagementData[] = [
-  {
-    walletAddress: "0x1zP1e93G8TbCc68s4w8B3rt58gs30GT097Dif751",
-    sessionPayment: 0.74,
-    isDecrypted: false,
-    selected: false,
-  },
-  {
-    walletAddress: "0x8ef1e93G8TbCc68s4w8B3rt58gs30GT097Dif799",
-    sessionPayment: 2.68,
-    isDecrypted: true,
-    selected: false,
-  },
-  {
-    walletAddress: "0x6e2fe93G8TbCc68s4w8B3rt58gs30GT097Dif7yn",
-    sessionPayment: 0.002,
-    isDecrypted: false,
-    selected: false,
-  },
-  {
-    walletAddress: "0x85fwe93G8TbCc68s4w8B3rt58gs30GT097Dif751",
-    sessionPayment: 1.28,
-    isDecrypted: true,
-    selected: false,
-  },
-  {
-    walletAddress: "0x1zP1e93G8TbCc68s4w8B3rt58gs30GT097Dif751",
-    sessionPayment: 0.74,
-    isDecrypted: false,
-    selected: false,
-  },
-  {
-    walletAddress: "0x8ef1e93G8TbCc68s4w8B3rt58gs30GT097Dif799",
-    sessionPayment: 2.68,
-    isDecrypted: true,
-    selected: false,
-  },
-  {
-    walletAddress: "0x6e2fe93G8TbCc68s4w8B3rt58gs30GT097Dif7yn",
-    sessionPayment: 0.002,
-    isDecrypted: false,
-    selected: false,
-  },
-  {
-    walletAddress: "0x85fwe93G8TbCc68s4w8B3rt58gs30GT097Dif751",
-    sessionPayment: 1.28,
-    isDecrypted: true,
-    selected: false,
-  },
-  {
-    walletAddress: "0x1zP1e93G8TbCc68s4w8B3rt58gs30GT097Dif751",
-    sessionPayment: 0.74,
-    isDecrypted: false,
-    selected: false,
-  },
-  {
-    walletAddress: "0x8ef1e93G8TbCc68s4w8B3rt58gs30GT097Dif799",
-    sessionPayment: 2.68,
-    isDecrypted: true,
-    selected: false,
-  },
-  {
-    walletAddress: "0x6e2fe93G8TbCc68s4w8B3rt58gs30GT097Dif7yn",
-    sessionPayment: 0.002,
-    isDecrypted: false,
-    selected: false,
-  },
-  {
-    walletAddress: "0x85fwe93G8TbCc68s4w8B3rt58gs30GT097Dif751",
-    sessionPayment: 1.28,
-    isDecrypted: true,
-    selected: false,
-  },
-  {
-    walletAddress: "0x1zP1e93G8TbCc68s4w8B3rt58gs30GT097Dif751",
-    sessionPayment: 0.74,
-    isDecrypted: false,
-    selected: false,
-  },
-  {
-    walletAddress: "0x8ef1e93G8TbCc68s4w8B3rt58gs30GT097Dif799",
-    sessionPayment: 2.68,
-    isDecrypted: true,
-    selected: false,
-  },
-  {
-    walletAddress: "0x6e2fe93G8TbCc68s4w8B3rt58gs30GT097Dif7yn",
-    sessionPayment: 0.002,
-    isDecrypted: false,
-    selected: false,
-  },
-  {
-    walletAddress: "0x85fwe93G8TbCc68s4w8B3rt58gs30GT097Dif751",
-    sessionPayment: 1.28,
-    isDecrypted: true,
-    selected: false,
-  },
-  {
-    walletAddress: "0x1zP1e93G8TbCc68s4w8B3rt58gs30GT097Dif751",
-    sessionPayment: 0.74,
-    isDecrypted: false,
-    selected: false,
-  },
-  {
-    walletAddress: "0x8ef1e93G8TbCc68s4w8B3rt58gs30GT097Dif799",
-    sessionPayment: 2.68,
-    isDecrypted: true,
-    selected: false,
-  },
-  {
-    walletAddress: "0x6e2fe93G8TbCc68s4w8B3rt58gs30GT097Dif7yn",
-    sessionPayment: 0.002,
-    isDecrypted: false,
-    selected: false,
-  },
-  {
-    walletAddress: "0x85fwe93G8TbCc68s4w8B3rt58gs30GT097Dif751",
-    sessionPayment: 1.28,
-    isDecrypted: true,
-    selected: false,
-  },
-];
+// export const dummyDaoMgmtData: DaoManagementData[] = [
+//   {
+//     walletAddress: "0x1zP1e93G8TbCc68s4w8B3rt58gs30GT097Dif751",
+//     sessionPayment: 0.74,
+//     isDecrypted: false,
+//     selected: false,
+//     tokenId: 0
+//   },
+//   {
+//     walletAddress: "0x8ef1e93G8TbCc68s4w8B3rt58gs30GT097Dif799",
+//     sessionPayment: 2.68,
+//     isDecrypted: true,
+//     selected: false,
+//     tokenId: 1
+//   },
+//   {
+//     walletAddress: "0x6e2fe93G8TbCc68s4w8B3rt58gs30GT097Dif7yn",
+//     sessionPayment: 0.002,
+//     isDecrypted: false,
+//     selected: false,
+//     tokenId: 2
+//   },
+//   {
+//     walletAddress: "0x85fwe93G8TbCc68s4w8B3rt58gs30GT097Dif751",
+//     sessionPayment: 1.28,
+//     isDecrypted: true,
+//     selected: false,
+//     tokenId: 3
+//   }
+// ];

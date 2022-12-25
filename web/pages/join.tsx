@@ -83,10 +83,14 @@ export default function Join() {
       });
 
       const { cid } = await rawRes.json();
+      const cidBlob = await new Blob([cid], {
+        type: "plain/text",
+      }).arrayBuffer();
+      console.log({ cid });
       const importedSymmKey = await LitJsSdk.importSymmetricKey(symmetricKey);
       const encryptedCid = await LitJsSdk.encryptWithSymmetricKey(
         importedSymmKey,
-        new TextEncoder().encode(cid).buffer
+        cidBlob
       );
       const encryptedCidString = await LitJsSdk.blobToBase64String(
         encryptedCid
