@@ -45,7 +45,7 @@ export default function DiscussionNVote({
           return (
             <div
               key={discussion.id}
-              className="border-2 rounded-lg mr-4 p-4 w-1/3"
+              className="border-2 rounded-lg mr-4 p-4 w-1/3 min-w-[15rem]"
             >
               <div className="flex flex-col truncate w-full text-2xl">
                 <div>{discussion.title}</div>
