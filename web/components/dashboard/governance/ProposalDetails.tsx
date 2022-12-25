@@ -1,7 +1,9 @@
+import { useRouter } from "next/router";
 import { MouseEventHandler, useMemo, useState } from "react";
 import Proposal from "../../../dataclass/Proposal";
 import { useContainerDimensions } from "../../../hooks/useContainerDimensions";
 import { abbrevAccount } from "../../../utils/string";
+import Button, { ButtonStyle } from "../../Button";
 import { DiscussionData, VoteData } from "../dummydata";
 
 export default function ProposalDetails({
@@ -12,6 +14,7 @@ export default function ProposalDetails({
   selectedOption,
   onSelectOption,
   onCastVote,
+  onDeleteProposal,
 }: {
   proposal: Proposal | undefined;
   discussionData: DiscussionData[];
@@ -20,7 +23,10 @@ export default function ProposalDetails({
   selectedOption: number;
   onSelectOption: Function;
   onCastVote: MouseEventHandler<HTMLButtonElement> | undefined;
+  onDeleteProposal?: Function;
 }) {
+  const router = useRouter();
+
   const [voteContainer, setVoteContainer] = useState<HTMLDivElement | null>();
 
   const { width: containerWidth } = useContainerDimensions(
@@ -38,6 +44,8 @@ export default function ProposalDetails({
   }, [votes]);
 
   const widthPerVote = containerWidth / votes.length!;
+
+  const isAdminPage = router.pathname.includes("/admin-dashboard");
 
   return (
     <div className="w-stretch m-5 md:mx-28 md:my-12 h-fit py-6 px-4 md:p-10 hero">
@@ -62,7 +70,7 @@ export default function ProposalDetails({
 
             <div className="w-full text-left text-sm mt-4 py-2 border-2 rounded-lg my-4 p-4">
               <h2 className="text-left text-2xl font-normal mb-2">
-                Cast your vote
+                {isAdminPage ? "Vote options" : "Cast your vote"}
               </h2>
 
               {proposal?.options?.map((option) => {
@@ -71,15 +79,18 @@ export default function ProposalDetails({
                     key={`${option.id}`}
                     className={`w-full ${
                       selectedOption === option.id ? "bg-gray-200" : ""
-                    } hover:bg-gray-300 p-2 rounded-lg border-2 border-gray my-2`}
+                    } ${
+                      isAdminPage ? "" : "hover:bg-gray-300"
+                    } p-2 rounded-lg border-2 border-gray my-2`}
                     onClick={() => onSelectOption(option.id)}
+                    disabled={isAdminPage}
                   >
                     {option.name}
                   </button>
                 );
               })}
 
-              {(proposal?.options?.length ?? 0) > 0 && (
+              {!isAdminPage && (proposal?.options?.length ?? 0) > 0 && (
                 <button
                   className="w-full hover:bg-gray-300 p-2 rounded-lg border-2 border-gray my-2"
                   onClick={onCastVote}
@@ -209,6 +220,17 @@ export default function ProposalDetails({
                 })}
               </div>
             </div>
+
+            {isAdminPage && (
+              <div>
+                <Button
+                  onClick={onDeleteProposal}
+                  buttonStyle={ButtonStyle.Outline}
+                >
+                  Delete
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

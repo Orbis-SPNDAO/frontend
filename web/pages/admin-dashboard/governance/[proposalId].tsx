@@ -52,6 +52,10 @@ export default function ProposalId() {
     setShowCastModal(false);
   }
 
+  function onDeleteProposal() {
+    console.log("Delete Proposal");
+  }
+
   return !address || isConnecting ? (
     <PageLayout containerClassName="bg-custom-blue bg-cover min-h-screen">
       <div className="text-center mt-20 min-w-full">
@@ -106,6 +110,7 @@ export default function ProposalId() {
           selectedOption={selectedOption}
           onSelectOption={onSelectOption}
           onCastVote={onCastVote}
+          onDeleteProposal={onDeleteProposal}
         />
       </div>
     </PageLayout>
