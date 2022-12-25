@@ -59,7 +59,7 @@ const ProposalManagement: FC = () => {
   };
 
   function onProposalClick(proposal: ProposalData) {
-    router.push(`/admin-dashboard/governance/${proposal.id}`);
+    router.push(`/admin-dashboard/proposal-management/${proposal.id}`);
   }
 
   return (

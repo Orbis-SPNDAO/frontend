@@ -97,7 +97,7 @@ export default function ProposalId() {
       <div className="text-center my-5 md:my-10 w-full">
         <div className="flex justify-between md:mx-28">
           <BackButton
-            backRoute="/dashboard/governance"
+            backRoute="/admin-dashboard/proposal-management"
             text="Back to all proposals"
           />
         </div>
