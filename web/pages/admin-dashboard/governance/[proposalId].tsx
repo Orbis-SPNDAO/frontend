@@ -29,7 +29,7 @@ export default function ProposalId() {
   const proposal = p && new Proposal(p);
 
   function navigateToDiscussion(discussionId: number) {
-    router.push(`/dashboard/governance/discussion/${discussionId}`);
+    router.push(`/admin-dashboard/governance/discussion/${discussionId}`);
   }
 
   function onSelectOption(optionId: number) {
