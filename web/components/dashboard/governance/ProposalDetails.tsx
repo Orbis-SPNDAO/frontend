@@ -23,7 +23,7 @@ export default function ProposalDetails({
   selectedOption: number;
   onSelectOption: Function;
   onCastVote: MouseEventHandler<HTMLButtonElement> | undefined;
-  onDeleteProposal?: Function;
+  onDeleteProposal?: MouseEventHandler<HTMLButtonElement> | undefined;
 }) {
   const router = useRouter();
 
