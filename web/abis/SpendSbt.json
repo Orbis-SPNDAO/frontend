@@ -153,6 +153,38 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "uint256[]",
+          "name": "tokenIds",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "decrypt",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "tokenId",
+          "type": "uint256"
+        }
+      ],
+      "name": "fetchHolder",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "fetchHolders",
       "outputs": [
@@ -180,6 +212,11 @@
               "internalType": "string",
               "name": "encryptedCid",
               "type": "string"
+            },
+            {
+              "internalType": "bool",
+              "name": "isDecrypted",
+              "type": "bool"
             }
           ],
           "internalType": "struct SpendSBT.nft[]",

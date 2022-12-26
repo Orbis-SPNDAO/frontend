@@ -27,10 +27,11 @@ export default async function handler(
 
     try {
       const filedata = fs.readFileSync(data.files.file.path, "utf8");
-      fs.writeFileSync(`./public/uploads/${data.fields.fields}.csv`, filedata);
+      fs.writeFileSync(data.fields.fields, filedata);
       await fs.unlinkSync(data.files.file.path);
       return res.status(200).json({ success: "true" });
-    } catch (err) {      
+    } catch (err) {
+      console.log({ err });
       return res.status(400).json({ success: "false" });
     }
   } else if (req.method == "GET") {

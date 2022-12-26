@@ -1,11 +1,16 @@
-import { FC, useState } from "react";
+import LitJsSdk from "@lit-protocol/sdk-browser";
+import { ethers } from "ethers";
+import { FC, useEffect, useState } from "react";
 import { BsFillCheckCircleFill } from "react-icons/bs";
 import { RxCross2 } from "react-icons/rx";
+import { useAccount, useContract, useSigner } from "wagmi";
+import { ADMIN_ABI, SBT_ABI } from "../../abis/currentABI";
 import DaoMgmtRow from "../../components/admin-dashboard/DaoMgmtRow";
 import Button, { ButtonStyle } from "../../components/Button";
-import { dummyDaoMgmtData } from "../../components/dashboard/dummydata";
+import { DaoManagementData } from "../../components/dashboard/dummydata";
 import BackButton from "../../components/dashboards-shared/BackButton";
 import PageLayout from "../../components/layouts/PageLayout";
+import downloadBlob from "../../utils/downloadBlob";
 
 enum DataSelectType {
   All = "all",
@@ -17,21 +22,142 @@ const DataManagement: FC = () => {
   const [activeTab, setActiveTab] = useState<DataSelectType>(
     DataSelectType.All
   );
-
-  const [daoMgmtData, setDaoMgmtData] = useState(dummyDaoMgmtData);
+  const [daoMgmtData, setDaoMgmtData] = useState<DaoManagementData[]>([]);
+  const [filteredDaoMgmtData, setFilteredDaoMgmtData] = useState<
+    DaoManagementData[]
+  >([]);
   const [totalPayment, setTotalPayment] = useState(0);
   const [numSelected, setNumSelected] = useState(0);
   const [isDecrypting, setIsDecrypting] = useState(false);
-  const [isLoading, isSuccess] = [false, false];
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [successMsg, setSuccessMsg] = useState<{
     numDecrypted: number;
     totalPayment: number;
   } | null>(null);
 
-  const submit = () => {
-    setSuccessMsg({ numDecrypted: numSelected, totalPayment });
-    setAllChecked(false);
-    setIsDecrypting(false);
+  const { data: signer } = useSigner();
+  const endUserContract = useContract({
+    address: process.env.NEXT_PUBLIC_SBT_ADDR,
+    abi: SBT_ABI,
+    signerOrProvider: signer,
+  });
+  const adminContract = useContract({
+    address: process.env.NEXT_PUBLIC_ADMIN_ADDR,
+    abi: ADMIN_ABI,
+    signerOrProvider: signer,
+  });
+  const { address } = useAccount();
+
+  useEffect(() => {
+    (async () => {
+      if (signer && endUserContract && adminContract && address) {
+        const endUserNftData = await endUserContract.fetchNfts();
+        const endUserHolderData = await endUserContract.fetchHolders();
+        const newDaoMgmtData: DaoManagementData[] = [];
+        for (let i = 0; i < endUserNftData.length; i++) {
+          if (endUserNftData[i].encryptedCid && endUserHolderData[i]) {
+            newDaoMgmtData.push({
+              ...endUserNftData[i],
+              walletAddress: endUserHolderData[i],
+              selected: false,
+              tokenId: i + 1,
+              sessionPayment: 0.01,
+            });
+          }
+        }
+        setDaoMgmtData(newDaoMgmtData);
+      }
+    })();
+  }, [signer, endUserContract, adminContract, address]);
+
+  useEffect(() => {
+    const newFilteredDaoMgmtData = daoMgmtData.filter((datum) => {
+      return (
+        activeTab === DataSelectType.All ||
+        (activeTab === DataSelectType.Decrypted && datum.isDecrypted) ||
+        (activeTab === DataSelectType.Undecrypted && !datum.isDecrypted)
+      );
+    });
+    setFilteredDaoMgmtData(newFilteredDaoMgmtData);
+  }, [daoMgmtData, activeTab]);
+
+  const submit = async () => {
+    if (adminContract) {
+      setIsLoading(true);
+      const tokenIds = filteredDaoMgmtData.reduce((a, c) => {
+        if (c.selected) return [...a, c.tokenId];
+        else return a;
+      }, [] as number[]);
+      const submitReceipt = await adminContract.decrypt(tokenIds, {
+        value: ethers.utils.parseEther(
+          (0.01 * tokenIds.length + 0.001).toString()
+        ),
+      });
+      setIsSuccess(true);
+      setIsLoading(false);
+      const txn = await submitReceipt.wait();
+      const decryptData: string[] = [];
+      txn.events
+        .filter((event: any) => event.event === "SendingKey")
+        .forEach((event: any) => {
+          const tokenId = parseInt(event.args.tokenId);
+          decryptData[tokenId] = event.args.key;
+        });
+      for (let i = 0; i < filteredDaoMgmtData.length; i++) {
+        const decryptKey = decryptData[filteredDaoMgmtData[i].tokenId];
+        try {
+          const symmetricKey = LitJsSdk.uint8arrayFromString(
+            decryptKey,
+            "base64"
+          );
+          const importedSymmKey = await LitJsSdk.importSymmetricKey(
+            symmetricKey
+          );
+          const encryptedCidBlob = await LitJsSdk.base64StringToBlob(
+            filteredDaoMgmtData[i].encryptedCid
+          );
+          const decryptedCidBlob = await LitJsSdk.decryptFile({
+            file: encryptedCidBlob,
+            symmetricKey,
+          });
+          const decryptedCid = new TextDecoder("utf-8").decode(
+            decryptedCidBlob
+          );
+
+          const res = await fetch("/api/generateToken", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ cids: [decryptedCid] }),
+          });
+          const { accessToken } = await res.json();
+          const fileRes = await fetch(
+            `https://patterndao.mypinata.cloud/ipfs/${decryptedCid}?accessToken=${accessToken}`
+          );
+
+          const encryptedFileString = await fileRes.text();
+
+          const encryptedFile = await LitJsSdk.base64StringToBlob(
+            encryptedFileString
+          );
+          const decryptedFile = await LitJsSdk.decryptWithSymmetricKey(
+            encryptedFile,
+            importedSymmKey
+          );
+          downloadBlob(new Blob([decryptedFile], { type: "text/csv" }));
+        } catch (err) {
+          console.log({ err });
+          throw err;
+        }
+      }
+
+      setSuccessMsg({ numDecrypted: numSelected, totalPayment });
+      setIsSuccess(false);
+      setAllChecked(false);
+      setIsDecrypting(false);
+    }
   };
 
   const setRowChecked = (i: number, isChecked: boolean) => {
@@ -109,7 +235,11 @@ const DataManagement: FC = () => {
               )} Matic`}</span>
             </div>
             {isLoading || isSuccess ? (
-              <Button disabled>Waiting for approval...</Button>
+              <Button disabled>
+                {isLoading
+                  ? "Waiting for approval..."
+                  : "Posting to blockchain..."}
+              </Button>
             ) : (
               <div className="flex justify-between w-full gap-5">
                 <Button
@@ -216,15 +346,8 @@ const DataManagement: FC = () => {
             </div>
             <div className="w-1/5 table-header-border px-2">Status</div>
           </div>
-          {daoMgmtData
-            .filter((datum) => {
-              return (
-                activeTab === DataSelectType.All ||
-                (activeTab === DataSelectType.Decrypted && datum.isDecrypted) ||
-                (activeTab === DataSelectType.Undecrypted && !datum.isDecrypted)
-              );
-            })
-            .map((datum, i) => (
+          {filteredDaoMgmtData.length ? (
+            filteredDaoMgmtData.map((datum, i) => (
               <DaoMgmtRow
                 data={datum}
                 key={i}
@@ -234,7 +357,12 @@ const DataManagement: FC = () => {
                 }
                 decrypt={() => decryptSingleRow(i)}
               />
-            ))}
+            ))
+          ) : (
+            <div className="w-full flex items-center">
+              <div className="my-10 mx-auto text-xl">No Data</div>
+            </div>
+          )}
         </div>
       </div>
     </PageLayout>
