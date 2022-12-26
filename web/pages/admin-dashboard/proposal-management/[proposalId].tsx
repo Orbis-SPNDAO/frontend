@@ -29,7 +29,7 @@ export default function ProposalId() {
   const proposal = p && new Proposal(p);
 
   function navigateToDiscussion(discussionId: number) {
-    router.push(`/dashboard/governance/discussion/${discussionId}`);
+    router.push(`/admin-dashboard/governance/discussion/${discussionId}`);
   }
 
   function onSelectOption(optionId: number) {
@@ -50,6 +50,10 @@ export default function ProposalId() {
 
   function onModalCancel() {
     setShowCastModal(false);
+  }
+
+  function onDeleteProposal() {
+    console.log("Delete Proposal");
   }
 
   return !address || isConnecting ? (
@@ -93,7 +97,7 @@ export default function ProposalId() {
       <div className="text-center my-5 md:my-10 w-full">
         <div className="flex justify-between md:mx-28">
           <BackButton
-            backRoute="/dashboard/governance"
+            backRoute="/admin-dashboard/proposal-management"
             text="Back to all proposals"
           />
         </div>
@@ -106,6 +110,7 @@ export default function ProposalId() {
           selectedOption={selectedOption}
           onSelectOption={onSelectOption}
           onCastVote={onCastVote}
+          onDeleteProposal={onDeleteProposal}
         />
       </div>
     </PageLayout>

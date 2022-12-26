@@ -33,8 +33,9 @@ export default function AdminDashboard() {
         } else {
           router.push("/");
         }
-      } catch (e) {
-        router.push("/");
+      } catch (e: any) {
+        console.error(`An error occurred fetching the contract, ${e.message}`);
+        // router.push("/");
       }
     }
 
@@ -52,7 +53,7 @@ export default function AdminDashboard() {
           onClick1={() => router.push("/admin-dashboard/data-management")}
           onClick2={() => router.push("/admin-dashboard/proposal-management")}
           isAdmin
-        ></Overview>
+        />
         <SocialsFooter addClasses="absolute bottom-0 left-0 right-0 pb-4 sm:pb-8" />
       </div>
     </PageLayout>
