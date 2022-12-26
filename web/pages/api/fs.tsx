@@ -6,11 +6,9 @@ import path from "path";
 
 export const config = {
   api: {
-      bodyParser: {
-          sizeLimit: '4mb' // Set desired value here
-      }
-  }
-}
+    bodyParser: false,
+  },
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -28,14 +26,8 @@ export default async function handler(
     );
 
     try {
-      // console.log("file path", data.files.file.path);
-      // console.log('file', data.files.file)
       const filedata = fs.readFileSync(data.files.file.path, "utf8");
-      // console.log({ filedata });
-      fs.writeFileSync(
-        data.fields.fields,
-        filedata
-      );
+      fs.writeFileSync(data.fields.fields, filedata);
       await fs.unlinkSync(data.files.file.path);
       return res.status(200).json({ success: "true" });
     } catch (err) {

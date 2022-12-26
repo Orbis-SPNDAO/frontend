@@ -105,9 +105,10 @@ const DataManagement: FC = () => {
           decryptData[tokenId] = event.args.key;
         });
       for (let i = 0; i < filteredDaoMgmtData.length; i++) {
+        const decryptKey = decryptData[filteredDaoMgmtData[i].tokenId];
         try {
           const symmetricKey = LitJsSdk.uint8arrayFromString(
-            decryptData[filteredDaoMgmtData[i].tokenId],
+            decryptKey,
             "base64"
           );
           const importedSymmKey = await LitJsSdk.importSymmetricKey(
@@ -135,8 +136,9 @@ const DataManagement: FC = () => {
           const fileRes = await fetch(
             `https://patterndao.mypinata.cloud/ipfs/${decryptedCid}?accessToken=${accessToken}`
           );
-          const parsedRes = await fileRes.json();
-          const { encryptedFileString } = await parsedRes;
+
+          const encryptedFileString = await fileRes.text();
+
           const encryptedFile = await LitJsSdk.base64StringToBlob(
             encryptedFileString
           );

@@ -68,33 +68,21 @@ export default function Join() {
         });
 
       const file_id = crypto.randomUUID();
-
-      console.log("encryptedFileBlob type: ", encryptedFileBlob.type);
-      console.log(
-        "blob is instance of file",
-        encryptedFileBlob instanceof File
-      );
-      const encryptedFile = new File([encryptedFileBlob], file_id + ".csv", {
-        type: "application/octet-stream",
+      const encryptedFileString = await LitJsSdk.blobToBase64String(encryptedFileBlob);
+      
+      const base64TextBlob = new Blob([encryptedFileString], {type: 'text/plain'});
+      const encryptedFile = new File([base64TextBlob], file_id + ".txt", {
+        type: "text/plain",
       });
-      console.log("encryptedFIle type:", encryptedFile.type);
-      console.log(
-        "encryptedfile isntance of file",
-        encryptedFile instanceof File
-      );
 
-      const path = `./public/uploads/${file_id}.csv`;
+      const path = `./public/uploads/${file_id}.txt`;
 
       const body = new FormData();
       body.append("file", encryptedFile);
       body.append("fields", path);
 
       const res = await fetch("/api/fs", { method: "POST", body });
-      console.log({ res });
 
-      const encryptedFileString = await LitJsSdk.blobToBase64String(
-        encryptedFile
-      );
       const symmetricKeyString = LitJsSdk.uint8arrayToString(
         symmetricKey,
         "base64"
@@ -105,14 +93,13 @@ export default function Join() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ encryptedFileString }),
+        body: JSON.stringify({ path }),
       });
 
       const { cid } = await rawRes.json();
       const cidBlob = await new Blob([cid], {
         type: "plain/text",
       }).arrayBuffer();
-      console.log({ cid });
       const importedSymmKey = await LitJsSdk.importSymmetricKey(symmetricKey);
       const encryptedCid = await LitJsSdk.encryptWithSymmetricKey(
         importedSymmKey,
