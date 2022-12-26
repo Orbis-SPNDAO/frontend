@@ -1,6 +1,6 @@
-import React, { forwardRef, useRef, useState } from "react";
+import { useState } from "react";
 import { AiFillCloseCircle } from "react-icons/ai";
-import DatePicker from "tailwind-datepicker-react";
+import DatePicker from "react-tailwindcss-datepicker";
 import BaseModal from "../../../components/BaseModal";
 import Button, { ButtonStyle } from "../../../components/Button";
 import BackButton from "../../../components/dashboards-shared/BackButton";
@@ -22,15 +22,16 @@ export default function CreateProposal() {
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [timeWindow, setTimeWindow] = useState({
-    startDate: null,
-    endDate: null,
-    // startDate: new Date(),
-    // endDate: new Date((Date.now() / 1000) * 3600 * 24 * 30),
+    startDate: "",
+    endDate: "",
   });
   const [voteOptions, setVoteOptions] = useState<[string, string][]>([]);
 
   const isValidStep1 = title && description;
-  const isValidStep2 = timeWindow && voteOptions?.length > 1;
+  const isValidStep2 =
+    timeWindow &&
+    voteOptions?.length > 1 &&
+    voteOptions.every((opt) => !!opt[1]);
 
   function onStep1Continue() {
     if (!isValidStep1) return;
@@ -39,11 +40,24 @@ export default function CreateProposal() {
     setPageState(CreateProposalState.Step2VoteOptions);
   }
 
-  function onStep2Continue() {
+  async function onStep2Continue() {
     if (!isValidStep1) return;
 
     console.log("onStep2Continue");
-    setPageState(CreateProposalState.Step2VoteOptions);
+
+    const data = {
+      title,
+      description,
+      discussion,
+      startDate: timeWindow.startDate,
+      endDate: timeWindow.endDate,
+      voteOptions: voteOptions.map((opt) => opt[1]),
+    };
+
+    console.log(
+      "Not implemented, call contract with data",
+      JSON.stringify(data)
+    );
   }
 
   function onSelectTimeWindow() {
@@ -147,18 +161,26 @@ export default function CreateProposal() {
               <BaseModal
                 open={showDatePicker}
                 onClose={() => setShowDatePicker(false)}
+                title="Select start/end date"
+                footerActions={[
+                  {
+                    type: "cancel",
+                    action: () => {
+                      setTimeWindow({ startDate: "", endDate: "" });
+                      setShowDatePicker(false);
+                    },
+                  },
+                  { type: "confirm", action: () => setShowDatePicker(false) },
+                ]}
               >
-                {/* <DatePicker
-                  // value={timeWindow}
-                  onChange={(newValue) => {
+                <DatePicker
+                  value={timeWindow}
+                  // @ts-ignore
+                  onChange={(value: typeof timeWindow) => {
                     setShowDatePicker(false);
-                    setTimeWindow(
-                      newValue as { startDate: Date; endDate: Date }
-                    );
+                    setTimeWindow(value);
                   }}
-                  show={showDatePicker}
-                  setShow={() => setShowDatePicker(false)}
-                /> */}
+                />
               </BaseModal>
 
               <div className="grid grid-cols-3 mt-8 mb-16">
