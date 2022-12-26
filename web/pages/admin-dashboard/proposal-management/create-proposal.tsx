@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { AiFillCloseCircle } from "react-icons/ai";
 import DatePicker from "react-tailwindcss-datepicker";
@@ -12,6 +13,8 @@ enum CreateProposalState {
 }
 
 export default function CreateProposal() {
+  const router = useRouter();
+
   const [pageState, setPageState] = useState(
     CreateProposalState.Step1BasicInfo
   );
@@ -29,7 +32,8 @@ export default function CreateProposal() {
 
   const isValidStep1 = title && description;
   const isValidStep2 =
-    timeWindow &&
+    timeWindow.startDate &&
+    timeWindow.endDate &&
     voteOptions?.length > 1 &&
     voteOptions.every((opt) => !!opt[1]);
 
@@ -58,6 +62,7 @@ export default function CreateProposal() {
       "Not implemented, call contract with data",
       JSON.stringify(data)
     );
+    router.push("/admin-dashboard/proposal-management");
   }
 
   function onSelectTimeWindow() {
