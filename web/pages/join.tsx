@@ -62,9 +62,35 @@ export default function Join() {
     setJoinState(JoinState.Encrypting);
 
     try {
-      const { encryptedFile, symmetricKey } = await LitJsSdk.encryptFile({
-        file: event.target.files[0],
+      const { encryptedFile: encryptedFileBlob, symmetricKey } =
+        await LitJsSdk.encryptFile({
+          file: event.target.files[0],
+        });
+
+      const file_id = crypto.randomUUID();
+
+      console.log("encryptedFileBlob type: ", encryptedFileBlob.type);
+      console.log(
+        "blob is instance of file",
+        encryptedFileBlob instanceof File
+      );
+      const encryptedFile = new File([encryptedFileBlob], file_id + ".csv", {
+        type: "application/octet-stream",
       });
+      console.log("encryptedFIle type:", encryptedFile.type);
+      console.log(
+        "encryptedfile isntance of file",
+        encryptedFile instanceof File
+      );
+
+      const path = `./public/uploads/${file_id}.csv`;
+
+      const body = new FormData();
+      body.append("file", encryptedFile);
+      body.append("fields", path);
+
+      const res = await fetch("/api/fs", { method: "POST", body });
+      console.log({ res });
 
       const encryptedFileString = await LitJsSdk.blobToBase64String(
         encryptedFile

@@ -6,9 +6,11 @@ import path from "path";
 
 export const config = {
   api: {
-    bodyParser: false,
-  },
-};
+      bodyParser: {
+          sizeLimit: '4mb' // Set desired value here
+      }
+  }
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -26,11 +28,18 @@ export default async function handler(
     );
 
     try {
+      // console.log("file path", data.files.file.path);
+      // console.log('file', data.files.file)
       const filedata = fs.readFileSync(data.files.file.path, "utf8");
-      fs.writeFileSync(`./public/uploads/${data.fields.fields}.csv`, filedata);
+      // console.log({ filedata });
+      fs.writeFileSync(
+        data.fields.fields,
+        filedata
+      );
       await fs.unlinkSync(data.files.file.path);
       return res.status(200).json({ success: "true" });
-    } catch (err) {      
+    } catch (err) {
+      console.log({ err });
       return res.status(400).json({ success: "false" });
     }
   } else if (req.method == "GET") {
