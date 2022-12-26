@@ -25,10 +25,10 @@ enum UserType {
 
 const Home: FC<{ justBurned?: boolean }> = ({ justBurned }) => {
   const [hasJustBurned, setHasJustBurned] = useState(justBurned);
+  const [hasTouchedSwitch, setHasTouchedSwitch] = useState(false);
   const router = useRouter();
 
   const [activeChoice, setActiveChoice] = useState(UserType.EndUser);
-  const [isLoading, setIsLoading] = useState(false);
   const [isMissingAdminToken, setIsMissingAdminToken] = useState(false);
   const provider = useProvider();
 
@@ -56,9 +56,9 @@ const Home: FC<{ justBurned?: boolean }> = ({ justBurned }) => {
           (adminContract && activeChoice == UserType.DaoAdmin)) &&
         !wrongNetwork &&
         !hasJustBurned &&
-        !isMissingAdminToken
+        !isMissingAdminToken &&
+        hasTouchedSwitch
       ) {
-        setIsLoading(true);
         if (activeChoice === UserType.EndUser && endUserContract) {
           const tokenId = await endUserContract
             .ownerToTokenId(address)
@@ -82,6 +82,7 @@ const Home: FC<{ justBurned?: boolean }> = ({ justBurned }) => {
     activeChoice,
     isMissingAdminToken,
     adminContract,
+    hasTouchedSwitch,
   ]);
 
   const boxShadowStyle = {
@@ -131,7 +132,10 @@ const Home: FC<{ justBurned?: boolean }> = ({ justBurned }) => {
                 "bg-white": activeChoice === UserType.EndUser,
               })}
               style={activeChoice === UserType.EndUser ? boxShadowStyle : {}}
-              onClick={() => setActiveChoice(UserType.EndUser)}
+              onClick={() => {
+                setActiveChoice(UserType.EndUser);
+                setHasTouchedSwitch(true);
+              }}
             >
               SPN Member
             </button>
@@ -140,7 +144,10 @@ const Home: FC<{ justBurned?: boolean }> = ({ justBurned }) => {
                 "bg-white": activeChoice === UserType.DaoAdmin,
               })}
               style={activeChoice === UserType.DaoAdmin ? boxShadowStyle : {}}
-              onClick={() => setActiveChoice(UserType.DaoAdmin)}
+              onClick={() => {
+                setActiveChoice(UserType.DaoAdmin);
+                setHasTouchedSwitch(true);
+              }}
             >
               DAO Admin
             </button>
@@ -186,29 +193,38 @@ const Home: FC<{ justBurned?: boolean }> = ({ justBurned }) => {
             )}
           </div>
           <div className="m-auto w-fit">
-            {hasJustBurned ? (
+            {!address || !signer || wrongNetwork ? (
+              <ConnectButton label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Connect Wallet&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" />
+            ) : hasJustBurned ? (
               <>
                 <h4 className="text-zinc-600 mb-4 text-xl">
                   Change your mind?
                 </h4>
-                <Button onClick={() => setHasJustBurned(false)} btnSize="px-20">
+                <Button
+                  onClick={() => {
+                    setHasJustBurned(false);
+                    setHasTouchedSwitch(true);
+                  }}
+                  btnSize="px-20"
+                >
                   Re-join SPN DAO
                 </Button>
               </>
-            ) : isMissingAdminToken ? (
+            ) : !hasTouchedSwitch || isMissingAdminToken ? (
               <Button
                 onClick={() => {
-                  setActiveChoice(UserType.DaoAdmin);
-                  setIsMissingAdminToken(false);
+                  if (isMissingAdminToken) {
+                    setIsMissingAdminToken(false);
+                    setActiveChoice(UserType.DaoAdmin);
+                  }
+                  setHasTouchedSwitch(true);
                 }}
                 btnSize="px-20"
               >
-                Connect Wallet
+                Enter App
               </Button>
-            ) : (isLoading || address) && !wrongNetwork ? (
-              <Spinner />
             ) : (
-              <ConnectButton label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Connect Wallet&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" />
+              <Spinner />
             )}
           </div>
         </div>
