@@ -18,6 +18,7 @@ import { SocialsFooter } from "../../components/SocialsFooter";
 export default function ManageMembership() {
   const router = useRouter();
   const { address, isConnecting } = useAccount();
+  const [tokenId, setTokenId] = useState<number | null>(null);
   const { data: signer } = useSigner();
   const contract = useContract({
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
@@ -30,6 +31,17 @@ export default function ManageMembership() {
     functionName: "userBurn",
     mode: "recklesslyUnprepared",
   });
+
+  useEffect(() => {
+    (async () => {
+      if (contract && address && signer) {
+        const scopedTokenId = await contract
+          .ownerToTokenId(address)
+          .then(parseInt);
+        setTokenId(scopedTokenId);
+      }
+    })();
+  }, [contract, address, signer]);
   useEffect(() => {
     if (isSuccess) router.push("/come-back");
   }, [isSuccess, router]);
@@ -37,9 +49,7 @@ export default function ManageMembership() {
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
   async function burnToken() {
-    if (contract && signer && write) {
-      const tokenId = await contract.ownerToTokenId(address).then(parseInt);
-      console.log(tokenId);
+    if (contract && signer && write && typeof tokenId === "number") {
       write({ recklesslySetUnpreparedArgs: [tokenId] });
     }
   }
@@ -140,7 +150,7 @@ export default function ManageMembership() {
                 <div className="flex w-stretch flex-wrap">
                   <MembershipSection>
                     <div className="flex flex-col m-1">
-                      <span className="text-xl md:text-4xl">bd847700</span>{" "}
+                      <span className="text-xl md:text-4xl">{tokenId}</span>{" "}
                       <div className="text-neutral-600 text-md md:text-2xl">
                         Token ID
                       </div>
@@ -156,14 +166,14 @@ export default function ManageMembership() {
                             <div className="flex items-center">
                               <button
                                 onClick={() => {
-                                  navigator.clipboard.writeText("testText");
+                                  navigator.clipboard.writeText(
+                                    process.env.NEXT_PUBLIC_SBT_ADDR!
+                                  );
                                 }}
                               >
                                 <MdContentCopy className="mr-1" size={16} />
                               </button>
-                              <span>
-                                0x75805aF2749a4fD09a98072074706d19B462C1
-                              </span>
+                              <span>{process.env.NEXT_PUBLIC_SBT_ADDR}</span>
                             </div>
                           }
                           showArrow={true}
@@ -176,7 +186,11 @@ export default function ManageMembership() {
                             fontWeight: "400",
                           }}
                         >
-                          <a href="#">0x7580...B462C1</a>
+                          <a href="#">
+                            {process.env.NEXT_PUBLIC_SBT_ADDR?.slice(0, 6) +
+                              "..." +
+                              process.env.NEXT_PUBLIC_SBT_ADDR?.slice(-6)}
+                          </a>
                         </Tooltip>
                       </span>
                       <div className="text-neutral-600 text-md md:text-2xl">
