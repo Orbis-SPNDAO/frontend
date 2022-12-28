@@ -14,7 +14,6 @@ export default async function handler(
       "https://patterndao.mypinata.cloud"
     );
     const { path } = req.body;
-    console.log({ path });
     const ipfs_res = await submarine.uploadFileOrFolder(path);
     await fs.unlinkSync(path);
     return res.status(200).json({ cid: ipfs_res.items[0].cid });
