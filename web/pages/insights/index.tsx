@@ -78,8 +78,8 @@ export default function Insights() {
             className="w-1/2"
           ></Image>
           <HeroSection
-            title="Access valuable data"
-            subtitle="Access valuable data crowd-sourced from DAO members"
+            title="Reward DAO members"
+            subtitle="Reward DAO members for their contribution to the data economy"
             hideMarginTop
           ></HeroSection>
         </div>
