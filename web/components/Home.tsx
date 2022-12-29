@@ -17,6 +17,7 @@ import Button from "./Button";
 import Header from "./Header";
 import { JoinSubText } from "./join/JoinSubText";
 import { RiErrorWarningFill } from "react-icons/ri";
+import BannerAndSubText from "./BannerAndSubText";
 
 enum UserType {
   EndUser = "endUser",
@@ -109,16 +110,13 @@ const Home: FC<{ justBurned?: boolean }> = ({ justBurned }) => {
             </h3>
           </div>
         ) : (
-          <div>
-            <h1 className="text-6xl text-custom-purple sm:text-9xl leading-tight">
-              SPN DAO
-            </h1>
-            <h4 className="text-md sm:text-3xl mb-16">
-              {activeChoice === UserType.EndUser
+          <BannerAndSubText
+            subtext={
+              activeChoice === UserType.EndUser
                 ? "Your data is more valuable than you think"
-                : "Be the shepherd for a vibrant data economy"}
-            </h4>
-          </div>
+                : "Be the shepherd for a vibrant data economy"
+            }
+          ></BannerAndSubText>
         )}
         {isMissingAdminToken ? (
           <JoinSubText amber>
