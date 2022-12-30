@@ -2,12 +2,14 @@ import { useRouter } from "next/router";
 import { FC } from "react";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import Link from "next/link";
 
 type HeaderProps = {
   hideLogo?: boolean;
   hideButton?: boolean;
   isAdmin?: boolean;
   hideMargin?: boolean;
+  showSubsriberLink?: boolean;
 };
 
 const Header: FC<HeaderProps> = ({
@@ -15,6 +17,7 @@ const Header: FC<HeaderProps> = ({
   hideButton,
   isAdmin,
   hideMargin,
+  showSubsriberLink,
 }) => {
   const router = useRouter();
 
@@ -42,6 +45,13 @@ const Header: FC<HeaderProps> = ({
             <div className="flex items-center space-x-6 ml-auto">
               <ConnectButton />
             </div>
+          ) : showSubsriberLink ? (
+            <Link
+              href="/insights"
+              className="font-normal text-custom-purple text-xl ml-auto"
+            >
+              Subscribers Portal
+            </Link>
           ) : null}
         </div>
       </div>
