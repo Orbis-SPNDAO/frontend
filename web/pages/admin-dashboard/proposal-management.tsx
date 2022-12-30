@@ -17,15 +17,19 @@ const ProposalManagement: FC = () => {
 
   useEffect(() => {
     async function getProposalIDs() {
-      await fetch("/api/proposals", { method: "GET" })
-        .then((res) => res.json())
-        .then((res) => {
-          for (let i = 0; i < res.data.id.length; i++) {
-            client.fetchElection(res.data.id[i]).then((p) => {
-              setProposals([...proposals, p]);
-            });
-          }
-        });
+      
+      const proposal_data = await fetch("/api/proposals", { method: "GET" })
+        .then((res) => res.json());
+        
+      
+      let temp_proposals: PublishedElection[] = [];
+      for (let i=0; i<proposal_data.data.id.length; i++) {
+        const id = proposal_data.data.id[i];
+        const proposal = await client.fetchElection(id);
+        temp_proposals.push(proposal);
+      }
+      setProposals(temp_proposals);
+
     }
 
     if (client) {
@@ -35,9 +39,9 @@ const ProposalManagement: FC = () => {
     }
   }, [client]);
 
-  useEffect(() => {
-    console.log(`proposals: ${JSON.stringify(proposals)}`);
-  }, [proposals]);
+  // useEffect(() => {
+  //   console.log(`proposals: ${JSON.stringify(proposals)}`);
+  // }, [proposals]);
 
   const createProposal = async () => {
     router.push("/admin-dashboard/proposal-management/create-proposal");
