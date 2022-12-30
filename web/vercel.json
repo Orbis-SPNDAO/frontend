@@ -1,9 +1,9 @@
 {
   "functions": {
-    "api/fs.ts": {
+    "api/fs.tsx": {
       "includeFiles": "uploads/**"
     },
-    "api/upload.ts": {
+    "api/upload.tsx": {
       "includeFiles": "uploads/**"
     }
   }
