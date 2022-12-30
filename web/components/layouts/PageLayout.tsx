@@ -29,7 +29,7 @@ const PageLayout: FC<PageLayoutProps> = ({
   return (
     <div className={containerClassName || ""}>
       <Header isAdmin={isAdmin} hideMargin={hideHeaderMargin} />
-      <div className="flex pb-10">{children}</div>
+      <div className="flex pb-10 justify-around">{children}</div>
     </div>
   )
 }

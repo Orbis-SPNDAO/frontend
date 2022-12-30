@@ -2,26 +2,46 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { useAccount, useContract, useProvider } from "wagmi";
+import { UNLOCK_ABI } from "../../abis/currentABI";
 import BannerAndSubText from "../../components/BannerAndSubText";
 import Button from "../../components/Button";
 import { HeroSection } from "../../components/HeroSection";
+import Spinner from "../../components/Spinner";
 
 export default function Insights() {
   const router = useRouter();
   const [baseUrl, setBaseUrl] = useState("");
   const [ratio, setRatio] = useState(16 / 9);
   const [ratio2, setRatio2] = useState(16 / 9);
+
+  const provider = useProvider();
+
+  const { address } = useAccount();
+
+  const contract = useContract({
+    address: process.env.NEXT_PUBLIC_UNLOCK_ADDR,
+    abi: UNLOCK_ABI,
+    signerOrProvider: provider,
+  });
+
   useEffect(() => {
-    const { query } = router;
-    if (query["address"] && query["signature"]) router.push("/insights/list");
-    if (typeof window !== undefined) {
-      setBaseUrl(
-        (window.location.host.includes("localhost") ? "http://" : "https://") +
-          window.location.host +
-          "/insights"
-      );
-    }
-  }, [router]);
+    (async () => {
+      if (contract && provider && address) {
+        const hasSubsribed = parseInt(await contract.balanceOf(address), 10);
+        if (hasSubsribed) router.push("/insights/list");
+        if (typeof window !== undefined) {
+          setBaseUrl(
+            (window.location.host.includes("localhost")
+              ? "http://"
+              : "https://") +
+              window.location.host +
+              "/insights"
+          );
+        }
+      }
+    })();
+  }, [router, contract, provider, address]);
 
   return (
     <div className="w-stretch min-h-screen bg-cover bg-[url('/assets/landing_bg.png')]">
@@ -45,9 +65,13 @@ export default function Insights() {
           )}%22%2C%22persistentCheckout%22%3Afalse%2C%22referrer%22%3A%22%22%2C%22messageToSign%22%3A%22Sign+to+confirm+your+identity+for+SPN+DAO%22%2C%22hideSoldOut%22%3Afalse%7D`}
           className="max-w-fit m-auto block"
         >
-          <Button btnSize="w-xl" addClassName="m-auto">
-            View Dashboard
-          </Button>
+          {baseUrl === "" ? (
+            <Spinner />
+          ) : (
+            <Button btnSize="w-xl" addClassName="m-auto">
+              Subscribe Now
+            </Button>
+          )}
         </a>
         <div className="w-stretch mt-12 mb-6 mx-6 sm:mx-14 lg:mx-20 2xl:mx-28 min-h-80 hero py-6 px-20 flex items-center">
           <HeroSection
@@ -78,8 +102,8 @@ export default function Insights() {
             className="w-1/2"
           ></Image>
           <HeroSection
-            title="Reward DAO members"
-            subtitle="Reward DAO members for their contribution to the data economy"
+            title="Rich consumer insights"
+            subtitle="Rich insights into consumer sector trends"
             hideMarginTop
           ></HeroSection>
         </div>
