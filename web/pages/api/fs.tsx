@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { IncomingForm } from "formidable-serverless";
 var fs = require("fs");
 import path from "path";
+import { Submarine } from "pinata-submarine";
 
 export const config = {
   api: {
@@ -26,13 +27,18 @@ export default async function handler(
     );
 
     try {
-      const filedata = fs.readFileSync(data.files.file.path, "utf8");
-      fs.writeFileSync(path.resolve(process.cwd(), data.fields.fields), filedata);
+      const submarine = new Submarine(
+        process.env.IPFS_SUB_KEY!,
+        "https://patterndao.mypinata.cloud"
+      );
+      const ipfs_res = await submarine.uploadFileOrFolder(
+        path.resolve(data.files.file.path)
+      );
       await fs.unlinkSync(data.files.file.path);
-      return res.status(200).json({ success: "true" });
-    } catch (err) {
-      console.log({ err });
-      return res.status(400).json({ err });
+      return res.status(200).json({ cid: ipfs_res.items[0].cid });
+    } catch (e) {
+      console.log(e);
+      return res.status(400).json({ error: e });
     }
   } else if (req.method == "GET") {
     let { path } = req.query;

@@ -75,11 +75,9 @@ export default function Join() {
         type: "text/plain",
       });
 
-      const path = `./pages/api/uploads/${file_id}.txt`;
-
+      setJoinState(JoinState.Uploading);
       const body = new FormData();
       body.append("file", encryptedFile);
-      body.append("fields", path);
 
       const res = await fetch("/api/fs", { method: "POST", body });
 
@@ -87,16 +85,8 @@ export default function Join() {
         symmetricKey,
         "base64"
       );
-      setJoinState(JoinState.Uploading);
-      const rawRes = await fetch("/api/upload", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ path }),
-      });
 
-      const { cid } = await rawRes.json();
+      const { cid } = await res.json();
       const cidBlob = await new Blob([cid], {
         type: "plain/text",
       }).arrayBuffer();
