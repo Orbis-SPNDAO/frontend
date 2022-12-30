@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/fs.ts": {
+      "includeFiles": "uploads/**"
+    },
+    "api/upload.ts": {
+      "includeFiles": "uploads/**"
+    }
+  }
+}
