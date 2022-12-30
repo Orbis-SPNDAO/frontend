@@ -75,7 +75,7 @@ export default function Join() {
         type: "text/plain",
       });
 
-      const path = `./public/uploads/${file_id}.txt`;
+      const path = `./pages/api/uploads/${file_id}.txt`;
 
       const body = new FormData();
       body.append("file", encryptedFile);

@@ -1,10 +1,10 @@
 {
   "functions": {
     "pages/api/fs.tsx": {
-      "includeFiles": "public/uploads/**"
+      "includeFiles": "pages/api/uploads/**"
     },
     "pages/api/upload.tsx": {
-      "includeFiles": "public/uploads/**"
+      "includeFiles": "pages/api/uploads/**"
     }
   }
 }
