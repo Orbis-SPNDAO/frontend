@@ -4,13 +4,13 @@ import Proposal from "../../../dataclass/Proposal";
 import { useContainerDimensions } from "../../../hooks/useContainerDimensions";
 import { ProposalData, VoteData } from "../dummydata";
 
+import { PublishedElection } from "@vocdoni/sdk";
+
 export default function Proposals({
-  proposalData,
-  voteData,
+  proposalData,  
   onProposalClick,
 }: {
-  proposalData: ProposalData[];
-  voteData: VoteData[];
+  proposalData: PublishedElection[];  
   onProposalClick: any;
 }) {
   const [voteContainer, setVoteContainer] = useState<HTMLDivElement | null>();

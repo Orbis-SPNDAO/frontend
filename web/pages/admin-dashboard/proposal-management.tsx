@@ -1,29 +1,43 @@
 import { useRouter } from "next/router";
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import Button from "../../components/Button";
-import {
-  ProposalData,
-  proposalData,
-  voteData,
-} from "../../components/dashboard/dummydata";
+import { ProposalData } from "../../components/dashboard/dummydata";
 import Proposals from "../../components/dashboard/governance/Proposals";
 import BackButton from "../../components/dashboards-shared/BackButton";
 import PageLayout from "../../components/layouts/PageLayout";
 
 import { useVocdoni } from "../../context/vocdoni";
 
+import { PublishedElection } from "@vocdoni/sdk";
+
 const ProposalManagement: FC = () => {
   const router = useRouter();
   const { client } = useVocdoni();
+  const [proposals, setProposals] = useState<PublishedElection[]>([]);
 
   useEffect(() => {
-    async function fetchAccountInfo() {
-      await client.fetchAccountInfo().then(console.log);            
+    async function getProposalIDs() {
+      await fetch("/api/proposals", { method: "GET" })
+        .then((res) => res.json())
+        .then((res) => {
+          for (let i = 0; i < res.data.id.length; i++) {
+            client.fetchElection(res.data.id[i]).then((p) => {
+              setProposals([...proposals, p]);
+            });
+          }
+        });
     }
-    if (client) {      
-      fetchAccountInfo();
+
+    if (client) {
+      getProposalIDs().then(() =>
+        console.log(`proposals: ${JSON.stringify(proposals)}`)
+      );
     }
   }, [client]);
+
+  useEffect(() => {
+    console.log(`proposals: ${JSON.stringify(proposals)}`);
+  }, [proposals]);
 
   const createProposal = async () => {
     router.push("/admin-dashboard/proposal-management/create-proposal");
@@ -32,7 +46,6 @@ const ProposalManagement: FC = () => {
   function onProposalClick(proposal: ProposalData) {
     router.push(`/admin-dashboard/proposal-management/${proposal.id}`);
   }
-
 
   return (
     <PageLayout
@@ -52,8 +65,7 @@ const ProposalManagement: FC = () => {
 
         <div className="w-stretch m-5 md:mx-28 md:my-12 h-fit py-6 px-4 md:p-10 hero">
           <Proposals
-            proposalData={proposalData}
-            voteData={voteData}
+            proposalData={proposals}
             onProposalClick={onProposalClick}
           />
         </div>
