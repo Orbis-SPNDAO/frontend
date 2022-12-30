@@ -27,7 +27,7 @@ export default async function handler(
 
     try {
       const filedata = fs.readFileSync(data.files.file.path, "utf8");
-      fs.writeFileSync(data.fields.fields, filedata);
+      fs.writeFileSync(path.resolve(process.cwd(), data.fields.fields), filedata);
       await fs.unlinkSync(data.files.file.path);
       return res.status(200).json({ success: "true" });
     } catch (err) {
