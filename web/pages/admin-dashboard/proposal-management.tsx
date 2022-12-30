@@ -17,10 +17,11 @@ const ProposalManagement: FC = () => {
   const { client } = useVocdoni();
 
   useEffect(() => {
-    if (client) {
-      
-        // client.fetchElection();
-
+    async function fetchAccountInfo() {
+      await client.fetchAccountInfo().then(console.log);            
+    }
+    if (client) {      
+      fetchAccountInfo();
     }
   }, [client]);
 

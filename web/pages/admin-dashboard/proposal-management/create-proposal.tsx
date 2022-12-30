@@ -7,7 +7,14 @@ import Button, { ButtonStyle } from "../../../components/Button";
 import BackButton from "../../../components/dashboards-shared/BackButton";
 import PageLayout from "../../../components/layouts/PageLayout";
 
-import { AccountData, EnvOptions, PlainCensus, VocdoniSDKClient, Election, ClientOptions } from "@vocdoni/sdk";
+import {
+  AccountData,
+  EnvOptions,
+  PlainCensus,
+  VocdoniSDKClient,
+  Election,
+  ClientOptions,
+} from "@vocdoni/sdk";
 import { FC, useEffect, useRef } from "react";
 import { useContractRead, useSigner } from "wagmi";
 import { SBT_ABI } from "../../../abis/currentABI";
@@ -103,25 +110,25 @@ export default function CreateProposal() {
 
     // step 1: create a new census + add contract sbt holders to it
     const census = new PlainCensus();
-    for (const holder of (sbtHolders as string[])) {      
+    for (const holder of sbtHolders as string[]) {
       census.add(holder);
     }
 
     // step 2: create a new election
     const election = Election.from({
       title: `${data.title}}`,
-      description: `${data.description}`,      
-      header: `${data.discussion}`,      
+      description: `${data.description}`,
+      header: `${data.discussion}`,
       startDate: data.startDate,
       endDate: data.endDate,
       census,
       streamUri: "https://vocdoni.io",
-    })
+    });
 
     // step 3: create a new proposal
     election.addQuestion(`${data.title}`, `${data.description}`, [
       {
-        title: "Yes",        
+        title: "Yes",
         value: 0,
       },
       {
@@ -129,17 +136,27 @@ export default function CreateProposal() {
         value: 1,
       },
     ]);
-    
+
     // step 4: publish the proposal
     const proposalID = await client.current!.createElection(election);
     console.log("proposalID", proposalID);
 
+    await fetch("/api/proposals", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: proposalID,
+      }),
+    })    
+    .then(console.log);
 
     // console.log(
     //   "Not implemented, call contract with data",
     //   JSON.stringify(data)
     // );
-    router.push("/admin-dashboard/proposal-management");
+    // router.push("/admin-dashboard/proposal-management");
   }
 
   function onSelectTimeWindow() {
