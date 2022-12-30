@@ -10,8 +10,19 @@ import Proposals from "../../components/dashboard/governance/Proposals";
 import BackButton from "../../components/dashboards-shared/BackButton";
 import PageLayout from "../../components/layouts/PageLayout";
 
+import { useVocdoni } from "../../context/vocdoni";
+
 const ProposalManagement: FC = () => {
   const router = useRouter();
+  const { client } = useVocdoni();
+
+  useEffect(() => {
+    if (client) {
+      
+        // client.fetchElection();
+
+    }
+  }, [client]);
 
   const createProposal = async () => {
     router.push("/admin-dashboard/proposal-management/create-proposal");
@@ -20,6 +31,7 @@ const ProposalManagement: FC = () => {
   function onProposalClick(proposal: ProposalData) {
     router.push(`/admin-dashboard/proposal-management/${proposal.id}`);
   }
+
 
   return (
     <PageLayout

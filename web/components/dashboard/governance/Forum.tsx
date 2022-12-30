@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Orbis } from "@orbisclub/orbis-sdk";
 
-let orbis = new Orbis();
+import { useOrbis } from "../../../context/orbis";
 
 interface IPosts {
   data: [],
@@ -14,6 +13,7 @@ export default function Forum() {
 
   const [user, setUser] = useState();
   const [posts, setPosts] = useState({} as IPosts);
+  const { orbis } = useOrbis();
   
   useEffect(() => {
     const getPosts = async () => {
