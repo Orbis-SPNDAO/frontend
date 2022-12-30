@@ -1,5 +1,5 @@
 import { createContext, SetStateAction, useContext, useState } from "react";
-import { EnvOptions, VocdoniSDKClient, AccountData } from "@vocdoni/sdk";
+import { EnvOptions, VocdoniSDKClient, AccountData, PublishedElection } from "@vocdoni/sdk";
 import { useSigner } from "wagmi";
 import React from "react";
 import { ethers } from "ethers";
@@ -8,19 +8,26 @@ import { useEffect } from "react";
 type VocdoniContextType = {
   client: VocdoniSDKClient;
   setClient: React.Dispatch<SetStateAction<VocdoniSDKClient>>;
+  proposalData: PublishedElection[];
+  setProposalData: React.Dispatch<SetStateAction<PublishedElection[]>>;
 };
 
-const initVocdoniClient = {
+const initVocdoni = {
   client: new VocdoniSDKClient({
     env: EnvOptions.DEV,
   }),
-  setClient: () => {},
+  setClient: () => {},  
+  proposalData: [],
+  setProposalData: () => {}
 };
 
-const VocdoniContext = createContext<VocdoniContextType>(initVocdoniClient);
+
+const VocdoniContext = createContext<VocdoniContextType>(initVocdoni);
 
 export function VocdoniProvider({ children }: any) {
   const [client, setClient] = useState<any>();
+  const [proposalData, setProposalData] = useState<PublishedElection[]>([]);
+
   const { data: signer } = useSigner(); // get the signer from wagmi
 
   useEffect(() => {
@@ -63,7 +70,7 @@ export function VocdoniProvider({ children }: any) {
   }, [signer, client]);
 
   return (
-    <VocdoniContext.Provider value={{ client, setClient }}>      
+    <VocdoniContext.Provider value={{ client, setClient, proposalData, setProposalData }}>      
         {children}      
     </VocdoniContext.Provider>
   );

@@ -1,16 +1,12 @@
-import React, { Dispatch, useEffect, useState } from "react";
+import { useState } from "react";
 import { IoIosCheckmark } from "react-icons/io";
-import Proposal from "../../../dataclass/Proposal";
 import { useContainerDimensions } from "../../../hooks/useContainerDimensions";
-import { ProposalData, VoteData } from "../dummydata";
 
-import { PublishedElection, IQuestion, ElectionStatus } from "@vocdoni/sdk";
+import { useVocdoni } from "../../../context/vocdoni";
 
-export default function Proposals({
-  proposalData,
+export default function Proposals({  
   onProposalClick,
-}: {
-  proposalData: PublishedElection[];
+}: {  
   onProposalClick: any;
 }) {
   const [voteContainer, setVoteContainer] = useState<HTMLDivElement | null>();
@@ -18,6 +14,8 @@ export default function Proposals({
     voteContainer as HTMLDivElement
   );
 
+  const { proposalData } = useVocdoni();
+  
   return (
     <>
       <h2 className="text-left text-2xl font-normal">Proposals</h2>
