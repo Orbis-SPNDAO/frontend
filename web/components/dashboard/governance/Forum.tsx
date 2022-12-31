@@ -32,7 +32,7 @@ export default function Forum() {
     getPosts().then((posts) => {
       setPosts(posts);
     });
-  }, [groupId, user]);
+  }, [groupId, orbis, user]);
 
   const deletePost = async (stream_id: string) => {
     let res = await orbis.isConnected();
@@ -75,7 +75,7 @@ export default function Forum() {
         }
       }
     })();
-  }, []);
+  }, [orbis]);
 
   return (
     <div>
