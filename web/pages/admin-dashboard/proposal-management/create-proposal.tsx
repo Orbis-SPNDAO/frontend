@@ -6,7 +6,7 @@ import BaseModal from "../../../components/BaseModal";
 import Button, { ButtonStyle } from "../../../components/Button";
 import BackButton from "../../../components/dashboards-shared/BackButton";
 import PageLayout from "../../../components/layouts/PageLayout";
-
+import Spinner from "../../../components/Spinner";
 import {
   AccountData,
   EnvOptions,
@@ -22,6 +22,7 @@ import { SBT_ABI } from "../../../abis/currentABI";
 enum CreateProposalState {
   Step1BasicInfo = "basic_info",
   Step2VoteOptions = "vote_options",
+  loading = "loading",
 }
 
 export default function CreateProposal() {
@@ -95,7 +96,7 @@ export default function CreateProposal() {
   async function onStep2Continue() {
     if (!isValidStep1) return;
 
-    console.log("onStep2Continue");
+    setPageState(CreateProposalState.loading);
 
     const data = {
       title,
@@ -150,7 +151,11 @@ export default function CreateProposal() {
         id: proposalID,
       }),
     })    
-    .then(console.log);
+    .then(console.log)
+    .then(() => {
+      setPageState(CreateProposalState.loading);
+      router.push("/admin-dashboard/proposal-management")
+    })
 
     // console.log(
     //   "Not implemented, call contract with data",
@@ -358,6 +363,13 @@ export default function CreateProposal() {
                 </div>
               </div>
             </>
+          )}
+
+          {pageState === CreateProposalState.loading && (
+            <div className="flex justify-center items-center h-full">
+              
+              <Spinner />
+            </div>
           )}
         </div>
       </div>
