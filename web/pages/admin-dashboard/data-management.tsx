@@ -303,7 +303,7 @@ const DataManagement: FC = () => {
             }`}
             onClick={() => setActiveTab(DataSelectType.Undecrypted)}
           >
-            Undecrypted data
+            Encrypted data
           </button>
           <button
             className={`mr-6 text-xs sm:text-base ${
