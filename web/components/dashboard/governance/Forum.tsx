@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Orbis } from "@orbisclub/orbis-sdk";
 
-let orbis = new Orbis();
+import { useOrbis } from "../../../context/orbis";
 
 interface IPosts {
   data: [];
@@ -12,6 +11,8 @@ interface IPosts {
 export default function Forum() {
   const [user, setUser] = useState();
   const [posts, setPosts] = useState({} as IPosts);
+  const { orbis } = useOrbis();
+  
   const groupId = process.env.NEXT_PUBLIC_ORBIS_GROUP_ID;
 
   useEffect(() => {
@@ -31,7 +32,7 @@ export default function Forum() {
     getPosts().then((posts) => {
       setPosts(posts);
     });
-  }, [groupId, user]);
+  }, [groupId, orbis, user]);
 
   const deletePost = async (stream_id: string) => {
     let res = await orbis.isConnected();
@@ -74,7 +75,7 @@ export default function Forum() {
         }
       }
     })();
-  }, []);
+  }, [orbis]);
 
   return (
     <div>

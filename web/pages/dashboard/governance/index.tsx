@@ -93,8 +93,6 @@ export default function Governance() {
           {activeTab === ActiveTab.Forum && <Forum />}
           {activeTab === ActiveTab.Proposal && (
             <Proposals
-              proposalData={proposalData}
-              voteData={voteData}
               onProposalClick={onProposalClick}
             />
           )}

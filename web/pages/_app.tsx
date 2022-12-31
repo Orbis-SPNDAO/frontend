@@ -6,16 +6,19 @@ import "../styles/globals.css";
 
 import "@rainbow-me/rainbowkit/styles.css";
 
+import { VocdoniProvider } from "../context/vocdoni";
+
 import {
   getDefaultWallets,
   lightTheme,
   RainbowKitProvider,
   Theme,
 } from "@rainbow-me/rainbowkit";
-import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { configureChains, createClient, useSigner, WagmiConfig } from "wagmi";
 import { polygonMumbai } from "wagmi/chains";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
+import { OrbisProvider } from "../context/orbis";
 
 const myTheme = merge(lightTheme(), {
   colors: {
@@ -47,9 +50,13 @@ const App = ({ Component, pageProps }: AppProps) => {
   return (
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider chains={chains} theme={myTheme}>
-        <MainLayout>
-          <Component {...pageProps} />
-        </MainLayout>
+        <OrbisProvider>
+          <VocdoniProvider>
+            <MainLayout>
+              <Component {...pageProps} />
+            </MainLayout>
+          </VocdoniProvider>
+        </OrbisProvider>
       </RainbowKitProvider>
     </WagmiConfig>
   );

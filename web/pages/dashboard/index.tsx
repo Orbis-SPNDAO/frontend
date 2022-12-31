@@ -1,18 +1,19 @@
+import { PublishedElection } from "@vocdoni/sdk";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAccount, useContract, useSigner } from "wagmi";
 import { SBT_ABI } from "../../abis/currentABI";
 import DiscussionNVote from "../../components/dashboard/Discussion&Vote";
 import {
   discussionData,
   overviewData,
-  proposalData,
   voteData,
 } from "../../components/dashboard/dummydata";
 import Overview from "../../components/dashboards-shared/Overview";
 import PageLayout from "../../components/layouts/PageLayout";
 import { SocialsFooter } from "../../components/SocialsFooter";
-
+import { useOrbis } from "../../context/orbis";
+import { useVocdoni } from "../../context/vocdoni";
 export default function Dashboard() {
   const router = useRouter();
   const { isConnecting, address } = useAccount();
@@ -22,6 +23,78 @@ export default function Dashboard() {
     abi: SBT_ABI,
     signerOrProvider: signer,
   });
+
+  const { client, proposalData, setProposalData } = useVocdoni();
+
+  useEffect(() => {
+    async function getProposalIDs() {
+      const proposal_data = await fetch("/api/proposals", {
+        method: "GET",
+      }).then((res) => res.json());
+
+      let temp_proposals: PublishedElection[] = [];
+      for (let i = 0; i < proposal_data.data.id.length; i++) {
+        const id = proposal_data.data.id[i];
+        const proposal = await client.fetchElection(id);
+        temp_proposals.push(proposal);
+      }
+      setProposalData(temp_proposals);
+    }
+
+    if (client) {
+      getProposalIDs();
+      // getProposalIDs().then(() =>
+      //   console.log(`proposals: ${JSON.stringify(proposalData)}`)
+      // );
+    }
+  }, [client, setProposalData, proposalData]);
+
+  interface IPosts {
+    data: [];
+    error: string;
+    status: number;
+  }
+  const [user, setUser] = useState();
+  const [posts, setPosts] = useState({} as IPosts);
+  const { orbis } = useOrbis();
+
+  const groupId = process.env.NEXT_PUBLIC_ORBIS_GROUP_ID;
+
+  useEffect(() => {
+    const getPosts = async () => {
+      if (user && groupId) {
+        const posts = await orbis.getPosts({
+          context: groupId,
+        });
+        console.log({ posts });
+        return posts;
+      } else {
+        console.log("need to connect to orbis");
+        return [];
+      }
+    };
+
+    getPosts().then((posts) => {
+      setPosts(posts);
+    });
+  }, [groupId, orbis, user]);
+  useEffect(() => {
+    (async () => {
+      if (!orbis) return;
+      const connectedRes = await orbis.isConnected();
+      if (connectedRes.status === 200) {
+        setUser(connectedRes.did);
+      } else {
+        const res = await orbis.connect();
+        if (res.status == 200) {
+          setUser(res.did);
+        } else {
+          console.log("Error connecting to Orbis: ", res);
+        }
+      }
+    })();
+  }, [orbis]);
+
   const { bal } = router.query;
   useEffect(() => {
     (async () => {
@@ -64,7 +137,7 @@ export default function Dashboard() {
             />
 
             <DiscussionNVote
-              discussionData={discussionData}
+              discussionData={posts}
               proposalData={proposalData}
               voteData={voteData}
               onProposal={onProposal}

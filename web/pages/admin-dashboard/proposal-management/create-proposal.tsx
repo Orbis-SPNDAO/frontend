@@ -7,6 +7,18 @@ import Button, { ButtonStyle } from "../../../components/Button";
 import BackButton from "../../../components/dashboards-shared/BackButton";
 import PageLayout from "../../../components/layouts/PageLayout";
 
+import {
+  AccountData,
+  EnvOptions,
+  PlainCensus,
+  VocdoniSDKClient,
+  Election,
+  ClientOptions,
+} from "@vocdoni/sdk";
+import { FC, useEffect, useRef } from "react";
+import { useContractRead, useSigner } from "wagmi";
+import { SBT_ABI } from "../../../abis/currentABI";
+
 enum CreateProposalState {
   Step1BasicInfo = "basic_info",
   Step2VoteOptions = "vote_options",
@@ -14,6 +26,42 @@ enum CreateProposalState {
 
 export default function CreateProposal() {
   const router = useRouter();
+
+  const client = useRef<VocdoniSDKClient>();
+  const vocAccount = useRef<AccountData>();
+  const { data: signer } = useSigner();
+  const { data: sbtHolders } = useContractRead({
+    address: process.env.NEXT_PUBLIC_SBT_ADDR,
+    abi: SBT_ABI,
+    functionName: "fetchHolders",
+  });
+
+  useEffect(() => {
+    if (!client.current && signer)
+      client.current = new VocdoniSDKClient({
+        env: EnvOptions.DEV,
+        wallet: signer,
+      });
+  }, [signer]);
+
+  useEffect(() => {
+    const accountHandler = async () => {
+      try {
+        // account already exists
+        vocAccount.current = await client.current!.fetchAccountInfo();
+      } catch (e) {
+        // account not created yet
+        vocAccount.current = await client.current!.createAccount();
+      }
+
+      // top up account with faucet tokens
+      if (vocAccount.current.balance === 0) {
+        await client.current!.collectFaucetTokens();
+      }
+    };
+
+    if (client.current) accountHandler();
+  }, [client]);
 
   const [pageState, setPageState] = useState(
     CreateProposalState.Step1BasicInfo
@@ -58,11 +106,57 @@ export default function CreateProposal() {
       voteOptions: voteOptions.map((opt) => opt[1]),
     };
 
-    console.log(
-      "Not implemented, call contract with data",
-      JSON.stringify(data)
-    );
-    router.push("/admin-dashboard/proposal-management");
+    // 3 steps to vocdoni proposal creation ---
+
+    // step 1: create a new census + add contract sbt holders to it
+    const census = new PlainCensus();
+    for (const holder of sbtHolders as string[]) {
+      census.add(holder);
+    }
+
+    // step 2: create a new election
+    const election = Election.from({
+      title: `${data.title}}`,
+      description: `${data.description}`,
+      header: `${data.discussion}`,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      census,
+      streamUri: "https://vocdoni.io",
+    });
+
+    // step 3: create a new proposal
+    election.addQuestion(`${data.title}`, `${data.description}`, [
+      {
+        title: "Yes",
+        value: 0,
+      },
+      {
+        title: "No",
+        value: 1,
+      },
+    ]);
+
+    // step 4: publish the proposal
+    const proposalID = await client.current!.createElection(election);
+    console.log("proposalID", proposalID);
+
+    await fetch("/api/proposals", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: proposalID,
+      }),
+    })    
+    .then(console.log);
+
+    // console.log(
+    //   "Not implemented, call contract with data",
+    //   JSON.stringify(data)
+    // );
+    // router.push("/admin-dashboard/proposal-management");
   }
 
   function onSelectTimeWindow() {

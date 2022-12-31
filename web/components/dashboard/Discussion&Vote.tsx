@@ -1,3 +1,4 @@
+import { PublishedElection } from "@vocdoni/sdk";
 import Link from "next/link";
 import { useState } from "react";
 import { IoIosCheckmark } from "react-icons/io";
@@ -6,14 +7,20 @@ import { useContainerDimensions } from "../../hooks/useContainerDimensions";
 import { abbrevAccount } from "../../utils/string";
 import { DiscussionData, ProposalData, VoteData } from "./dummydata";
 
+interface IPosts {
+  data: [];
+  error: string;
+  status: number;
+}
+
 export default function DiscussionNVote({
   discussionData,
   proposalData,
   voteData,
   onProposal,
 }: {
-  discussionData: DiscussionData[];
-  proposalData: ProposalData[];
+  discussionData: IPosts;
+  proposalData: PublishedElection[];
   voteData: VoteData[];
   onProposal: (proposalId: number) => void;
 }) {
@@ -40,26 +47,36 @@ export default function DiscussionNVote({
         </Link>
       </div>
 
-      <div className="flex w-full overflow-x-auto text-left text-md mt-4 py-2">
-        {discussionData?.map((discussion) => {
-          return (
-            <div
-              key={discussion.id}
-              className="border-2 rounded-lg mr-4 p-4 w-1/3 min-w-[15rem]"
-            >
-              <div className="flex flex-col truncate w-full text-2xl">
-                <div>{discussion.title}</div>
+      {!discussionData || !discussionData.data || !discussionData.data.length ? (
+        <p className="text-center m-auto my-7">No posts found</p>
+      ) : (
+        <div className="flex w-full overflow-x-auto text-left text-md mt-4 py-2">
+          {discussionData.data.map((post: any) => {
+            return (
+              <div
+                key={post.timestamp}
+                className="border-2 rounded-lg mr-4 p-4 w-1/3 min-w-[15rem]"
+              >
+                <div className="flex flex-col truncate w-full text-2xl">
+                  <div>{post.content.title}</div>
 
-                <div className="flex w-max text-custom-text-gray text-sm mt-2">
-                  <span>{abbrevAccount(discussion.creator)}</span>
-                  <span className="mx-2">|</span>
-                  <span>{discussion.numberComments} comments</span>
+                  <div className="flex w-max text-custom-text-gray text-sm mt-2">
+                    <span>
+                      {post.creator_details.metadata?.ensName ??
+                        post.creator_details.metadata?.address ??
+                        ""}
+                    </span>
+                    <span className="mx-2">|</span>
+                    {/* <span>{post.content.comments.length} comments</span> */}
+                    <span>5 comments</span>
+
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       <div className="my-8 w-full h-0.5 bg-custom-border opacity-25"></div>
 
@@ -79,70 +96,63 @@ export default function DiscussionNVote({
         ref={(ref) => setVoteContainer(ref)}
         className="flex flex-col w-full text-left text-sm mt-4 py-2"
       >
-        {proposalData?.map((p) => {
-          const votes = voteData.filter((vote) => vote.proposalId === p.id);
-
-          const votesByOption: Record<number, number> = {};
-          votes.forEach((vote) => {
-            votesByOption[vote.option] = (votesByOption[vote.option] || 0) + 1;
-          });
-
-          const maxVoteCount = Math.max(...Object.values(votesByOption));
-
-          const widthPerVote = containerWidth / votes.length!;
-
-          const proposal = new Proposal(p);
-
-          return (
-            <button
-              key={proposal.id}
-              className="border-2 text-left rounded-lg mb-4 p-4"
-              onClick={() => onProposal(proposal.id)}
-            >
-              <div className="flex flex-col">
-                <div className="flex justify-between items-center">
-                  <span className="text-2xl">{proposal.title}</span>
-                  <span className="text-md rounded-full border-2 border-gray py-1 px-4">
-                    {proposal.getStatusDisplay()}
-                  </span>
-                </div>
-
-                <span className="text-custom-gray text-sm my-4">
-                  {proposal.description}
-                </span>
-
-                {proposal.options.map((option) => {
-                  const optionVoteCount = votesByOption[option.id] || 0;
-
-                  return (
-                    <span key={`${option.id}`}>
-                      <div
-                        className="absolute flex items-center bg-custom-purple bg-opacity-20 my-2 py-2 px-4 rounded-lg h-9"
-                        style={{
-                          width: widthPerVote * optionVoteCount,
-                        }}
-                      />
-
-                      <div className="flex items-center my-2 py-2 px-4 rounded-lg">
-                        <div className="mx-2 w-6">
-                          {optionVoteCount === maxVoteCount && (
-                            <IoIosCheckmark size="20" />
-                          )}
-                        </div>
-
-                        <span> {option.name}</span>
-
-                        <span className="ml-2 text-custom-gray">
-                          {optionVoteCount} vote
-                        </span>
-                      </div>
+        {proposalData ? (
+          proposalData.map((p) => {
+            // let jp = JSON.parse(JSON.stringify(p));
+            // console.log("JSON PARSE", jp);
+            return (
+              <button
+                key={p.id}
+                className="border-2 rounded-lg mb-4 p-4 text-left"
+              >
+                <div className="flex flex-col">
+                  <div className="flex justify-between items-center">
+                    <span className="text-2xl">{p.title.default}</span>
+                    <span className="text-md rounded-full border-2 border-gray py-1 px-4">
+                      {p.status}
                     </span>
-                  );
-                })}
-              </div>
-            </button>
-          );
-        })}
+                  </div>
+
+                  <span className="text-custom-gray text-sm my-4">
+                    {p.description.default}
+                  </span>
+
+                  {p.questions.map((question) => {
+                    return question.choices.map((choice) => {
+                      return (
+                        <span key={choice.value}>
+                          <div
+                            className="absolute flex items-center bg-custom-purple bg-opacity-20 my-2 py-2 px-4 rounded-lg h-9"
+                            style={{
+                              width: p.voteCount * Number(choice.results),
+                            }}
+                          />
+
+                          <div className="flex items-center my-2 py-2 px-4 rounded-lg">
+                            <div className="mx-2 w-6">
+                              {Number(choice.results) === p.voteCount && (
+                                <IoIosCheckmark size="20" />
+                              )}
+                            </div>
+                            <span>{choice.title.default}</span>
+
+                            <span className="ml-2 text-custom-gray">
+                              {choice.answer} vote
+                            </span>
+                          </div>
+                        </span>
+                      );
+                    });
+                  })}
+                </div>
+              </button>
+            );
+          })
+        ) : (
+          <div className="flex justify-center items-center w-full h-20">
+            <span className="text-custom-gray">No proposals yet</span>
+          </div>
+        )}
       </div>
     </div>
   );
