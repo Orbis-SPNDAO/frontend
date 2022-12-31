@@ -34,11 +34,8 @@ export default function Forum() {
         return [];
       }
     };
-
-    setForumState(ForumState.posting);
     getPosts().then((posts) => {
       setPosts(posts);
-      setForumState(ForumState.done);
     });
   }, [groupId, orbis, user]);
 
@@ -54,6 +51,7 @@ export default function Forum() {
 
   const newPost = async (e: any) => {
     e.preventDefault();
+    setForumState(ForumState.posting);
     const res = await orbis.isConnected();
     if (res.status == 200) {
       let title = e.target.title.value;
@@ -68,6 +66,7 @@ export default function Forum() {
     } else {
       console.log("need to connect to orbis");
     }
+    setForumState(ForumState.done);
   };
   useEffect(() => {
     (async () => {
@@ -89,7 +88,11 @@ export default function Forum() {
     <>
       <div>
         <div className="p-5">
-          <form onSubmit={newPost}>
+          <form
+            onSubmit={(event) => {
+              newPost(event);
+            }}
+          >
             <input type={"text"} placeholder={"Title"} name="title" />
             <input
               type={"text"}
