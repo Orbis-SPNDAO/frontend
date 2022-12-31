@@ -11,8 +11,6 @@ import { DaoManagementData } from "../../components/dashboard/dummydata";
 import BackButton from "../../components/dashboards-shared/BackButton";
 import PageLayout from "../../components/layouts/PageLayout";
 import downloadBlob from "../../utils/downloadBlob";
-import { useVocdoni } from "../../context/vocdoni";
-import { EnvOptions, VocdoniSDKClient } from "@vocdoni/sdk";
 
 enum DataSelectType {
   All = "all",
@@ -50,12 +48,6 @@ const DataManagement: FC = () => {
     signerOrProvider: signer,
   });
   const { address } = useAccount();
-
-  const { client } = useVocdoni();
-
-  useEffect(() => {
-    client 
-  }, [client]);
 
   useEffect(() => {
     (async () => {

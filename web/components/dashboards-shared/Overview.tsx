@@ -1,6 +1,9 @@
 import { ethers } from "ethers";
-import React from "react";
+import React, { useEffect } from "react";
 import Button, { ButtonStyle } from "../Button";
+import { useVocdoni } from "../../context/vocdoni";
+import { AccountData, EnvOptions, VocdoniSDKClient } from "@vocdoni/sdk";
+import { useSigner } from "wagmi";
 
 export default function Overview({
   overviewData,
@@ -13,6 +16,51 @@ export default function Overview({
   onClick2: Function;
   isAdmin?: boolean;
 }) {
+
+
+  const { client, setClient } = useVocdoni();
+  const { data: signer } = useSigner();
+  
+  useEffect(() => {
+    const accountHandler = async () => {      
+      if (!client) return;
+      
+      let info = null as AccountData | null;      
+      try {        
+         info = await client.fetchAccountInfo(); // account already exists
+      } catch (e) {        
+        info = await client.createAccount(); // account not created yet        
+      }      
+      // top up account with faucet tokens
+      if (info && info.balance === 0) {
+        await client.collectFaucetTokens();
+      }
+      console.log(`Account info: ${info}`)
+    };    
+    accountHandler();
+  }, [client]);
+
+  // initialize the sdk provider
+  useEffect(() => {
+    try {
+      if (!client && signer) {
+        setClient(
+          new VocdoniSDKClient({
+            env: EnvOptions.DEV,
+            wallet: signer!,
+          })
+        )        
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      console.log(
+        `Vocdoni SDK initialized with signer: ${signer}, client: ${client}`
+      );
+    }
+  }, [signer, client, setClient]);
+
+
   return (
     <div className="w-stretch m-5 md:mx-28 md:my-12 h-fit py-6 px-4 md:p-10 hero">
       <h1 className="text-xl md:text-4xl font-normal">
