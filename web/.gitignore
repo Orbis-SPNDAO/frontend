@@ -36,9 +36,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-**/public/uploads/
-uploads/
-
 /pages/tester.tsx
 
 yarn.lock

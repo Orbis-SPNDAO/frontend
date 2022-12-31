@@ -1,18 +1,19 @@
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BsChevronLeft } from "react-icons/bs";
-import { useAccount } from "wagmi";
+import { useAccount, useContract, useSigner } from "wagmi";
+import { SBT_ABI } from "../../../abis/currentABI";
 import {
   ProposalData,
   proposalData,
   voteData,
-} from "../../components/dashboard/dummydata";
-import Forum from "../../components/dashboard/governance/Forum";
-import Proposals from "../../components/dashboard/governance/Proposals";
-import { SignInPrompt } from "../../components/dashboard/SignInPrompt";
-import BackButton from "../../components/dashboards-shared/BackButton";
-import PageLayout from "../../components/layouts/PageLayout";
-import { SocialsFooter } from "../../components/SocialsFooter";
+} from "../../../components/dashboard/dummydata";
+import Forum from "../../../components/dashboard/governance/Forum";
+import Proposals from "../../../components/dashboard/governance/Proposals";
+import { SignInPrompt } from "../../../components/dashboard/SignInPrompt";
+import BackButton from "../../../components/dashboards-shared/BackButton";
+import PageLayout from "../../../components/layouts/PageLayout";
+import { SocialsFooter } from "../../../components/SocialsFooter";
 
 enum ActiveTab {
   Forum = "forum",
@@ -21,12 +22,33 @@ enum ActiveTab {
 
 export default function Governance() {
   const router = useRouter();
-  const { "initial-active-tab": initialActiveTab } = router.query;
-  const { isConnecting, address } = useAccount();
 
-  const [activeTab, setActiveTab] = useState(
-    initialActiveTab ?? ActiveTab.Proposal
-  );
+  const { isConnecting, address } = useAccount();
+  const { data: signer } = useSigner();
+  const contract = useContract({
+    address: process.env.NEXT_PUBLIC_SBT_ADDR,
+    abi: SBT_ABI,
+    signerOrProvider: signer,
+  });
+  useEffect(() => {
+    (async () => {
+      if (contract && address && signer && router) {
+        const scopedTokenId = await contract
+          .ownerToTokenId(address)
+          .then(parseInt);
+        if (!scopedTokenId) router.push("/join");
+      }
+    })();
+  }, [contract, address, signer, router]);
+
+  const [activeTab, setActiveTab] = useState(ActiveTab.Proposal);
+
+  useEffect(() => {
+    if (router) {
+      const { "initial-active-tab": initialActiveTab } = router.query;
+      if (initialActiveTab) setActiveTab(initialActiveTab as ActiveTab);
+    }
+  }, [router]);
 
   function onProposalClick(proposal: ProposalData) {
     router.push(`/dashboard/governance/${proposal.id}`);
@@ -49,7 +71,6 @@ export default function Governance() {
                   : "text-neutral-400"
               }`}
               onClick={() => setActiveTab(ActiveTab.Forum)}
-              disabled
             >
               Forum
             </button>

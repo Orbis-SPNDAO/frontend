@@ -105,51 +105,53 @@ const DataManagement: FC = () => {
           decryptData[tokenId] = event.args.key;
         });
       for (let i = 0; i < filteredDaoMgmtData.length; i++) {
-        const decryptKey = decryptData[filteredDaoMgmtData[i].tokenId];
-        try {
-          const symmetricKey = LitJsSdk.uint8arrayFromString(
-            decryptKey,
-            "base64"
-          );
-          const importedSymmKey = await LitJsSdk.importSymmetricKey(
-            symmetricKey
-          );
-          const encryptedCidBlob = await LitJsSdk.base64StringToBlob(
-            filteredDaoMgmtData[i].encryptedCid
-          );
-          const decryptedCidBlob = await LitJsSdk.decryptFile({
-            file: encryptedCidBlob,
-            symmetricKey,
-          });
-          const decryptedCid = new TextDecoder("utf-8").decode(
-            decryptedCidBlob
-          );
+        if (filteredDaoMgmtData[i].selected) {
+          const decryptKey = decryptData[filteredDaoMgmtData[i].tokenId];
+          try {
+            const symmetricKey = LitJsSdk.uint8arrayFromString(
+              decryptKey,
+              "base64"
+            );
+            const importedSymmKey = await LitJsSdk.importSymmetricKey(
+              symmetricKey
+            );
+            const encryptedCidBlob = await LitJsSdk.base64StringToBlob(
+              filteredDaoMgmtData[i].encryptedCid
+            );
+            const decryptedCidBlob = await LitJsSdk.decryptFile({
+              file: encryptedCidBlob,
+              symmetricKey,
+            });
+            const decryptedCid = new TextDecoder("utf-8").decode(
+              decryptedCidBlob
+            );
 
-          const res = await fetch("/api/generateToken", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ cids: [decryptedCid] }),
-          });
-          const { accessToken } = await res.json();
-          const fileRes = await fetch(
-            `https://patterndao.mypinata.cloud/ipfs/${decryptedCid}?accessToken=${accessToken}`
-          );
+            const res = await fetch("/api/generateToken", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ cids: [decryptedCid] }),
+            });
+            const { accessToken } = await res.json();
+            const fileRes = await fetch(
+              `https://patterndao.mypinata.cloud/ipfs/${decryptedCid}?accessToken=${accessToken}`
+            );
 
-          const encryptedFileString = await fileRes.text();
+            const encryptedFileString = await fileRes.text();
 
-          const encryptedFile = await LitJsSdk.base64StringToBlob(
-            encryptedFileString
-          );
-          const decryptedFile = await LitJsSdk.decryptWithSymmetricKey(
-            encryptedFile,
-            importedSymmKey
-          );
-          downloadBlob(new Blob([decryptedFile], { type: "text/csv" }));
-        } catch (err) {
-          console.log({ err });
-          throw err;
+            const encryptedFile = await LitJsSdk.base64StringToBlob(
+              encryptedFileString
+            );
+            const decryptedFile = await LitJsSdk.decryptWithSymmetricKey(
+              encryptedFile,
+              importedSymmKey
+            );
+            downloadBlob(new Blob([decryptedFile], { type: "text/csv" }));
+          } catch (err) {
+            console.log({ err });
+            throw err;
+          }
         }
       }
 
