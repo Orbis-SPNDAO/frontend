@@ -89,8 +89,9 @@ export default function Forum() {
 
       <div className="p-5 text-start">
         <div className="flex bg-table-header-blue px-4 rounded-lg h-8 items-center">
-          <div className="w-1/2">Topic</div>
-          <div className="w-1/2">Author</div>
+          <div className="w-3/12">Topic</div>
+          <div className="w-3/12">Description</div>
+          <div className="w-1/12">Author</div>
         </div>
         <>
           {!posts || !posts.data || !posts.data.length ? (
@@ -99,7 +100,8 @@ export default function Forum() {
             posts.data.map((post: any) => {
               return (
                 <div key={post.timestamp} className="flex p-5 w-stretch">
-                  <div className="w-1/2">{post.content.title}</div>
+                  <div className="w-3/12">{post.content.title}</div>
+                  <div className="w-3/12">{post.content.body ?? ""}</div>
                   <div className="w-5/12 truncate">
                     {post.creator_details.metadata?.ensName ??
                       post.creator_details.metadata?.address ??
