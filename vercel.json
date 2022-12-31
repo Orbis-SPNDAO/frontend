@@ -1,7 +1,7 @@
 {
     "functions": {
       "api/proposals.tsx": {
-        "includeFiles": "public/proposals.json"
+        "includeFiles": "/proposals.json"
       }
     }
   }
