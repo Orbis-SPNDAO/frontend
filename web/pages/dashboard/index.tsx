@@ -1,3 +1,4 @@
+import { PublishedElection } from "@vocdoni/sdk";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useAccount, useContract, useSigner } from "wagmi";
@@ -6,13 +7,12 @@ import DiscussionNVote from "../../components/dashboard/Discussion&Vote";
 import {
   discussionData,
   overviewData,
-  proposalData,
   voteData,
 } from "../../components/dashboard/dummydata";
 import Overview from "../../components/dashboards-shared/Overview";
 import PageLayout from "../../components/layouts/PageLayout";
 import { SocialsFooter } from "../../components/SocialsFooter";
-
+import { useVocdoni } from "../../context/vocdoni";
 export default function Dashboard() {
   const router = useRouter();
   const { isConnecting, address } = useAccount();
@@ -22,6 +22,35 @@ export default function Dashboard() {
     abi: SBT_ABI,
     signerOrProvider: signer,
   });
+
+const { client, proposalData, setProposalData} = useVocdoni();
+
+useEffect(() => {
+  async function getProposalIDs() {
+    
+    const proposal_data = await fetch("/api/proposals", { method: "GET" })
+      .then((res) => res.json())
+      
+
+    let temp_proposals: PublishedElection[] = [];
+    for (let i=0; i<proposal_data.data.id.length; i++) {
+      const id = proposal_data.data.id[i];
+      const proposal = await client.fetchElection(id);
+      temp_proposals.push(proposal);
+    }      
+    setProposalData(temp_proposals);
+
+  }
+
+  if (client) {
+    getProposalIDs();
+    // getProposalIDs().then(() =>
+    //   console.log(`proposals: ${JSON.stringify(proposalData)}`)
+    // );
+  }
+}, [client, setProposalData, proposalData]);
+
+
   const { bal } = router.query;
   useEffect(() => {
     (async () => {
