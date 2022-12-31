@@ -5,7 +5,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const path = "/proposals.json";
+  const path = "public/proposals.json";
 
   if (req.method == "POST") {
     try {

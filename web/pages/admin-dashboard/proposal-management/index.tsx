@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect} from "react";
 import Button from "../../../components/Button";
-import { ProposalData } from "../../../components/dashboard/dummydata";
 import Proposals from "../../../components/dashboard/governance/Proposals";
 import BackButton from "../../../components/dashboards-shared/BackButton";
 import PageLayout from "../../../components/layouts/PageLayout";
@@ -44,9 +43,6 @@ const ProposalManagement: FC = () => {
     }
   }, [client, setProposalData]);
 
-  // useEffect(() => {
-  //   console.log(`proposals: ${JSON.stringify(proposals)}`);
-  // }, [proposals]);
 
   const createProposal = async () => {
     router.push("/admin-dashboard/proposal-management/create-proposal");
