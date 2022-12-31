@@ -7,13 +7,19 @@ import { useContainerDimensions } from "../../hooks/useContainerDimensions";
 import { abbrevAccount } from "../../utils/string";
 import { DiscussionData, ProposalData, VoteData } from "./dummydata";
 
+interface IPosts {
+  data: [];
+  error: string;
+  status: number;
+}
+
 export default function DiscussionNVote({
   discussionData,
   proposalData,
   voteData,
   onProposal,
 }: {
-  discussionData: DiscussionData[];
+  discussionData: IPosts;
   proposalData: PublishedElection[];
   voteData: VoteData[];
   onProposal: (proposalId: number) => void;
@@ -41,26 +47,34 @@ export default function DiscussionNVote({
         </Link>
       </div>
 
-      <div className="flex w-full overflow-x-auto text-left text-md mt-4 py-2">
-        {discussionData?.map((discussion) => {
-          return (
-            <div
-              key={discussion.id}
-              className="border-2 rounded-lg mr-4 p-4 w-1/3 min-w-[15rem]"
-            >
-              <div className="flex flex-col truncate w-full text-2xl">
-                <div>{discussion.title}</div>
+      {!discussionData || !discussionData.data || !discussionData.data.length ? (
+        <p className="text-center m-auto my-7">No posts found</p>
+      ) : (
+        <div className="flex w-full overflow-x-auto text-left text-md mt-4 py-2">
+          {discussionData.data.map((post: any) => {
+            return (
+              <div
+                key={post.timestamp}
+                className="border-2 rounded-lg mr-4 p-4 w-1/3 min-w-[15rem]"
+              >
+                <div className="flex flex-col truncate w-full text-2xl">
+                  <div>{post.content.title}</div>
 
-                <div className="flex w-max text-custom-text-gray text-sm mt-2">
-                  <span>{abbrevAccount(discussion.creator)}</span>
-                  <span className="mx-2">|</span>
-                  <span>{discussion.numberComments} comments</span>
+                  <div className="flex w-max text-custom-text-gray text-sm mt-2">
+                    <span>
+                      {post.creator_details.metadata?.ensName ??
+                        post.creator_details.metadata?.address ??
+                        ""}
+                    </span>
+                    <span className="mx-2">|</span>
+                    <span>{post.content.comments.length} comments</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       <div className="my-8 w-full h-0.5 bg-custom-border opacity-25"></div>
 
@@ -80,7 +94,6 @@ export default function DiscussionNVote({
         ref={(ref) => setVoteContainer(ref)}
         className="flex flex-col w-full text-left text-sm mt-4 py-2"
       >
-
         {proposalData ? (
           proposalData.map((p) => {
             // let jp = JSON.parse(JSON.stringify(p));
@@ -103,13 +116,12 @@ export default function DiscussionNVote({
                   </span>
 
                   {p.questions.map((question) => {
-                    
                     return question.choices.map((choice) => {
                       return (
                         <span key={choice.value}>
                           <div
                             className="absolute flex items-center bg-custom-purple bg-opacity-20 my-2 py-2 px-4 rounded-lg h-9"
-                            style={{                              
+                            style={{
                               width: p.voteCount * Number(choice.results),
                             }}
                           />
@@ -129,20 +141,16 @@ export default function DiscussionNVote({
                         </span>
                       );
                     });
-                    
                   })}
                 </div>
               </button>
             );
           })
-        ) 
-        : (
+        ) : (
           <div className="flex justify-center items-center w-full h-20">
             <span className="text-custom-gray">No proposals yet</span>
-
-            </div>
+          </div>
         )}
-
       </div>
     </div>
   );
