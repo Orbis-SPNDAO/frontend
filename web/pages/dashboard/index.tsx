@@ -78,6 +78,22 @@ export default function Dashboard() {
       setPosts(posts);
     });
   }, [groupId, orbis, user]);
+  useEffect(() => {
+    (async () => {
+      if (!orbis) return;
+      const connectedRes = await orbis.isConnected();
+      if (connectedRes.status === 200) {
+        setUser(connectedRes.did);
+      } else {
+        const res = await orbis.connect();
+        if (res.status == 200) {
+          setUser(res.did);
+        } else {
+          console.log("Error connecting to Orbis: ", res);
+        }
+      }
+    })();
+  }, [orbis]);
 
   const { bal } = router.query;
   useEffect(() => {

@@ -67,7 +67,9 @@ export default function DiscussionNVote({
                         ""}
                     </span>
                     <span className="mx-2">|</span>
-                    <span>{post.content.comments.length} comments</span>
+                    {/* <span>{post.content.comments.length} comments</span> */}
+                    <span>5 comments</span>
+
                   </div>
                 </div>
               </div>
