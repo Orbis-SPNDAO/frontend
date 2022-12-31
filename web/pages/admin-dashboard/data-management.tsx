@@ -104,12 +104,9 @@ const DataManagement: FC = () => {
           const tokenId = parseInt(event.args.tokenId);
           decryptData[tokenId] = event.args.key;
         });
-      console.log({ filteredDaoMgmtData, decryptData });
       for (let i = 0; i < filteredDaoMgmtData.length; i++) {
         if (filteredDaoMgmtData[i].selected) {
-          console.log(filteredDaoMgmtData[i].tokenId);
           const decryptKey = decryptData[filteredDaoMgmtData[i].tokenId];
-          console.log({ decryptKey });
           try {
             const symmetricKey = LitJsSdk.uint8arrayFromString(
               decryptKey,

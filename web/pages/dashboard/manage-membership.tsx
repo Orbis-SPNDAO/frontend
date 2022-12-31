@@ -34,14 +34,15 @@ export default function ManageMembership() {
 
   useEffect(() => {
     (async () => {
-      if (contract && address && signer) {
+      if (contract && address && signer && router) {
         const scopedTokenId = await contract
           .ownerToTokenId(address)
           .then(parseInt);
-        setTokenId(scopedTokenId);
+        if (scopedTokenId) setTokenId(scopedTokenId);
+        else router.push("/join");
       }
     })();
-  }, [contract, address, signer]);
+  }, [contract, address, signer, router]);
   useEffect(() => {
     if (isSuccess) router.push("/come-back");
   }, [isSuccess, router]);

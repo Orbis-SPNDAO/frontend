@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { BiUpload } from "react-icons/bi";
 import { BsCheckLg } from "react-icons/bs";
 import { FaDatabase } from "react-icons/fa";
-import { useAccount, useContractWrite } from "wagmi";
+import { useAccount, useContract, useContractWrite, useSigner } from "wagmi";
 import { SBT_ABI } from "../abis/currentABI";
 import Button from "../components/Button";
 import { JoinSubText } from "../components/join/JoinSubText";
@@ -30,6 +30,22 @@ enum JoinState {
 }
 
 export default function Join() {
+  const { data: signer } = useSigner();
+  const { address } = useAccount();
+  const contract = useContract({
+    address: process.env.NEXT_PUBLIC_SBT_ADDR,
+    abi: SBT_ABI,
+    signerOrProvider: signer,
+  });
+  const router = useRouter();
+  useEffect(() => {
+    (async () => {
+      if (contract && address && signer) {
+        const tokenId = await contract.ownerToTokenId(address).then(parseInt);
+        if (tokenId) router.push("/dashboard");
+      }
+    })();
+  }, [contract, address, signer, router]);
   const { write, isLoading, isSuccess } = useContractWrite({
     mode: "recklesslyUnprepared",
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
@@ -37,8 +53,6 @@ export default function Join() {
     functionName: "mintLitSBT",
   });
 
-  const { address } = useAccount();
-  const router = useRouter();
   const [consentChecked, setConsentChecked] = useState(false);
   const [encryptedData, setEncryptedData] = useState<{
     encryptedCidString: string;
@@ -68,9 +82,13 @@ export default function Join() {
         });
 
       const file_id = crypto.randomUUID();
-      const encryptedFileString = await LitJsSdk.blobToBase64String(encryptedFileBlob);
-      
-      const base64TextBlob = new Blob([encryptedFileString], {type: 'text/plain'});
+      const encryptedFileString = await LitJsSdk.blobToBase64String(
+        encryptedFileBlob
+      );
+
+      const base64TextBlob = new Blob([encryptedFileString], {
+        type: "text/plain",
+      });
       const encryptedFile = new File([base64TextBlob], file_id + ".txt", {
         type: "text/plain",
       });

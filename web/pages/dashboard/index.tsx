@@ -1,5 +1,7 @@
 import { useRouter } from "next/router";
-import { useAccount } from "wagmi";
+import { useEffect } from "react";
+import { useAccount, useContract, useSigner } from "wagmi";
+import { SBT_ABI } from "../../abis/currentABI";
 import DiscussionNVote from "../../components/dashboard/Discussion&Vote";
 import {
   discussionData,
@@ -14,7 +16,23 @@ import { SocialsFooter } from "../../components/SocialsFooter";
 export default function Dashboard() {
   const router = useRouter();
   const { isConnecting, address } = useAccount();
+  const { data: signer } = useSigner();
+  const contract = useContract({
+    address: process.env.NEXT_PUBLIC_SBT_ADDR,
+    abi: SBT_ABI,
+    signerOrProvider: signer,
+  });
   const { bal } = router.query;
+  useEffect(() => {
+    (async () => {
+      if (contract && address && signer && router) {
+        const scopedTokenId = await contract
+          .ownerToTokenId(address)
+          .then(parseInt);
+        if (!scopedTokenId) router.push("/join");
+      }
+    })();
+  }, [contract, address, signer, router]);
 
   function onDiscussVote() {
     document.querySelector("#discussion")?.scrollIntoView();
