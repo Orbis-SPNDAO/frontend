@@ -7,17 +7,11 @@ import Button, { ButtonStyle } from "../../../components/Button";
 import BackButton from "../../../components/dashboards-shared/BackButton";
 import PageLayout from "../../../components/layouts/PageLayout";
 import Spinner from "../../../components/Spinner";
-import {
-  AccountData,
-  EnvOptions,
-  PlainCensus,
-  VocdoniSDKClient,
-  Election,
-  ClientOptions,
-} from "@vocdoni/sdk";
 import { FC, useEffect, useRef } from "react";
 import { useContractRead, useSigner } from "wagmi";
 import { SBT_ABI } from "../../../abis/currentABI";
+import {useVocdoni} from "../../../context/vocdoni";
+import { AccountData, Election, PlainCensus } from "@vocdoni/sdk";
 
 enum CreateProposalState {
   Step1BasicInfo = "basic_info",
@@ -27,42 +21,14 @@ enum CreateProposalState {
 
 export default function CreateProposal() {
   const router = useRouter();
+  const {client} = useVocdoni();
 
-  const client = useRef<VocdoniSDKClient>();
-  const vocAccount = useRef<AccountData>();
-  const { data: signer } = useSigner();
+  const vocAccount = useRef<AccountData>();  const { data: signer } = useSigner();
   const { data: sbtHolders } = useContractRead({
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
     abi: SBT_ABI,
     functionName: "fetchHolders",
   });
-
-  useEffect(() => {
-    if (!client.current && signer)
-      client.current = new VocdoniSDKClient({
-        env: EnvOptions.DEV,
-        wallet: signer,
-      });
-  }, [signer]);
-
-  useEffect(() => {
-    const accountHandler = async () => {
-      try {
-        // account already exists
-        vocAccount.current = await client.current!.fetchAccountInfo();
-      } catch (e) {
-        // account not created yet
-        vocAccount.current = await client.current!.createAccount();
-      }
-
-      // top up account with faucet tokens
-      if (vocAccount.current.balance === 0) {
-        await client.current!.collectFaucetTokens();
-      }
-    };
-
-    if (client.current) accountHandler();
-  }, [client]);
 
   const [pageState, setPageState] = useState(
     CreateProposalState.Step1BasicInfo
@@ -139,7 +105,7 @@ export default function CreateProposal() {
     ]);
 
     // step 4: publish the proposal
-    const proposalID = await client.current!.createElection(election);
+    const proposalID = await client.createElection(election);
     console.log("proposalID", proposalID);
 
     await fetch("/api/proposals", {
@@ -156,12 +122,6 @@ export default function CreateProposal() {
       setPageState(CreateProposalState.loading);
       router.push("/admin-dashboard/proposal-management")
     })
-
-    // console.log(
-    //   "Not implemented, call contract with data",
-    //   JSON.stringify(data)
-    // );
-    // router.push("/admin-dashboard/proposal-management");
   }
 
   function onSelectTimeWindow() {
