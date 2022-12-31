@@ -112,6 +112,8 @@ export default function CreateProposal() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Accept": 'application/json, text/plain, */*',
+        'User-Agent': '*',
       },
       body: JSON.stringify({
         id: proposalID,

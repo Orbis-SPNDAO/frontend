@@ -14,23 +14,26 @@ const ProposalManagement: FC = () => {
   const router = useRouter();
   const { client } = useVocdoni();
 
-  const { proposalData, setProposalData} = useVocdoni();
+  const { proposalData, setProposalData } = useVocdoni();
 
   useEffect(() => {
     async function getProposalIDs() {
-      
-      const proposal_data = await fetch("/api/proposals", { method: "GET" })
-        .then((res) => res.json());
-        
+      const proposal_data = await fetch("/api/proposals", {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json, text/plain, */*",
+          "User-Agent": "*",
+        },
+        method: "GET",
+      }).then((res) => res.json());
 
       let temp_proposals: PublishedElection[] = [];
-      for (let i=0; i<proposal_data.data.id.length; i++) {
+      for (let i = 0; i < proposal_data.data.id.length; i++) {
         const id = proposal_data.data.id[i];
         const proposal = await client.fetchElection(id);
         temp_proposals.push(proposal);
-      }      
+      }
       setProposalData(temp_proposals);
-
     }
 
     if (client) {
@@ -70,7 +73,7 @@ const ProposalManagement: FC = () => {
         </div>
 
         <div className="w-stretch m-5 md:mx-28 md:my-12 h-fit py-6 px-4 md:p-10 hero">
-          <Proposals onProposalClick={onProposalClick}/>
+          <Proposals onProposalClick={onProposalClick} />
         </div>
       </div>
     </PageLayout>
