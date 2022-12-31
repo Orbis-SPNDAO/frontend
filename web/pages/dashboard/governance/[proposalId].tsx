@@ -1,15 +1,16 @@
+import { PublishedElection } from "@vocdoni/sdk";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import BaseModal from "../../../components/BaseModal";
 import {
   discussionData,
-  proposalData,
   voteData,
 } from "../../../components/dashboard/dummydata";
 import ProposalDetails from "../../../components/dashboard/governance/ProposalDetails";
 import BackButton from "../../../components/dashboards-shared/BackButton";
 import PageLayout from "../../../components/layouts/PageLayout";
+import { useVocdoni } from "../../../context/vocdoni";
 import Proposal from "../../../dataclass/Proposal";
 
 export default function ProposalId() {
@@ -20,13 +21,15 @@ export default function ProposalId() {
 
   const [showCastModal, setShowCastModal] = useState(false);
 
-  const p = proposalData?.find(
-    (p) => p.id.toString() === router.query?.proposalId
-  );
+  const { proposalData } = useVocdoni();
 
-  const votes = voteData.filter((vote) => vote.proposalId === p?.id);
+  const [proposal, setProposal ] = useState<PublishedElection|null>(null);
 
-  const proposal = p && new Proposal(p);
+
+  useEffect(() => {
+    let p = proposalData?.find((p) => p.id === router.query.proposalId)??null;    
+    setProposal(p);    
+  }, [proposalData, router.query.proposalId]);
 
   function navigateToDiscussion(discussionId: number) {
     router.push(`/dashboard/governance/discussion/${discussionId}`);
@@ -74,14 +77,20 @@ export default function ProposalId() {
         <div className="grid-cols-2 pt-2">
           <div className="flex justify-between">
             <span>Choice:</span>
-            <span className="text-custom-gray mb-2">
-              {proposal?.options?.[selectedOption - 1]?.name}
+            {
+              proposal?.questions.map((c, i) => {
+                return (
+                  <span key={i} className="text-custom-gray mb-2">{c.title.default}</span>
+                )
+              })
+            }
+            <span className="text-custom-gray mb-2">              
             </span>
           </div>
 
           <div className="flex justify-between">
             <span>Snapshot:</span>
-            <span className="text-custom-gray mb-2">{proposal?.snapshot}</span>
+            <span className="text-custom-gray mb-2">{proposal?.description.default}</span>
           </div>
 
           <div className="flex justify-between">
@@ -99,9 +108,9 @@ export default function ProposalId() {
         </div>
 
         <ProposalDetails
-          proposal={proposal}
+          proposal={proposal!}
           discussionData={discussionData}
-          votes={votes}
+          votes={[]}
           navigateToDiscussion={navigateToDiscussion}
           selectedOption={selectedOption}
           onSelectOption={onSelectOption}
