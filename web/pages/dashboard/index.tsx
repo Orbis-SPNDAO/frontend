@@ -4,11 +4,7 @@ import { useEffect, useState } from "react";
 import { useAccount, useContract, useSigner } from "wagmi";
 import { SBT_ABI } from "../../abis/currentABI";
 import DiscussionNVote from "../../components/dashboard/Discussion&Vote";
-import {
-  discussionData,
-  overviewData,
-  voteData,
-} from "../../components/dashboard/dummydata";
+import { overviewData, voteData } from "../../components/dashboard/dummydata";
 import Overview from "../../components/dashboards-shared/Overview";
 import PageLayout from "../../components/layouts/PageLayout";
 import { SocialsFooter } from "../../components/SocialsFooter";
@@ -28,26 +24,21 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function getProposalIDs() {
-      const proposal_data = await fetch("/api/proposals", {
-        method: "GET",
-      }).then((res) => res.json());
+      if (client && contract && signer && setProposalData) {
+        const proposal_data = await contract.fetchProposalIds();
 
-      let temp_proposals: PublishedElection[] = [];
-      for (let i = 0; i < proposal_data.data.id.length; i++) {
-        const id = proposal_data.data.id[i];
-        const proposal = await client.fetchElection(id);
-        temp_proposals.push(proposal);
+        let temp_proposals: PublishedElection[] = [];
+        for (let i = 0; i < proposal_data.length; i++) {
+          const id = proposal_data[i].proposalId;
+          const proposal = await client.fetchElection(id);
+          temp_proposals.push(proposal);
+        }
+        setProposalData(temp_proposals);
       }
-      setProposalData(temp_proposals);
     }
 
-    if (client) {
-      getProposalIDs();
-      // getProposalIDs().then(() =>
-      //   console.log(`proposals: ${JSON.stringify(proposalData)}`)
-      // );
-    }
-  }, [client, setProposalData, proposalData]);
+    getProposalIDs();
+  }, [client, setProposalData, proposalData, contract, signer]);
 
   interface IPosts {
     data: [];
@@ -102,7 +93,8 @@ export default function Dashboard() {
         const scopedTokenId = await contract
           .ownerToTokenId(address)
           .then(parseInt);
-        if (!scopedTokenId && router.query['minted'] !== 'success') router.push("/join");
+        if (!scopedTokenId && router.query["minted"] !== "success")
+          router.push("/join");
       }
     })();
   }, [contract, address, signer, router]);

@@ -7,10 +7,10 @@ import Button, { ButtonStyle } from "../../../components/Button";
 import BackButton from "../../../components/dashboards-shared/BackButton";
 import PageLayout from "../../../components/layouts/PageLayout";
 import Spinner from "../../../components/Spinner";
-import { FC, useEffect, useRef } from "react";
-import { useContractRead, useSigner } from "wagmi";
-import { SBT_ABI } from "../../../abis/currentABI";
-import {useVocdoni} from "../../../context/vocdoni";
+import { useEffect, useRef } from "react";
+import { useContractRead, useContractWrite, useSigner } from "wagmi";
+import { ADMIN_ABI, SBT_ABI } from "../../../abis/currentABI";
+import { useVocdoni } from "../../../context/vocdoni";
 import { AccountData, Election, PlainCensus } from "@vocdoni/sdk";
 
 enum CreateProposalState {
@@ -21,13 +21,19 @@ enum CreateProposalState {
 
 export default function CreateProposal() {
   const router = useRouter();
-  const {client} = useVocdoni();
+  const { client } = useVocdoni();
 
-  const vocAccount = useRef<AccountData>();  const { data: signer } = useSigner();
   const { data: sbtHolders } = useContractRead({
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
     abi: SBT_ABI,
     functionName: "fetchHolders",
+  });
+
+  const { write, isSuccess } = useContractWrite({
+    mode: "recklesslyUnprepared",
+    address: process.env.NEXT_PUBLIC_ADMIN_ADDR,
+    abi: ADMIN_ABI,
+    functionName: "addProposal",
   });
 
   const [pageState, setPageState] = useState(
@@ -74,13 +80,13 @@ export default function CreateProposal() {
     };
 
     // 3 steps to vocdoni proposal creation ---
-
+    console.log("step 1");
     // step 1: create a new census + add contract sbt holders to it
     const census = new PlainCensus();
     for (const holder of sbtHolders as string[]) {
       census.add(holder);
     }
-
+    console.log("step 2");
     // step 2: create a new election
     const election = Election.from({
       title: `${data.title}}`,
@@ -91,7 +97,7 @@ export default function CreateProposal() {
       census,
       streamUri: "https://vocdoni.io",
     });
-
+    console.log("step 3");
     // step 3: create a new proposal
     election.addQuestion(`${data.title}`, `${data.description}`, [
       {
@@ -103,28 +109,19 @@ export default function CreateProposal() {
         value: 1,
       },
     ]);
-
+    console.log("step 4");
     // step 4: publish the proposal
     const proposalID = await client.createElection(election);
-    console.log("proposalID", proposalID);
-
-    await fetch("/api/proposals", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": 'application/json, text/plain, */*',
-        'User-Agent': '*',
-      },
-      body: JSON.stringify({
-        id: proposalID,
-      }),
-    })    
-    .then(console.log)
-    .then(() => {
-      setPageState(CreateProposalState.loading);
-      router.push("/admin-dashboard/proposal-management")
-    })
+    console.log({proposalID})
+    write!({ recklesslySetUnpreparedArgs: [proposalID] });
   }
+
+  useEffect(() => {
+    if (isSuccess) {
+      setPageState(CreateProposalState.loading);
+      router.push("/admin-dashboard/proposal-management");
+    }
+  }, [isSuccess, router]);
 
   function onSelectTimeWindow() {
     setShowDatePicker(true);
@@ -329,7 +326,6 @@ export default function CreateProposal() {
 
           {pageState === CreateProposalState.loading && (
             <div className="flex justify-center items-center h-full">
-              
               <Spinner />
             </div>
           )}

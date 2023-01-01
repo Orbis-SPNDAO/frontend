@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { FC, useEffect} from "react";
+import { FC, useEffect } from "react";
 import Button from "../../../components/Button";
 import Proposals from "../../../components/dashboard/governance/Proposals";
 import BackButton from "../../../components/dashboards-shared/BackButton";
@@ -8,27 +8,31 @@ import PageLayout from "../../../components/layouts/PageLayout";
 import { useVocdoni } from "../../../context/vocdoni";
 
 import { PublishedElection } from "@vocdoni/sdk";
+import { useContractRead } from "wagmi";
+import { SBT_ABI } from "../../../abis/currentABI";
 
 const ProposalManagement: FC = () => {
   const router = useRouter();
   const { client } = useVocdoni();
 
   const { proposalData, setProposalData } = useVocdoni();
+  const { data: proposal_data } = useContractRead({
+    address: process.env.NEXT_PUBLIC_SBT_ADDR,
+    abi: SBT_ABI,
+    functionName: "fetchProposalIds",
+  });
 
   useEffect(() => {
     async function getProposalIDs() {
-      const proposal_data = await fetch("/api/proposals", {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json, text/plain, */*",
-          "User-Agent": "*",
-        },
-        method: "GET",
-      }).then((res) => res.json());
-
+      console.log({ proposal_data });
+      if (!proposal_data) return;
+      const typedProposalData = proposal_data as {
+        proposalId: string;
+        index: number;
+      }[];
       let temp_proposals: PublishedElection[] = [];
-      for (let i = 0; i < proposal_data.data.id.length; i++) {
-        const id = proposal_data.data.id[i];
+      for (let i = 0; i < typedProposalData.length; i++) {
+        const id = typedProposalData[i].proposalId;
         const proposal = await client.fetchElection(id);
         temp_proposals.push(proposal);
       }
@@ -37,12 +41,8 @@ const ProposalManagement: FC = () => {
 
     if (client) {
       getProposalIDs();
-      // getProposalIDs().then(() =>
-      //   // console.log(`proposals: ${JSON.stringify(proposalData)}`)
-      // );
     }
-  }, [client, setProposalData]);
-
+  }, [client, setProposalData, proposal_data]);
 
   const createProposal = async () => {
     router.push("/admin-dashboard/proposal-management/create-proposal");
