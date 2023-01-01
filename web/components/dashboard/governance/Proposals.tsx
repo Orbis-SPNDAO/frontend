@@ -26,8 +26,6 @@ export default function Proposals({
       >
         {proposalData ? (
           proposalData.map((p) => {
-            // let jp = JSON.parse(JSON.stringify(p));
-            // console.log("JSON PARSE", jp);
             return (
               <button
                 key={p.id}
@@ -54,7 +52,7 @@ export default function Proposals({
                           <div
                             className="absolute flex items-center bg-custom-purple bg-opacity-20 my-2 py-2 px-4 rounded-lg h-9"
                             style={{                              
-                              width: p.voteCount * Number(choice.results),
+                              width: 200
                             }}
                           />
 

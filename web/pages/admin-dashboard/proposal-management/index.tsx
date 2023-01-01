@@ -29,9 +29,11 @@ const ProposalManagement: FC = () => {
       const typedProposalData = proposal_data as {
         proposalId: string;
         index: number;
+        isActive: boolean;
       }[];
       let temp_proposals: PublishedElection[] = [];
       for (let i = 0; i < typedProposalData.length; i++) {
+        if (typedProposalData[i].isActive === false) continue;
         const id = typedProposalData[i].proposalId;
         const proposal = await client.fetchElection(id);
         temp_proposals.push(proposal);

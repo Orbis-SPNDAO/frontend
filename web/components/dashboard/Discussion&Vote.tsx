@@ -122,7 +122,7 @@ export default function DiscussionNVote({
                           <div
                             className="absolute flex items-center bg-custom-purple bg-opacity-20 my-2 py-2 px-4 rounded-lg h-9"
                             style={{
-                              width: p.voteCount * Number(choice.results),
+                              width: 200,
                             }}
                           />
 

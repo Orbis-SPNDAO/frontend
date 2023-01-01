@@ -89,7 +89,7 @@ export default function CreateProposal() {
     console.log("step 2");
     // step 2: create a new election
     const election = Election.from({
-      title: `${data.title}}`,
+      title: `${data.title}`,
       description: `${data.description}`,
       header: `${data.discussion}`,
       startDate: data.startDate,
@@ -112,7 +112,7 @@ export default function CreateProposal() {
     console.log("step 4");
     // step 4: publish the proposal
     const proposalID = await client.createElection(election);
-    console.log({proposalID})
+    console.log({ proposalID });
     write!({ recklesslySetUnpreparedArgs: [proposalID] });
   }
 
@@ -147,6 +147,7 @@ export default function CreateProposal() {
   }
 
   function updateVoteOptionText(text: string, index: number) {
+    console.log({ text });
     const voteOption = voteOptions[index];
     voteOption[1] = text;
 
@@ -181,11 +182,14 @@ export default function CreateProposal() {
                   Title
                   <input
                     className="mt-2"
-                    type={"text"}
-                    placeholder={"Add proposal title here"}
+                    type="text"
+                    placeholder="Add proposal title here"
                     name="title"
                     value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    onChange={(e) => {
+                      console.log(e.target.value)
+                      setTitle(e.target.value);
+                    }}
                   />
                 </div>
                 <div className="flex flex-col text-left mt-4">

@@ -29,6 +29,7 @@ export default function Dashboard() {
 
         let temp_proposals: PublishedElection[] = [];
         for (let i = 0; i < proposal_data.length; i++) {
+          if (proposal_data[i].isActive === false) continue;
           const id = proposal_data[i].proposalId;
           const proposal = await client.fetchElection(id);
           temp_proposals.push(proposal);

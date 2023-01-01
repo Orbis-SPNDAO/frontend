@@ -1,16 +1,15 @@
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useContractWrite } from "wagmi";
 import BaseModal from "../../../components/BaseModal";
-import {
-  discussionData
-} from "../../../components/dashboard/dummydata";
+import { discussionData } from "../../../components/dashboard/dummydata";
 import ProposalDetails from "../../../components/dashboard/governance/ProposalDetails";
 import BackButton from "../../../components/dashboards-shared/BackButton";
 import PageLayout from "../../../components/layouts/PageLayout";
 import { useVocdoni } from "../../../context/vocdoni";
 import { PublishedElection } from "@vocdoni/sdk";
 import { useEffect } from "react";
+import { ADMIN_ABI } from "../../../abis/currentABI";
 
 export default function ProposalId() {
   const router = useRouter();
@@ -22,14 +21,18 @@ export default function ProposalId() {
 
   const { proposalData } = useVocdoni();
 
-  const [proposal, setProposal ] = useState<PublishedElection|null>(null);
-
+  const [proposal, setProposal] = useState<PublishedElection | null>(null);
+  const { write, isSuccess } = useContractWrite({
+    address: process.env.NEXT_PUBLIC_ADMIN_ADDR,
+    mode: "recklesslyUnprepared",
+    abi: ADMIN_ABI,
+    functionName: "deleteProposal",
+  });
 
   useEffect(() => {
-    let p = proposalData?.find((p) => p.id === router.query.proposalId)??null;    
-    setProposal(p);    
+    let p = proposalData?.find((p) => p.id === router.query.proposalId) ?? null;
+    setProposal(p);
   }, [proposalData, router.query.proposalId]);
-
 
   function navigateToDiscussion(discussionId: number) {
     router.push(`/admin-dashboard/governance/discussion/${discussionId}`);
@@ -55,8 +58,9 @@ export default function ProposalId() {
     setShowCastModal(false);
   }
 
-  function onDeleteProposal() {
+  function onDeleteProposal(id: string) {
     console.log("Delete Proposal");
+    write!({ recklesslySetUnpreparedArgs: [id] });
   }
 
   return !address || isConnecting ? (
@@ -81,20 +85,21 @@ export default function ProposalId() {
         <div className="grid-cols-2 pt-2">
           <div className="flex justify-between">
             <span>Choice:</span>
-            {
-              proposal?.questions.map((c, i) => {
-                return (
-                  <span key={i} className="text-custom-gray mb-2">{c.title.default}</span>
-                )
-              })
-            }
-            <span className="text-custom-gray mb-2">              
-            </span>
+            {proposal?.questions.map((c, i) => {
+              return (
+                <span key={i} className="text-custom-gray mb-2">
+                  {c.title.default}
+                </span>
+              );
+            })}
+            <span className="text-custom-gray mb-2"></span>
           </div>
 
           <div className="flex justify-between">
             <span>Snapshot:</span>
-            <span className="text-custom-gray mb-2">{proposal?.description.default}</span>
+            <span className="text-custom-gray mb-2">
+              {proposal?.description.default}
+            </span>
           </div>
 
           <div className="flex justify-between">
@@ -113,12 +118,12 @@ export default function ProposalId() {
 
         <ProposalDetails
           proposal={proposal!}
-          discussionData={discussionData}          
+          discussionData={discussionData}
           navigateToDiscussion={navigateToDiscussion}
           selectedOption={selectedOption}
           onSelectOption={onSelectOption}
           onCastVote={onCastVote}
-          onDeleteProposal={onDeleteProposal}
+          onDeleteProposal={() => onDeleteProposal(proposal!.id)}
           votes={[]}
         />
       </div>
