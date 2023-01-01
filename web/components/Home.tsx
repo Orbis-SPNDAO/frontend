@@ -65,7 +65,7 @@ const Home: FC<{ justBurned?: boolean }> = ({ justBurned }) => {
             .ownerToTokenId(address)
             .then(parseInt);
           if (tokenId) router.push("/dashboard");
-          else router.push("/join");
+          else router.push({ pathname: "/join", query: { justBurned: true } });
         } else if (adminContract) {
           const bal = parseInt(await adminContract.balanceOf(address), 10);
           if (bal === 0) setIsMissingAdminToken(true);

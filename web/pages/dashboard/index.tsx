@@ -102,7 +102,7 @@ export default function Dashboard() {
         const scopedTokenId = await contract
           .ownerToTokenId(address)
           .then(parseInt);
-        if (!scopedTokenId) router.push("/join");
+        if (!scopedTokenId && router.query['minted'] !== 'success') router.push("/join");
       }
     })();
   }, [contract, address, signer, router]);
@@ -111,7 +111,7 @@ export default function Dashboard() {
     document.querySelector("#discussion")?.scrollIntoView();
   }
   function onManageSbt() {
-    router.push({ pathname: "/dashboard/manage-membership", query: { bal } });
+    router.push("/dashboard/manage-membership");
   }
   function onProposal(proposalId: number) {
     router.push({ pathname: `/dashboard/governance/${proposalId}` });

@@ -6,7 +6,13 @@ import { useEffect, useRef, useState } from "react";
 import { BiUpload } from "react-icons/bi";
 import { BsCheckLg } from "react-icons/bs";
 import { FaDatabase } from "react-icons/fa";
-import { useAccount, useContract, useContractWrite, useSigner } from "wagmi";
+import {
+  useAccount,
+  useContract,
+  useContractWrite,
+  useSigner,
+  useWaitForTransaction,
+} from "wagmi";
 import { SBT_ABI } from "../abis/currentABI";
 import Button from "../components/Button";
 import { JoinSubText } from "../components/join/JoinSubText";
@@ -42,15 +48,23 @@ export default function Join() {
     (async () => {
       if (contract && address && signer) {
         const tokenId = await contract.ownerToTokenId(address).then(parseInt);
-        if (tokenId) router.push("/dashboard");
+        if (tokenId && !router.query['justBurned']) router.push("/dashboard");
       }
     })();
   }, [contract, address, signer, router]);
-  const { write, isLoading, isSuccess } = useContractWrite({
+  const {
+    write,
+    isLoading,
+    data: writeData,
+  } = useContractWrite({
     mode: "recklesslyUnprepared",
     address: process.env.NEXT_PUBLIC_SBT_ADDR,
     abi: SBT_ABI,
     functionName: "mintLitSBT",
+  });
+
+  const { isSuccess } = useWaitForTransaction({
+    hash: writeData?.hash,
   });
 
   const [consentChecked, setConsentChecked] = useState(false);
@@ -147,7 +161,7 @@ export default function Join() {
   }
 
   function onViewDashboard() {
-    router.push("/dashboard");
+    router.push({ pathname: "/dashboard", query: { minted: "success" } });
   }
 
   function showTitle() {
