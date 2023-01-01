@@ -22,7 +22,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     // check for admin NFT
     async function checkForAdminNFT() {
-      if (!provider || !contract) {
+      if (!provider || !contract || !address) {
         return;
       }
       try {

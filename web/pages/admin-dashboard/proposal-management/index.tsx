@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { FC, useEffect} from "react";
+import { FC, useEffect } from "react";
 import Button from "../../../components/Button";
 import Proposals from "../../../components/dashboard/governance/Proposals";
 import BackButton from "../../../components/dashboards-shared/BackButton";
@@ -20,29 +20,34 @@ const ProposalManagement: FC = () => {
       const proposal_data = await fetch("/api/proposals", {
         headers: {
           "Content-Type": "application/json",
-          Accept: "application/json, text/plain, */*",
-          "User-Agent": "*",
         },
         method: "GET",
-      }).then((res) => res.json());
+      }).then((res) => {
+        if (res.status === 200) {
+          return res.json();
+        } else {
+          return;
+        }
+      });
 
-      let temp_proposals: PublishedElection[] = [];
-      for (let i = 0; i < proposal_data.data.id.length; i++) {
-        const id = proposal_data.data.id[i];
-        const proposal = await client.fetchElection(id);
-        temp_proposals.push(proposal);
+      if (!proposal_data) {
+        console.log('no proposals found')
+        return;
+      } else {
+        let temp_proposals: PublishedElection[] = [];
+        for (let i = 0; i < proposal_data.data.id.length; i++) {
+          const id = proposal_data.data.id[i];
+          const proposal = await client.fetchElection(id);
+          temp_proposals.push(proposal);
+        }
+        setProposalData(temp_proposals);
       }
-      setProposalData(temp_proposals);
     }
 
     if (client) {
       getProposalIDs();
-      // getProposalIDs().then(() =>
-      //   // console.log(`proposals: ${JSON.stringify(proposalData)}`)
-      // );
     }
   }, [client, setProposalData]);
-
 
   const createProposal = async () => {
     router.push("/admin-dashboard/proposal-management/create-proposal");

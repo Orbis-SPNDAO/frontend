@@ -1,11 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 var fs = require("fs");
+var p = require("path");
+const path = p.resolve(__dirname, './proposals.json');
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const path = "public/proposals.json";
 
   if (req.method == "POST") {
     try {

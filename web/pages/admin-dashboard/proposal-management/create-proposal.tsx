@@ -108,12 +108,12 @@ export default function CreateProposal() {
     const proposalID = await client.createElection(election);
     console.log("proposalID", proposalID);
 
+
+
     await fetch("/api/proposals", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Accept": 'application/json, text/plain, */*',
-        'User-Agent': '*',
       },
       body: JSON.stringify({
         id: proposalID,
