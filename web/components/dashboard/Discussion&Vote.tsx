@@ -2,10 +2,8 @@ import { PublishedElection } from "@vocdoni/sdk";
 import Link from "next/link";
 import { useState } from "react";
 import { IoIosCheckmark } from "react-icons/io";
-import Proposal from "../../dataclass/Proposal";
 import { useContainerDimensions } from "../../hooks/useContainerDimensions";
-import { abbrevAccount } from "../../utils/string";
-import { DiscussionData, ProposalData, VoteData } from "./dummydata";
+import { VoteData } from "./dummydata";
 
 interface IPosts {
   data: [];
