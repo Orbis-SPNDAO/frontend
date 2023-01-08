@@ -26,7 +26,7 @@ const DaoMgmtRow: FC<{
           className="mr-2"
           checked={selected}
           onChange={(e) => {
-            setRowChecked(e.target.checked);
+            setRowChecked(e.target.checked, walletAddress);            
           }}
         ></input>
         <span className="overflow-hidden whitespace-nowrap truncate">

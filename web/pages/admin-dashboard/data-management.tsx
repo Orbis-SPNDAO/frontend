@@ -2,7 +2,7 @@ import LitJsSdk from "@lit-protocol/sdk-browser";
 import { ethers } from "ethers";
 import { FC, useEffect, useState } from "react";
 import { BsFillCheckCircleFill } from "react-icons/bs";
-import { RxCross2 } from "react-icons/rx";
+import { RxCircleBackslash, RxCross2 } from "react-icons/rx";
 import { useAccount, useContract, useSigner } from "wagmi";
 import { ADMIN_ABI, SBT_ABI } from "../../abis/currentABI";
 import DaoMgmtRow from "../../components/admin-dashboard/DaoMgmtRow";
@@ -14,7 +14,7 @@ import downloadBlob from "../../utils/downloadBlob";
 
 enum DataSelectType {
   All = "all",
-  Undecrypted = "undecrypted",
+  Encrypted = "encrypted",
   Decrypted = "decrypted",
 }
 
@@ -35,6 +35,7 @@ const DataManagement: FC = () => {
     numDecrypted: number;
     totalPayment: number;
   } | null>(null);
+  const [holderCheckbox, setHolderCheckbox] = useState(false);
 
   const { data: signer } = useSigner();
   const endUserContract = useContract({
@@ -66,19 +67,20 @@ const DataManagement: FC = () => {
             });
           }
         }
-        setDaoMgmtData(newDaoMgmtData);
+        setDaoMgmtData(newDaoMgmtData);        
       }
     })();
   }, [signer, endUserContract, adminContract, address]);
 
   useEffect(() => {
-    const newFilteredDaoMgmtData = daoMgmtData.filter((datum) => {
+    const newFilteredDaoMgmtData = daoMgmtData.filter((datum) => {            
       return (
         activeTab === DataSelectType.All ||
         (activeTab === DataSelectType.Decrypted && datum.isDecrypted) ||
-        (activeTab === DataSelectType.Undecrypted && !datum.isDecrypted)
+        (activeTab === DataSelectType.Encrypted && !datum.isDecrypted)
       );
     });
+    
     setFilteredDaoMgmtData(newFilteredDaoMgmtData);
   }, [daoMgmtData, activeTab]);
 
@@ -162,17 +164,18 @@ const DataManagement: FC = () => {
     }
   };
 
-  const setRowChecked = (i: number, isChecked: boolean) => {
+  const setRowChecked = (isChecked: boolean, walletAddress: any) => {    
+    const i = daoMgmtData.findIndex((datum) => datum.walletAddress === walletAddress);
     if (isChecked) {
       setTotalPayment(totalPayment + daoMgmtData[i].sessionPayment);
       setNumSelected(numSelected + 1);
     } else {
       setTotalPayment(totalPayment - daoMgmtData[i].sessionPayment);
       setNumSelected(numSelected - 1);
-    }
-    const newDaoMgmtData = JSON.parse(JSON.stringify(daoMgmtData));
-    newDaoMgmtData[i].selected = isChecked;
-    setDaoMgmtData(newDaoMgmtData);
+    }            
+    const newDaoMgmtData = JSON.parse(JSON.stringify(daoMgmtData));        
+    newDaoMgmtData[i].selected = isChecked;            
+    setDaoMgmtData(newDaoMgmtData);    
   };
 
   const decryptSingleRow = (i: number) => {
@@ -188,17 +191,27 @@ const DataManagement: FC = () => {
   };
 
   const setAllChecked = (isChecked: boolean) => {
-    setNumSelected(isChecked ? daoMgmtData.length : 0);
-    let newTotalPayment = 0;
+    let newNumSelected = 0;
+    let newTotalPayment = 0;    
     const newDaoMgmtData = daoMgmtData.map((datum) => {
-      if (isChecked) newTotalPayment += datum.sessionPayment;
-      return {
-        ...datum,
-        selected: isChecked,
-      };
+      if (!datum.isDecrypted && isChecked) {
+        newNumSelected++;
+        newTotalPayment += datum.sessionPayment;
+        return {
+          ...datum,
+          selected: true,
+        };
+      } else {
+        return {
+          ...datum,
+          selected: false,
+        };
+      }
     });
+    
     setTotalPayment(newTotalPayment);
     setDaoMgmtData(newDaoMgmtData);
+    setNumSelected(newNumSelected);
   };
 
   return (
@@ -297,11 +310,11 @@ const DataManagement: FC = () => {
           </button>
           <button
             className={`mr-6 text-xs sm:text-base ${
-              activeTab === DataSelectType.Undecrypted
+              activeTab === DataSelectType.Encrypted
                 ? "text-custom-purple underline underline-offset-8"
                 : "text-neutral-400"
             }`}
-            onClick={() => setActiveTab(DataSelectType.Undecrypted)}
+            onClick={() => setActiveTab(DataSelectType.Encrypted)}
           >
             Encrypted data
           </button>
@@ -336,9 +349,10 @@ const DataManagement: FC = () => {
               <input
                 type="checkbox"
                 className="mr-2"
-                checked={!daoMgmtData.some((datum) => !datum.selected)}
+                checked={holderCheckbox}
                 onChange={(e) => {
-                  setAllChecked(e.target.checked);
+                  setHolderCheckbox(e.target.checked);
+                  setAllChecked(e.target.checked);                  
                 }}
               ></input>
               Holder wallet address
@@ -354,8 +368,8 @@ const DataManagement: FC = () => {
                 data={datum}
                 key={i}
                 hideBorder={i === daoMgmtData.length - 1}
-                setRowChecked={(isChecked: boolean) =>
-                  setRowChecked(i, isChecked)
+                setRowChecked={(isChecked: boolean, walletAddress: any) =>
+                  setRowChecked(isChecked, walletAddress)
                 }
                 decrypt={() => decryptSingleRow(i)}
               />
